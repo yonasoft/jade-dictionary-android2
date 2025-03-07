@@ -21,22 +21,18 @@ import androidx.compose.ui.unit.sp
 import java.util.Locale
 
 @Composable
-fun LinkDirector(label:String, onClick:()->Unit){
+fun LinkDirector(label:String, onClick:()->Unit, modifier: Modifier,){
     Row(
-        modifier = Modifier
+        modifier = modifier
             .clickable {
                 onClick()
             }
-            .fillMaxWidth()
-            .height(50.dp)
-            .padding(5.dp)
         ,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             label.uppercase(Locale.getDefault()), color = Color.White,
-            fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
         Icon(

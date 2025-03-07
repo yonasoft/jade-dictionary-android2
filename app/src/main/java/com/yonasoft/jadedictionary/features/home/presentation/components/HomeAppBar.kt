@@ -53,7 +53,11 @@ fun HomeAppBar(onClickSearch: () -> Unit) {
         },
         actions = {
             IconButton(onClick = {}) {
-                Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More menu")
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "More menu",
+                    modifier = Modifier.size(28.dp),
+                )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(

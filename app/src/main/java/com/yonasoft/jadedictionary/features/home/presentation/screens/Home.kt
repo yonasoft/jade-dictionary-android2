@@ -1,32 +1,28 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.yonasoft.jadedictionary.features.home.presentation.screens
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.ContextualFlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.features.home.presentation.components.HomeAppBar
+import com.yonasoft.jadedictionary.features.home.presentation.components.JadeBanner
 import com.yonasoft.jadedictionary.features.home.presentation.components.LinkDirector
 
 @Composable
@@ -43,37 +39,64 @@ fun Home() {
 
         Column(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(padding)
-                .scrollable(state = scrollState, orientation = Orientation.Vertical),
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Box(
+            JadeBanner(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 125.dp, max = 150.dp),
-                contentAlignment = Alignment.Center
+                    .heightIn(max = 150.dp),
+            )
+            LinkDirector(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                label = "Lists",
+                onClick = {},
+            )
+            ContextualFlowRow(
+                itemCount = 0,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(
+                    12.dp,
+                    alignment = Alignment.CenterHorizontally,
+                ),
+                verticalArrangement = Arrangement.Center,
+                maxLines = 2,
             ) {
-                Image(
-                    painter = painterResource(R.drawable.jade_background),
-                    contentDescription = "Jade Background",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
+            }
+            LinkDirector(
+                modifier = Modifier
+                    .background(CustomColor.GRAY04.color)
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                label = "Favorite",
+                onClick = {},
+            )
+            LinkDirector(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                label = "Practice",
+                onClick = {},
+            )
+            LazyRow(
+                modifier = Modifier.padding(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(
+                    space = 12.dp,
+                    alignment = Alignment.CenterHorizontally,
                 )
-
-                Text(
-                    text = "Jade Dictionary",
-                    fontSize = 45.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    textAlign = TextAlign.Center,
-                    color = Color.White,
-                    modifier = Modifier
-                        .background(color = Color.Gray.copy(alpha = 0.6f))
-                        .fillMaxWidth()
-                        .padding(vertical = 15.dp)
-                )
+            ) {
 
             }
-            LinkDirector("Lists") { }
-            LinkDirector("Practice") { }
         }
     }
 }
+
