@@ -15,11 +15,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.features.home.presentation.components.HomeAppBar
 import com.yonasoft.jadedictionary.features.home.presentation.components.JadeBanner
@@ -33,7 +42,7 @@ fun Home() {
                 Log.i("clicked", "clicked")
             }
         },
-        containerColor = CustomColor.GRAY03.color,
+        containerColor = Color.Black,
     ) { padding ->
         val scrollState = rememberScrollState()
 
@@ -54,6 +63,8 @@ fun Home() {
                     .padding(8.dp)
                     .fillMaxWidth()
                     .height(50.dp),
+                icon = Icons.AutoMirrored.Filled.List,
+                contentDescription = "Lists",
                 label = "Lists",
                 onClick = {},
             )
@@ -76,6 +87,8 @@ fun Home() {
                     .padding(8.dp)
                     .fillMaxWidth()
                     .height(50.dp),
+                icon = Icons.Default.Favorite,
+                contentDescription = "Favorites",
                 label = "Favorite",
                 onClick = {},
             )
@@ -84,6 +97,8 @@ fun Home() {
                     .padding(8.dp)
                     .fillMaxWidth()
                     .height(50.dp),
+                icon = ImageVector.vectorResource(id = R.drawable.baseline_videogame_asset_24),
+                contentDescription = "Practice",
                 label = "Practice",
                 onClick = {},
             )
