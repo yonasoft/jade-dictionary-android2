@@ -11,13 +11,15 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SearchTextField(modifier: Modifier = Modifier) {
+fun SearchTextField(modifier: Modifier = Modifier, focusRequester: FocusRequester?) {
     TextField(
         value = "",
         onValueChange = {
@@ -47,6 +49,8 @@ fun SearchTextField(modifier: Modifier = Modifier) {
 
             }
         ),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().let { base ->
+            focusRequester?.let { base.focusRequester(it) } ?: base
+        }
     )
 }

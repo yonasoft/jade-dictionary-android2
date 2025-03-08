@@ -2,7 +2,6 @@
 
 package com.yonasoft.jadedictionary.features.home.presentation.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,28 +17,28 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
+import com.yonasoft.jadedictionary.core.navigation.MainNavigation
 import com.yonasoft.jadedictionary.features.home.presentation.components.HomeAppBar
 import com.yonasoft.jadedictionary.features.home.presentation.components.JadeBanner
 import com.yonasoft.jadedictionary.features.home.presentation.components.LinkDirector
 
 @Composable
-fun Home() {
+fun Home(navController: NavHostController) {
     Scaffold(
         topBar = {
             HomeAppBar {
-                Log.i("clicked", "clicked")
+                navController.navigate(MainNavigation.WordSearch.name)
             }
         },
         containerColor = Color.Black,

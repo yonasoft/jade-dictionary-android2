@@ -13,22 +13,28 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordSearchAppBar
 
 
 @Composable
-fun WordSearch() {
+fun WordSearch(navController: NavHostController) {
+    val focusRequester = remember { FocusRequester() }
     val inputTabs = listOf(
         ImageVector.vectorResource(R.drawable.baseline_keyboard_24),
         ImageVector.vectorResource(R.drawable.baseline_draw_24),
@@ -37,10 +43,19 @@ fun WordSearch() {
     var selectedInputTab by rememberSaveable {
         mutableIntStateOf(0)
     }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     Scaffold(
         containerColor = Color.Black,
         topBar = {
-            WordSearchAppBar()
+            WordSearchAppBar(navigateUp = {
+                navController.navigateUp()
+            },
+                focusRequester = focusRequester
+            )
         }
     ) { paddingValue ->
         LazyColumn(
@@ -70,7 +85,7 @@ fun WordSearch() {
                                     tint = Color.White,
                                     modifier = Modifier
                                         .padding(6.dp)
-                                        .size(36.dp)
+                                        .size(32.dp)
                                         .background(color = Color.Black),
                                 )
                             },
@@ -87,8 +102,3 @@ fun WordSearch() {
     }
 }
 
-@Preview
-@Composable
-fun WordSearchPreview(modifier: Modifier = Modifier) {
-    WordSearch()
-}
