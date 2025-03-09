@@ -9,7 +9,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
@@ -25,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
@@ -35,6 +33,7 @@ import com.yonasoft.jadedictionary.features.word_search.presentation.components.
 @Composable
 fun WordSearch(navController: NavHostController) {
     val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
     val inputTabs = listOf(
         ImageVector.vectorResource(R.drawable.baseline_keyboard_24),
         ImageVector.vectorResource(R.drawable.baseline_draw_24),
@@ -48,12 +47,23 @@ fun WordSearch(navController: NavHostController) {
         focusRequester.requestFocus()
     }
 
+    LaunchedEffect(selectedInputTab) {
+        focusRequester.requestFocus()
+        if (selectedInputTab != 0) {
+            kotlinx.coroutines.delay(100)
+            keyboardController?.hide()
+        } else {
+            keyboardController?.show()
+        }
+    }
+
     Scaffold(
         containerColor = Color.Black,
         topBar = {
-            WordSearchAppBar(navigateUp = {
-                navController.navigateUp()
-            },
+            WordSearchAppBar(
+                navigateUp = {
+                    navController.navigateUp()
+                },
                 focusRequester = focusRequester
             )
         }
@@ -92,6 +102,7 @@ fun WordSearch(navController: NavHostController) {
                             selected = selectedInputTab == index,
                             onClick = {
                                 selectedInputTab = index
+                                determineInputType(index)
                             }
                         )
                     }
@@ -102,3 +113,19 @@ fun WordSearch(navController: NavHostController) {
     }
 }
 
+fun determineInputType(index: Int) {
+    when (index) {
+        0 -> onKeyboardSelect()
+        1 -> onHandwritingSelect()
+        2 -> onSpeechSelect()
+    }
+}
+
+
+fun onKeyboardSelect() {
+
+}
+
+fun onHandwritingSelect() {}
+
+fun onSpeechSelect() {}
