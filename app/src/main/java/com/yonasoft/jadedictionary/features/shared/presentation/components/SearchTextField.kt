@@ -16,6 +16,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -48,7 +50,13 @@ fun SearchTextField(
                 modifier = Modifier.size(24.dp)
             )
         },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Search,
+            hintLocales = LocaleList(
+                Locale("en"),
+                Locale("zh"),
+            ),
+        ),
         keyboardActions = KeyboardActions(
             onSearch = {
 

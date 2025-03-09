@@ -8,4 +8,5 @@ enum class CustomColor(val color: Color) {
     GRAY02(Color(0xFFE5E5E5)),
     GRAY03(Color(0xFF2E2E2E)),
     GRAY04(lerp(Color.Black, Color.White, 0.2f)),
+    GREEN01(lerp(Color.Green, Color.White, .5f))
 }

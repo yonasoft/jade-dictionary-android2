@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -26,12 +27,14 @@ class SharedWordViewModel(private val repository: CCWordRepository) : ViewModel(
     fun search(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Log.i("search", "searching:$query")
+                // Add a small delay to avoid too many searches while typing
+                delay(300)
+                Log.d("ViewModel", "Searching for: $query")
                 val result = repository.searchWords(query)
                 _words.value = result
-                Log.i("search", "results:$result")
-            } catch (e:Exception){
-                Log.e("search", "Search failed", e)
+                Log.d("ViewModel", "Found ${result.size} results")
+            } catch (e: Exception) {
+                Log.e("ViewModel", "Search failed", e)
             }
         }
     }

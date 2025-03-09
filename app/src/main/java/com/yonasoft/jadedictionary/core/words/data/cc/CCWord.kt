@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.yonasoft.jadedictionary.core.words.data.Word
+import com.yonasoft.jadedictionary.core.words.utils.PinyinUtils
 
 @Entity(
     tableName = "cc_words",
@@ -37,8 +38,14 @@ data class CCWord(
             traditional?.let {
                 if (it != simplified) append(" ($it)")
             }
-            pinyin?.let { append(" - $it") }
         }
+
+    val displayPinyin:String
+        get() = buildString {
+        pinyin?.let {
+            append(" - ${PinyinUtils.numberedToAccented(it)}")
+        }
+    }
 }
 
 
