@@ -1,6 +1,11 @@
 package com.yonasoft.jadedictionary.core.navigation
 
-enum class MainNavigation {
+enum class MainRoutes {
     Home,
-    WordSearch
+    Words
+}
+
+enum class WordRoutes {
+    WordSearch,
+    WordDetail
 }

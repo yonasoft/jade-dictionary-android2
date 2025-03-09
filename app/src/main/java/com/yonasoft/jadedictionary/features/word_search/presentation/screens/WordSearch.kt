@@ -95,7 +95,7 @@ fun WordSearch(navController: NavHostController) {
                                     tint = Color.White,
                                     modifier = Modifier
                                         .padding(6.dp)
-                                        .size(32.dp)
+                                        .size(28.dp)
                                         .background(color = Color.Black),
                                 )
                             },

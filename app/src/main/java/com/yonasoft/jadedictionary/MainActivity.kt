@@ -5,10 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
+import androidx.navigation.Navigation
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.yonasoft.jadedictionary.core.navigation.MainNavigation
+import androidx.navigation.navigation
+import com.yonasoft.jadedictionary.core.navigation.MainRoutes
+import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
 import com.yonasoft.jadedictionary.features.word_search.presentation.screens.WordSearch
 import com.yonasoft.jadedictionary.ui.theme.JadeDictionaryTheme
@@ -23,15 +26,22 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    startDestination = MainNavigation.Home.name,
-                ){
-                    composable(route = MainNavigation.Home.name) {
+                    startDestination = MainRoutes.Home.name,
+                ) {
+                    composable(route = MainRoutes.Home.name) {
                         Home(navController = navController)
                     }
-                    composable(route = MainNavigation.WordSearch.name) {
-                        WordSearch(navController = navController)
+
+                    navigation(
+                        startDestination = WordRoutes.WordSearch.name,
+                        route = MainRoutes.Words.name
+                    ) {
+                        composable(route = WordRoutes.WordSearch.name) {
+                            WordSearch(navController = navController)
+                        }
                     }
                 }
+
             }
         }
     }

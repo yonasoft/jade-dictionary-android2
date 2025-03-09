@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
-import com.yonasoft.jadedictionary.core.navigation.MainNavigation
+import com.yonasoft.jadedictionary.core.navigation.MainRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.components.HomeAppBar
 import com.yonasoft.jadedictionary.features.home.presentation.components.JadeBanner
 import com.yonasoft.jadedictionary.features.home.presentation.components.LinkDirector
@@ -38,7 +38,7 @@ fun Home(navController: NavHostController) {
     Scaffold(
         topBar = {
             HomeAppBar {
-                navController.navigate(MainNavigation.WordSearch.name)
+                navController.navigate(MainRoutes.Words.name)
             }
         },
         containerColor = Color.Black,
