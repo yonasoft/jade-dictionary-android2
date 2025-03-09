@@ -1,7 +1,11 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.yonasoft.jadedictionary.core.words.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -25,7 +30,7 @@ fun CCWordColumn(word: CCWord, modifier: Modifier = Modifier) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 60.dp, max = 95.dp)
+            .heightIn(min = 60.dp, max = 100.dp)
             .background(Color.Black)
             .padding(10.dp)
         ,
@@ -36,18 +41,19 @@ fun CCWordColumn(word: CCWord, modifier: Modifier = Modifier) {
                 .weight(1f),
             horizontalAlignment = Alignment.Start
         ) {
-            Row {
+            FlowRow(maxLines = 2){
                 Text(
                     text = word.displayText,
                     color = CustomColor.GREEN01.color,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 18.sp,
+                    overflow = TextOverflow.Visible
                 )
-                Spacer(modifier.width(2.dp))
                 Text(
                     text = word.displayPinyin,
                     color = Color.White,
                     fontSize = 18.sp,
+                    overflow = TextOverflow.Visible
                 )
             }
             Text(
