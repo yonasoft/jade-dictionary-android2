@@ -19,11 +19,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SearchTextField(modifier: Modifier = Modifier, focusRequester: FocusRequester?) {
+fun SearchTextField(
+    modifier: Modifier = Modifier,
+    searchQuery: String,
+    onValueChange: (String) -> Unit,
+    focusRequester: FocusRequester?
+) {
     TextField(
-        value = "",
+        value = searchQuery,
         onValueChange = {
-
+            onValueChange(it)
         },
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.Black,
@@ -49,8 +54,10 @@ fun SearchTextField(modifier: Modifier = Modifier, focusRequester: FocusRequeste
 
             }
         ),
-        modifier = modifier.fillMaxWidth().let { base ->
-            focusRequester?.let { base.focusRequester(it) } ?: base
-        }
+        modifier = modifier
+            .fillMaxWidth()
+            .let { base ->
+                focusRequester?.let { base.focusRequester(it) } ?: base
+            }
     )
 }

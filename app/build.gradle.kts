@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -50,6 +52,25 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.common.jvm)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.annotation)
+    implementation(libs.room.runtime)
+    ksp(libs.androidx.room.compiler)
+
+    implementation(libs.compose.ui.google.fonts)
+
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.core.viewmodel)
+    implementation(libs.koin.core.viewmodel.navigation)
+    implementation(libs.koin.annotations)
+    implementation(libs.koin.ksp)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -58,5 +79,16 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation(libs.compose.ui.google.fonts)
+
+
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+configurations {
+    create("cleanedAnnotations")
+    // This excludes the annotations module for the "implementation" configuration:
+    getByName("implementation").exclude(group = "org.jetbrains", module = "annotations")
 }

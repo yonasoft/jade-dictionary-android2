@@ -18,7 +18,11 @@ import androidx.compose.ui.unit.dp
 import com.yonasoft.jadedictionary.features.shared.presentation.components.SearchTextField
 
 @Composable
-fun WordSearchAppBar(navigateUp: () -> Unit, focusRequester: FocusRequester) {
+fun WordSearchAppBar(
+    navigateUp: () -> Unit,
+    searchQuery: String,
+    onValueChange: (String) -> Unit, focusRequester: FocusRequester
+) {
     TopAppBar(
         navigationIcon = {
             IconButton(
@@ -33,7 +37,11 @@ fun WordSearchAppBar(navigateUp: () -> Unit, focusRequester: FocusRequester) {
             }
         },
         title = {
-            SearchTextField(focusRequester = focusRequester)
+            SearchTextField(
+                searchQuery = searchQuery,
+                onValueChange = { onValueChange(it) },
+                focusRequester = focusRequester
+            )
         },
         actions = {
 

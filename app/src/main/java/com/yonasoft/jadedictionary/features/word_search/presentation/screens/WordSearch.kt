@@ -5,12 +5,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,13 +27,23 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.room.util.query
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordSearchAppBar
+import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.SharedWordViewModel
+import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun WordSearch(navController: NavHostController) {
+fun WordSearch(
+    navController: NavHostController,
+    sharedWordViewModel: SharedWordViewModel = koinViewModel()
+) {
+    val searchQuery by sharedWordViewModel.searchQuery.collectAsStateWithLifecycle()
+    val words by sharedWordViewModel.words.collectAsStateWithLifecycle()
+
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     val inputTabs = listOf(
@@ -46,7 +58,6 @@ fun WordSearch(navController: NavHostController) {
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
-
     LaunchedEffect(selectedInputTab) {
         focusRequester.requestFocus()
         if (selectedInputTab != 0) {
@@ -57,12 +68,20 @@ fun WordSearch(navController: NavHostController) {
         }
     }
 
+    LaunchedEffect(searchQuery) {
+        sharedWordViewModel.search(searchQuery)
+    }
+
     Scaffold(
         containerColor = Color.Black,
         topBar = {
             WordSearchAppBar(
                 navigateUp = {
                     navController.navigateUp()
+                },
+                searchQuery = searchQuery,
+                onValueChange = { newQuery ->
+                    sharedWordViewModel.updateSearchQuery(newQuery)
                 },
                 focusRequester = focusRequester
             )
@@ -108,6 +127,11 @@ fun WordSearch(navController: NavHostController) {
                     }
                 }
 
+            }
+            if(searchQuery.isNotEmpty()){
+                itemsIndexed(words) { index, word ->
+                    Text(word.simplified?:"", color = Color.White)
+                }
             }
         }
     }
