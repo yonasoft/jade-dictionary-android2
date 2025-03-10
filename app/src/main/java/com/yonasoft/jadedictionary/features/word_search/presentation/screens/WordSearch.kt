@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -19,13 +20,9 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,30 +40,35 @@ fun WordSearch(
     navController: NavHostController,
     wordSearchViewModel: WordSearchViewModel = koinViewModel()
 ) {
-    val searchQuery by wordSearchViewModel.searchQuery.collectAsStateWithLifecycle()
-    val words by wordSearchViewModel.words.collectAsStateWithLifecycle()
-    val selectedInputTab by wordSearchViewModel.selectedInputTab.collectAsStateWithLifecycle()
-
-    val focusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
     val inputTabs = listOf(
         ImageVector.vectorResource(R.drawable.baseline_keyboard_24),
         ImageVector.vectorResource(R.drawable.baseline_draw_24),
         ImageVector.vectorResource(R.drawable.outline_mic_24)
     )
 
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
+    val focusRequester = wordSearchViewModel.focusRequester
+    val focusManager = wordSearchViewModel.localFocusManager.current
+    val keyboardController = wordSearchViewModel.localKeyboardController.current
+
+    val searchQuery by wordSearchViewModel.searchQuery.collectAsStateWithLifecycle()
+    val words by wordSearchViewModel.words.collectAsStateWithLifecycle()
+    val selectedInputTab by wordSearchViewModel.selectedInputTab.collectAsStateWithLifecycle()
+
     LaunchedEffect(selectedInputTab) {
         focusRequester.requestFocus()
-        if (selectedInputTab != 0) {
-            kotlinx.coroutines.delay(100)
-            keyboardController?.hide()
-        } else {
-            keyboardController?.show()
+        kotlinx.coroutines.delay(100)
+        when (selectedInputTab) {
+            0 -> {
+                keyboardController?.show()
+            }
+            1 -> {
+                keyboardController?.hide()
+            }
+            2 -> {
+                keyboardController?.hide()
+            }
         }
+
     }
 
     Scaffold(
@@ -86,7 +88,6 @@ fun WordSearch(
                 },
                 onValueChange = { newQuery ->
                     wordSearchViewModel.updateSearchQuery(newQuery)
-                    wordSearchViewModel.search(newQuery)
                 },
                 focusRequester = focusRequester
             )
@@ -125,7 +126,6 @@ fun WordSearch(
                         selected = selectedInputTab == index,
                         onClick = {
                             wordSearchViewModel.updateInputTab(index)
-                            onInputTabChange(index)
                         }
                     )
                 }
@@ -133,10 +133,11 @@ fun WordSearch(
             Spacer(modifier = Modifier.height(8.dp))
             LazyColumn(
                 Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                state = rememberLazyListState()
             ) {
                 if (searchQuery.isNotEmpty()) {
-                    itemsIndexed(words) { index, word ->
+                    itemsIndexed(words) { _, word ->
                         CCWordColumn(word = word, onClick = {
                             navController.navigate(WordRoutes.WordDetail.createRoute(word.id!!))
                         })
@@ -148,19 +149,3 @@ fun WordSearch(
     }
 }
 
-fun onInputTabChange(index: Int) {
-    when (index) {
-        0 -> onKeyboardSelect()
-        1 -> onHandwritingSelect()
-        2 -> onSpeechSelect()
-    }
-}
-
-
-fun onKeyboardSelect() {
-
-}
-
-fun onHandwritingSelect() {}
-
-fun onSpeechSelect() {}
