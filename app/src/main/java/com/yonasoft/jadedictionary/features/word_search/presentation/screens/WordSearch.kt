@@ -19,10 +19,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
@@ -33,22 +30,21 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
+import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordSearchAppBar
-import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.SharedWordViewModel
+import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
 fun WordSearch(
     navController: NavHostController,
-    sharedWordViewModel: SharedWordViewModel = koinViewModel()
+    wordSearchViewModel: WordSearchViewModel = koinViewModel()
 ) {
-    val searchQuery by sharedWordViewModel.searchQuery.collectAsStateWithLifecycle()
-    val words by sharedWordViewModel.words.collectAsStateWithLifecycle()
-    var selectedInputTab by rememberSaveable {
-        mutableIntStateOf(0)
-    }
+    val searchQuery by wordSearchViewModel.searchQuery.collectAsStateWithLifecycle()
+    val words by wordSearchViewModel.words.collectAsStateWithLifecycle()
+    val selectedInputTab by wordSearchViewModel.selectedInputTab.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -70,9 +66,6 @@ fun WordSearch(
             keyboardController?.show()
         }
     }
-    LaunchedEffect(searchQuery) {
-        sharedWordViewModel.search(searchQuery)
-    }
 
     Scaffold(
         containerColor = Color.Black,
@@ -83,15 +76,18 @@ fun WordSearch(
                 },
                 searchQuery = searchQuery,
                 onValueChange = { newQuery ->
-                    sharedWordViewModel.updateSearchQuery(newQuery)
+                    wordSearchViewModel.updateSearchQuery(newQuery)
+                    wordSearchViewModel.search(newQuery)
                 },
                 focusRequester = focusRequester
             )
         }
     ) { paddingValue ->
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(paddingValue)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(paddingValue)
+        ) {
             TabRow(
                 modifier = Modifier.padding(8.dp),
                 selectedTabIndex = selectedInputTab,
@@ -119,8 +115,8 @@ fun WordSearch(
                         },
                         selected = selectedInputTab == index,
                         onClick = {
-                            selectedInputTab = index
-                            determineInputType(index)
+                            wordSearchViewModel.updateInputTab(index)
+                            onInputTabChange(index)
                         }
                     )
                 }
@@ -132,7 +128,9 @@ fun WordSearch(
             ) {
                 if (searchQuery.isNotEmpty()) {
                     itemsIndexed(words) { index, word ->
-                        CCWordColumn(word = word)
+                        CCWordColumn(word = word, onClick = {
+                            navController.navigate(WordRoutes.WordDetail.createRoute(word.id!!))
+                        })
                         HorizontalDivider()
                     }
                 }
@@ -141,7 +139,7 @@ fun WordSearch(
     }
 }
 
-fun determineInputType(index: Int) {
+fun onInputTabChange(index: Int) {
     when (index) {
         0 -> onKeyboardSelect()
         1 -> onHandwritingSelect()

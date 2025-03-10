@@ -5,7 +5,8 @@ import android.util.Log
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWordDatabase
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWordRepositoryImpl
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
-import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.SharedWordViewModel
+import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
+import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -26,5 +27,6 @@ val appModule = module {
     single<CCWordRepository> { CCWordRepositoryImpl(get()) }
 
     // Provide the ViewModel
-    viewModel { SharedWordViewModel(get()) }
+    viewModel { WordSearchViewModel(get()) }
+    viewModel { WordDetailViewModel(get()) }
 }

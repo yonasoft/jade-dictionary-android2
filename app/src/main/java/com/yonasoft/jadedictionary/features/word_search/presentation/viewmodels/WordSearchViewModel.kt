@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SharedWordViewModel(private val repository: CCWordRepository) : ViewModel() {
+class WordSearchViewModel(private val repository: CCWordRepository) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery :StateFlow<String> = _searchQuery
@@ -19,9 +19,15 @@ class SharedWordViewModel(private val repository: CCWordRepository) : ViewModel(
     private val _words = MutableStateFlow<List<CCWord>>(emptyList())
     val words: StateFlow<List<CCWord>> = _words
 
+    private val _selectedInputTab = MutableStateFlow(0)
+    val selectedInputTab :StateFlow<Int> = _selectedInputTab
 
     fun updateSearchQuery(newValue: String) {
         _searchQuery.value = newValue
+    }
+
+    fun updateInputTab(index:Int){
+        _selectedInputTab.value = index
     }
 
     fun search(query: String) {

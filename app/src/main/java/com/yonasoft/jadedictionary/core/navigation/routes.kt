@@ -5,7 +5,9 @@ enum class MainRoutes {
     Words
 }
 
-enum class WordRoutes {
-    WordSearch,
-    WordDetail
+sealed class WordRoutes(val route: String) {
+    data object WordSearch : WordRoutes("word_search")
+    data object WordDetail : WordRoutes("word_detail/{wordId}") {
+        fun createRoute(wordId: Long) = "word_detail/$wordId"
+    }
 }
