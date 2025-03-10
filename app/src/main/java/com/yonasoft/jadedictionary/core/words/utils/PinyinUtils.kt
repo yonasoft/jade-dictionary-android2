@@ -18,60 +18,80 @@ object PinyinUtils {
         4 to "àòèìùǜǜ"
     )
 
-    fun normalizeQuery(query: String): String {
-        if (query.isBlank()) return ""
+    private val initials = listOf(
+        "b", "p", "m", "f", "d", "t", "n", "l",
+        "g", "k", "h", "j", "q", "x", "zh", "ch",
+        "sh", "r", "z", "c", "s", "y", "w"
+    )
+
+    // List of all Pinyin finals
+    private val finals = listOf(
+        "a", "o", "e", "ai", "ei", "ao", "ou", "an", "en", "ang", "eng",
+        "i", "ia", "ie", "iao", "iu", "ian", "in", "iang", "ing", "iong",
+        "u", "ua", "uo", "uai", "ui", "uan", "un", "uang", "ong",
+        "ü", "üe", "üan", "ün"
+    )
+
+    // Regular expression to match a Pinyin syllable with a tone number
+    private val pinyinRegex = Regex("(${initials.joinToString("|")})?(${finals.joinToString("|")})([1-5])?")
+
+    // Existing accentToNumberMap and other methods...
+
+    private fun splitIntoSyllables(pinyin: String): List<String> {
+        val matches = pinyinRegex.findAll(pinyin)
+        return matches.map { it.value }.toList()
+    }
+
+    fun normalizeQuery(input: String, markNeutral: Boolean = true): String {
+        if (input.isBlank()) return ""
 
         // If it's Chinese characters, return as is
-        if (query.any { it.code in 0x4E00..0x9FFF }) {
-            return query.trim()
+        if (input.any { it.code in 0x4E00..0x9FFF }) {
+            return input.trim()
         }
 
-        var normalized = query.trim().lowercase()
+        var normalized = input.trim().lowercase()
 
-        // Handle 'ü' to 'v' conversion
-        normalized = normalized.replace("ü", "v")
+        // Check if the input contains accented characters
+        val hasAccent = accentToNumberMap.keys.any { normalized.contains(it) }
 
-        // For spaced numbered pinyin (dian4 shi4), remove extra spaces
-        if (normalized.matches(Regex("([a-z]+[1-4]\\s*)+"))) {
-            return normalized.replace(Regex("\\s+"), " ")
-        }
-
-        // For unspaced numbered pinyin (dian4shi4), add spaces
-        if (normalized.matches(Regex("[a-z]+[1-4]+"))) {
-            return normalized.replace(Regex("(?<=[1-4])(?=[a-z])"), " ")
-        }
-
-        // For accented pinyin (with or without spaces)
-        var hasAccent = false
-        accentToNumberMap.forEach { (accent, _) ->
-            if (normalized.contains(accent)) {
-                hasAccent = true
-            }
-        }
-
+        // If input has accent, convert to numbered pinyin
         if (hasAccent) {
             // Split into syllables if there are spaces
             val parts = if (normalized.contains(" ")) {
                 normalized.split(" ")
             } else {
-                // Try to split by consonants if no spaces
-                listOf(normalized)
+                // Use regex to split syllables
+                val syllableMatches = pinyinRegex.findAll(normalized)
+                syllableMatches.map { it.value }.toList()
             }
 
             // Convert each part
             val converted = parts.map { part ->
                 var syllable = part
                 var tone = ""
+
+                // Find the first accent in the syllable
                 accentToNumberMap.forEach { (accent, numbered) ->
                     if (syllable.contains(accent)) {
                         syllable = syllable.replace(accent, numbered[0].toString())
                         tone = numbered[1].toString()
                     }
                 }
+
                 "$syllable$tone"
             }
 
-            return converted.joinToString(" ")
+            // Join the converted syllables
+            normalized = converted.joinToString(" ")
+        }
+
+        // Handle 'ü' to 'v' conversion
+        normalized = normalized.replace("ü", "v")
+
+        // Ensure spaces between syllables if not already present
+        if (!normalized.contains(" ") && normalized.any { it in '1'..'5' }) {
+            normalized = normalized.replace(Regex("([a-z])([1-5])(?=[a-z])"), "$1$2 ")
         }
 
         return normalized
@@ -82,16 +102,14 @@ object PinyinUtils {
         var temp = ""
 
         s.lowercase().forEach { c ->
-            when {
-                c in 'a'..'z' -> {
+            when (c) {
+                in 'a'..'z' -> {
                     temp += c
                 }
-
-                c == ':' -> {
+                ':' -> {
                     require(temp.lastOrNull() == 'u') { "Expected 'u' before ':'" }
                     temp = temp.substring(0, temp.length - 1) + "ü"
                 }
-
                 else -> {
                     if (c in '1'..'5') {  // Changed from '0'..'5' to '1'..'5'
                         val tone = c.digitToInt()
@@ -137,7 +155,7 @@ object PinyinUtils {
                                             pinyinToneMark[tone]!![4].toString()
                                         )
 
-                                        else -> temp + "!"
+                                        else -> "$temp!"
                                     }
                                 }
                             }
@@ -151,13 +169,6 @@ object PinyinUtils {
         result += temp
         return result
     }
-
-    fun numberedToAccented(pinyin: String): String {
-        return pinyin.split(" ")
-            .map { decodePinyin(it) }
-            .joinToString(" ")
-    }
-
 }
 
 // Add this to your repository to debug:

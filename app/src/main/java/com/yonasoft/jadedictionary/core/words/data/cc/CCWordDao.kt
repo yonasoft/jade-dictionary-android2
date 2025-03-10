@@ -11,32 +11,39 @@ interface CCWordDao {
 
     @RewriteQueriesToDropUnusedColumns
     @Query("""
-    SELECT * FROM cc_words
-    WHERE 
-        simplified LIKE '%' || :query || '%'
-        OR traditional LIKE '%' || :query || '%'
-        OR pinyin LIKE '%' || :query || '%'
-        OR pinyin LIKE '%' || REPLACE(:query, ' ', '') || '%'
-        OR definition LIKE '%' || :query || '%'
-    ORDER BY 
-        CASE 
-            WHEN simplified = :query THEN 300
-            WHEN traditional = :query THEN 300
-            WHEN pinyin = :query THEN 250
-            WHEN pinyin = REPLACE(:query, ' ', '') THEN 250
-            WHEN definition LIKE :query || ' %' OR definition = :query THEN 200
-            WHEN simplified LIKE '%' || :query || '%' THEN 150
-            WHEN traditional LIKE '%' || :query || '%' THEN 150
-            WHEN pinyin LIKE '%' || :query || '%' THEN 100
-            WHEN definition LIKE '%' || :query || '%' THEN 50
-            ELSE 0
-        END DESC,
-        length(simplified) ASC,
-        simplified ASC
-    LIMIT 50
+SELECT 
+    *,
+    CASE 
+        -- Exact matches
+        WHEN simplified = :query THEN 300
+        WHEN traditional = :query THEN 300
+        WHEN definition = :query THEN 250
+        WHEN pinyin = :query THEN 250
+        -- Containing matches
+        WHEN simplified LIKE '%' || :query || '%' THEN 200
+        WHEN traditional LIKE '%' || :query || '%' THEN 200
+        WHEN definition LIKE '%' || :query || '%' THEN 150
+        WHEN pinyin LIKE '%' || :query || '%' THEN 125
+        
+        ELSE 0
+    END as ranking
+FROM cc_words
+WHERE 
+    simplified LIKE '%' || :query || '%'
+    OR traditional LIKE '%' || :query || '%'
+    OR definition LIKE '%' || :query || '%'
+    OR pinyin LIKE '%' || :query || '%'
+    OR pinyin LIKE '%' || REPLACE(:query, ' ', '') || '%'
+ORDER BY 
+    ranking DESC,
+    length(simplified) ASC,
+    simplified ASC
+LIMIT 50
 """)
     suspend fun searchWords(query: String): List<CCWord>
+
 
     @Query("SELECT * FROM cc_words")
     suspend fun getAllWords(): List<CCWord>
 }
+

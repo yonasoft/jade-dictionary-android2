@@ -20,8 +20,8 @@ koin-bom = "4.0.0"
 ksp = "2.0.21-1.0.27"
 koin-ksp-annotations = "1.4.0-RC4"
 annotation = "1.9.1"
-
-
+gms-google-services = "4.4.2"
+firebase-bom = "32.7.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,6 +54,8 @@ koin-core-viewmodel-navigation = { group = "io.insert-koin", name = "koin-core-v
 koin-annotations = { group = "io.insert-koin", name = "koin-annotations", version.ref = "koin-ksp-annotations" }
 koin-ksp = { group = "io.insert-koin", name = "koin-ksp-compiler", version.ref = "koin-ksp-annotations" }
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -61,6 +63,8 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 room = { id = "androidx.room", version.ref = "room" }
+google-services = { id = "com.google.gms.google-services", version.ref = "gms-google-services" }
+
 
 
 
