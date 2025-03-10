@@ -1,15 +1,20 @@
 package com.yonasoft.jadedictionary.features.shared.presentation.components
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -25,6 +30,7 @@ fun SearchTextField(
     modifier: Modifier = Modifier,
     searchQuery: String,
     onValueChange: (String) -> Unit,
+    onCancel: () -> Unit,
     focusRequester: FocusRequester?
 ) {
     TextField(
@@ -43,12 +49,29 @@ fun SearchTextField(
             cursorColor = lerp(Color.Green, Color.White, .5f)
         ),
         trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Back arrow",
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
-            )
+            Row(
+                modifier = Modifier.fillMaxHeight(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = {
+                        onCancel()
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Cancel Icon",
+                        tint = Color.LightGray,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Back arrow",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         },
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Search,

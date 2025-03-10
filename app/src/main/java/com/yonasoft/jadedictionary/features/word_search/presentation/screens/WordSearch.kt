@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ fun WordSearch(
     val selectedInputTab by wordSearchViewModel.selectedInputTab.collectAsStateWithLifecycle()
 
     val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val inputTabs = listOf(
         ImageVector.vectorResource(R.drawable.baseline_keyboard_24),
@@ -75,6 +77,13 @@ fun WordSearch(
                     navController.navigateUp()
                 },
                 searchQuery = searchQuery,
+                onCancel = {
+                    if (searchQuery.isEmpty()) {
+                        focusManager.clearFocus()
+                    } else {
+                        wordSearchViewModel.updateSearchQuery("")
+                    }
+                },
                 onValueChange = { newQuery ->
                     wordSearchViewModel.updateSearchQuery(newQuery)
                     wordSearchViewModel.search(newQuery)
