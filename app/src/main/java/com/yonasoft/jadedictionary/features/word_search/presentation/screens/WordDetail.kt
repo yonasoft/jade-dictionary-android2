@@ -1,5 +1,6 @@
 package com.yonasoft.jadedictionary.features.word_search.presentation.screens
 
+import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,9 +38,11 @@ import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
+import com.yonasoft.jadedictionary.features.shared.presentation.components.rememberTextToSpeech
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordDetailAppbar
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
 import org.koin.androidx.compose.koinViewModel
+import java.util.Locale
 
 @Composable
 fun WordDetail(
@@ -48,7 +51,7 @@ fun WordDetail(
 ) {
     val tabs = listOf(
 //        { Text("Strokes") },
-        "Characters",
+        "Chars",
         "Words",
         "Examples"
     )
@@ -56,6 +59,9 @@ fun WordDetail(
     val wordDetails by wordDetailViewModel.wordDetails.collectAsStateWithLifecycle()
     val characters by wordDetailViewModel.characters.collectAsStateWithLifecycle()
     val wordsOfWord by wordDetailViewModel.wordsOfWord.collectAsStateWithLifecycle()
+    val isSpeaking by wordDetailViewModel.isSpeaking.collectAsStateWithLifecycle()
+
+    val tts = rememberTextToSpeech(Locale.CHINESE)
 
     Scaffold(
         topBar = {
@@ -94,16 +100,25 @@ fun WordDetail(
                             append(wordDetails?.displayPinyin ?: "")
                         }
                         withStyle(
-                            SpanStyle(color = Color.White, fontSize = 24.sp)
+                            SpanStyle(color = Color.White, fontSize = 20.sp)
                         ) {
                             append("\n" + wordDetails?.definition)
                         }
                     },
                     fontSize = 32.sp,
+                    modifier = Modifier.weight(1f).padding(8.dp)
                 )
 
                 IconButton(onClick = {
-
+                    if (tts.value?.isSpeaking == true) {
+                        tts.value?.stop()
+                        wordDetailViewModel.setIsSpeaking(false)
+                    } else {
+                        tts.value?.speak(
+                            wordDetails!!.simplified, TextToSpeech.QUEUE_FLUSH, null, ""
+                        )
+                        wordDetailViewModel.setIsSpeaking(true)
+                    }
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_volume_up_24),
@@ -121,7 +136,7 @@ fun WordDetail(
                         content = {
                             Text(
                                 text,
-                                fontSize = 24.sp,
+                                fontSize = 20.sp,
                                 color = if (selectedTab == index) CustomColor.GREEN01.color else Color.White
                             )
                         },

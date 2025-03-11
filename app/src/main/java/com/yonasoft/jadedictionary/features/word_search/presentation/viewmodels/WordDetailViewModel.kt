@@ -21,11 +21,14 @@ class WordDetailViewModel(
     private val _characters = MutableStateFlow<List<CCWord>>(emptyList())
     private val _wordsOfWord = MutableStateFlow<List<CCWord>>(emptyList())
     private val _selectedTab = MutableStateFlow(0)
+    private val _isSpeaking = MutableStateFlow(false)
 
     val wordDetails: StateFlow<CCWord?> = _wordDetails.asStateFlow()
     val characters: StateFlow<List<CCWord>> = _characters.asStateFlow()
     val wordsOfWord: StateFlow<List<CCWord>> = _wordsOfWord.asStateFlow()
     val tabIndex: StateFlow<Int> = _selectedTab.asStateFlow()
+    val isSpeaking : StateFlow<Boolean> = _isSpeaking.asStateFlow()
+
 
     init {
         viewModelScope.launch {
@@ -53,6 +56,10 @@ class WordDetailViewModel(
 
     fun updateSelectedTab(index: Int) {
         _selectedTab.value = index
+    }
+
+    fun setIsSpeaking(boolean: Boolean){
+        _isSpeaking.value = boolean
     }
 
     private suspend fun fetchWordDetails(wordId: Long) {
