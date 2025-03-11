@@ -128,7 +128,6 @@ WHERE simplified LIKE '%' || (
     FROM chars 
     WHERE char <> ''
     GROUP BY char
-    LIMIT 1
 ) || '%'
 ORDER BY length(simplified) ASC
 LIMIT 50
