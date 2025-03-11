@@ -2,6 +2,7 @@
 package com.yonasoft.jadedictionary.di
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWordDatabase
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWordRepositoryImpl
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
@@ -17,8 +18,9 @@ val appModule = module {
     single {
         Log.i("search", "word db init complete")
         CCWordDatabase.getDatabase(androidContext()).also {
-        Log.i("search", "word db init complete")
-    } }
+            Log.i("search", "word db init complete")
+        }
+    }
 
     // Provide the DAO
     single { get<CCWordDatabase>().ccWordDao() }
@@ -28,5 +30,7 @@ val appModule = module {
 
     // Provide the ViewModel
     viewModel { WordSearchViewModel(get()) }
-    viewModel { WordDetailViewModel(get()) }
+    viewModel { (savedStateHandle: SavedStateHandle) ->
+        WordDetailViewModel(get(), savedStateHandle)
+    }
 }

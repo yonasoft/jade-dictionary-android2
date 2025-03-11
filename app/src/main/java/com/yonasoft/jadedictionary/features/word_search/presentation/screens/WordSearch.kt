@@ -14,9 +14,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +27,7 @@ import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
+import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordSearchAppBar
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -100,16 +98,8 @@ fun WordSearch(
                 .fillMaxWidth()
                 .padding(paddingValue)
         ) {
-            TabRow(
-                modifier = Modifier.padding(8.dp),
-                selectedTabIndex = selectedInputTab,
-                containerColor = Color.Black,
-                indicator = { tabPositions ->
-                    SecondaryIndicator(
-                        Modifier.tabIndicatorOffset(tabPositions[selectedInputTab]),
-                        color = Color.White
-                    )
-                }
+            JadeTabRow(
+                selectedIndex = selectedInputTab,
             ) {
                 inputTabs.forEachIndexed { index, icon ->
                     Tab(
@@ -133,12 +123,13 @@ fun WordSearch(
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn(
-                Modifier
-                    .fillMaxWidth(),
-                state = rememberLazyListState()
-            ) {
-                if (searchQuery.isNotEmpty()) {
+            if (searchQuery.isNotEmpty()) {
+                LazyColumn(
+                    Modifier
+                        .fillMaxWidth(),
+                    state = rememberLazyListState()
+                ) {
+
                     itemsIndexed(
                         words,
                         key = { _, word -> word.id!! },

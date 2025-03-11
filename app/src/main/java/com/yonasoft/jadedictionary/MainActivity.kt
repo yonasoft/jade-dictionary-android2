@@ -50,11 +50,9 @@ class MainActivity : ComponentActivity() {
                             arguments = listOf(
                                 navArgument("wordId") { type = NavType.LongType }
                             )
-                        ) { backStackEntry ->
-                            val wordId = backStackEntry.arguments?.getLong("wordId")
+                        ) {
                             WordDetail(
                                 navController = navController,
-                                wordId = wordId
                             )
                         }
                     }

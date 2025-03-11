@@ -5,7 +5,7 @@ import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
 import com.yonasoft.jadedictionary.core.words.utils.PinyinUtils
 
 class CCWordRepositoryImpl(private val dao: CCWordDao) : CCWordRepository {
-    override suspend fun getWordById(id: Int): CCWord? = dao.getWordById(id)
+    override suspend fun getWordById(id: Long): CCWord? = dao.getWordById(id)
 
     override suspend fun searchWords(query: String): List<CCWord> {
 
@@ -21,4 +21,12 @@ class CCWordRepositoryImpl(private val dao: CCWordDao) : CCWordRepository {
     }
 
     override suspend fun getAllWords(): List<CCWord> = dao.getAllWords()
+    override suspend fun getCharsFromWord(word: String): List<CCWord> {
+        return dao.getCharsFromWord(word)
+    }
+
+    override suspend fun getWordsFromWord(word: String): List<CCWord> {
+        return dao.getWordsFromWord(word)
+    }
+
 }

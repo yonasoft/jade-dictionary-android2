@@ -7,10 +7,11 @@ import androidx.room.RewriteQueriesToDropUnusedColumns
 @Dao
 interface CCWordDao {
     @Query("SELECT * FROM cc_words WHERE _id = :id")
-    suspend fun getWordById(id: Int): CCWord?
+    suspend fun getWordById(id: Long): CCWord?
 
     @RewriteQueriesToDropUnusedColumns
-    @Query("""
+    @Query(
+        """
 WITH RECURSIVE
   input_split(syllable, rest) AS (
     SELECT '', :query || ' '
@@ -105,8 +106,47 @@ ORDER BY
     length(simplified) ASC,
     simplified ASC
 LIMIT 50
-""")
+"""
+    )
     suspend fun searchWords(query: String): List<CCWord>
+
+    @Query(
+        """
+WITH RECURSIVE
+  chars(char) AS (
+    SELECT substr(:word, 1, 1)
+    UNION ALL
+    SELECT substr(:word, length(char) + 2, 1)
+    FROM chars
+    WHERE length(:word) > length(char)
+  )
+
+SELECT *
+FROM cc_words
+WHERE simplified LIKE '%' || (
+    SELECT char 
+    FROM chars 
+    WHERE char <> ''
+    GROUP BY char
+    LIMIT 1
+) || '%'
+ORDER BY length(simplified) ASC
+LIMIT 50
+"""
+    )
+    suspend fun getCharsFromWord(word: String): List<CCWord>
+
+    @Query(
+        """
+SELECT * FROM cc_words 
+WHERE simplified LIKE '%' || :word|| '%'
+ORDER BY 
+    length(simplified) ASC,
+    simplified ASC
+LIMIT 50
+"""
+    )
+    suspend fun getWordsFromWord(word: String): List<CCWord>
 
     @Query("SELECT * FROM cc_words")
     suspend fun getAllWords(): List<CCWord>
