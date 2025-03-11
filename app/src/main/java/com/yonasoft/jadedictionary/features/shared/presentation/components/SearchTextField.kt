@@ -20,10 +20,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun SearchTextField(
@@ -35,6 +37,7 @@ fun SearchTextField(
 ) {
     TextField(
         value = searchQuery,
+        singleLine = true,
         onValueChange = {
             onValueChange(it)
         },
@@ -46,7 +49,10 @@ fun SearchTextField(
             focusedIndicatorColor = Color.DarkGray,
             unfocusedIndicatorColor = Color.DarkGray,
             unfocusedLabelColor = Color.DarkGray,
-            cursorColor = lerp(Color.Green, Color.White, .5f)
+            cursorColor = lerp(Color.Green, Color.White, .5f),
+        ),
+        textStyle = TextStyle.Default.copy(
+            fontSize = 20.sp
         ),
         trailingIcon = {
             Row(

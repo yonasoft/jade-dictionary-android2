@@ -33,14 +33,14 @@ fun JadeBanner(modifier: Modifier = Modifier) {
         )
         Text(
             text = "Jade Dictionary",
-            fontSize = 45.sp,
+            fontSize = 35.sp,
             fontWeight = FontWeight.ExtraBold,
             textAlign = TextAlign.Center,
             color = Color.White,
             modifier = Modifier
                 .background(color = Color.Gray.copy(alpha = 0.5f))
                 .fillMaxWidth()
-                .padding(vertical = 15.dp)
+                .padding(vertical = 16.dp)
         )
     }
 }

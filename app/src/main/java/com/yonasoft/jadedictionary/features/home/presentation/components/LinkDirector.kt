@@ -19,7 +19,13 @@ import androidx.compose.ui.unit.dp
 import java.util.Locale
 
 @Composable
-fun LinkDirector(icon: ImageVector, contentDescription:String, label: String, onClick: () -> Unit, modifier: Modifier) {
+fun LinkDirector(
+    icon: ImageVector,
+    contentDescription: String,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier,
+) {
     Row(
         modifier = modifier
             .clickable {
@@ -28,14 +34,17 @@ fun LinkDirector(icon: ImageVector, contentDescription:String, label: String, on
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
                 tint = Color.White,
                 modifier = Modifier
                     .padding(8.dp)
-                    .size(25.dp),
+                    .size(28.dp),
             )
             Text(
                 label.uppercase(Locale.getDefault()), color = Color.White,

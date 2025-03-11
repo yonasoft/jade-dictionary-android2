@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.ContextualFlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
@@ -55,7 +54,7 @@ fun Home(navController: NavHostController) {
             JadeBanner(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 150.dp),
+                    .height(150.dp)
             )
             LinkDirector(
                 modifier = Modifier
@@ -95,20 +94,26 @@ fun Home(navController: NavHostController) {
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(42.dp),
                 icon = ImageVector.vectorResource(id = R.drawable.baseline_videogame_asset_24),
                 contentDescription = "Practice",
                 label = "Practice",
                 onClick = {},
             )
             LazyRow(
-                modifier = Modifier.padding(10.dp),
+                modifier = Modifier.padding(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(
                     space = 12.dp,
                     alignment = Alignment.CenterHorizontally,
                 )
             ) {
+                items(0,
+                    key = { index ->
+                        index
+                    }
+                ) {
 
+                }
             }
         }
     }

@@ -61,9 +61,11 @@ fun WordSearch(
             0 -> {
                 keyboardController?.show()
             }
+
             1 -> {
                 keyboardController?.hide()
             }
+
             2 -> {
                 keyboardController?.hide()
             }
@@ -137,7 +139,10 @@ fun WordSearch(
                 state = rememberLazyListState()
             ) {
                 if (searchQuery.isNotEmpty()) {
-                    itemsIndexed(words) { _, word ->
+                    itemsIndexed(
+                        words,
+                        key = { _, word -> word.id!! },
+                    ) { _, word ->
                         CCWordColumn(word = word, onClick = {
                             navController.navigate(WordRoutes.WordDetail.createRoute(word.id!!))
                         })

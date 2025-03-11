@@ -14,15 +14,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class WordSearchViewModel(private val repository: CCWordRepository) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
-
     private val _words = MutableStateFlow<List<CCWord>>(emptyList())
     val words: StateFlow<List<CCWord>> = _words
-
     private val _selectedInputTab = MutableStateFlow(0)
     val selectedInputTab: StateFlow<Int> = _selectedInputTab
 
@@ -33,8 +32,6 @@ class WordSearchViewModel(private val repository: CCWordRepository) : ViewModel(
     init {
         viewModelScope.launch(Dispatchers.Main) {
             focusRequester.requestFocus()
-        }
-        viewModelScope.launch(Dispatchers.IO) {
             _searchQuery.collectLatest {
                 search(it)
             }
@@ -49,15 +46,12 @@ class WordSearchViewModel(private val repository: CCWordRepository) : ViewModel(
         _selectedInputTab.value = index
     }
 
-    fun search(query: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+    suspend fun search(query: String) {
+        withContext(Dispatchers.IO) {
             try {
-                // Add a small delay to avoid too many searches while typing
                 delay(300)
-                Log.d("ViewModel", "Searching for: $query")
                 val result = repository.searchWords(query)
                 _words.value = result
-                Log.d("ViewModel", "Found ${result.size} results")
             } catch (e: Exception) {
                 Log.e("ViewModel", "Search failed", e)
             }

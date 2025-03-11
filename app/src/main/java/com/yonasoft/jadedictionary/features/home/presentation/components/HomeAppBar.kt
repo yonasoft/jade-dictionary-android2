@@ -14,11 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -42,8 +40,8 @@ fun HomeAppBar(onClickSearch: () -> Unit) {
                 contentScale = ContentScale.Inside,
                 modifier = Modifier
                     .padding(start = 10.dp)
-                    .width(50.dp)
-                    .height(50.dp),
+                    .width(48.dp)
+                    .height(48.dp),
             )
         },
         title = {
@@ -52,13 +50,13 @@ fun HomeAppBar(onClickSearch: () -> Unit) {
             }
         },
         actions = {
-            IconButton(onClick = {}) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = "More menu",
-                    modifier = Modifier.size(28.dp),
-                )
-            }
+//            IconButton(onClick = {}) {
+//                Icon(
+//                    imageVector = Icons.Default.MoreVert,
+//                    contentDescription = "More menu",
+//                    modifier = Modifier.size(28.dp),
+//                )
+//            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = CustomColor.GRAY01.color
@@ -74,7 +72,7 @@ fun HomeSearchBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(60.dp) // Set height for better visibility
+            .height(56.dp) // Set height for better visibility
             .padding(10.dp)
             .clip(RoundedCornerShape(12.dp)) // ✅ Use RoundedCornerShape
             .background(color = CustomColor.GRAY02.color)
