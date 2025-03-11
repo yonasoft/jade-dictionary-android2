@@ -93,7 +93,7 @@ fun WordDetail(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 100.dp, 180.dp),
+                    .heightIn(min = 100.dp, 240.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
@@ -123,6 +123,7 @@ fun WordDetail(
                     modifier = Modifier
                         .weight(1f)
                         .padding(8.dp)
+                    ,
                 )
 
                 IconButton(onClick = {

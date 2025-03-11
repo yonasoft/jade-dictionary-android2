@@ -1,5 +1,12 @@
 package com.yonasoft.jadedictionary.features.word_search.presentation.screens
 
+import android.app.Activity
+import android.content.Intent
+import android.os.Build
+import android.speech.RecognizerIntent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +41,7 @@ import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.
 import org.koin.androidx.compose.koinViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun WordSearch(
     navController: NavHostController,
@@ -52,6 +60,13 @@ fun WordSearch(
     val searchQuery by wordSearchViewModel.searchQuery.collectAsStateWithLifecycle()
     val words by wordSearchViewModel.words.collectAsStateWithLifecycle()
     val selectedInputTab by wordSearchViewModel.selectedInputTab.collectAsStateWithLifecycle()
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            val data = it.data
+            val result = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+           wordSearchViewModel.updateSearchQuery(result?.get(0) ?: "")
+        }
+    }
 
     LaunchedEffect(selectedInputTab) {
         focusRequester.requestFocus()
@@ -66,7 +81,27 @@ fun WordSearch(
             }
 
             2 -> {
+                val supportedLanguages = arrayOf(
+                    "zh-CN",  // Chinese (Simplified)
+                    "zh-TW",  // Chinese (Traditional)
+                    "en-US",  // English (United States)
+                    "en-GB",  // English (United Kingdom)
+                )
                 keyboardController?.hide()
+                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                    putExtra(
+                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                    )
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, "zh-CN")
+                    putExtra(
+                        RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES,
+                        supportedLanguages
+                    )
+
+                    putExtra(RecognizerIntent.EXTRA_PROMPT, "Go on then, say something.")
+                }
+                launcher.launch(intent)
             }
         }
 
