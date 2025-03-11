@@ -2,6 +2,7 @@ package com.yonasoft.jadedictionary.features.word_search.presentation.screens
 
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,7 +23,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -62,6 +67,15 @@ fun WordDetail(
     val isSpeaking by wordDetailViewModel.isSpeaking.collectAsStateWithLifecycle()
 
     val tts = rememberTextToSpeech(Locale.CHINESE)
+    val pagerState = rememberPagerState(initialPage = selectedTab) {
+        tabs.size
+    }
+    LaunchedEffect(selectedTab) {
+        pagerState.scrollToPage(selectedTab)
+    }
+    LaunchedEffect(pagerState.currentPage) {
+        wordDetailViewModel.updateSelectedTab(pagerState.currentPage)
+    }
 
     Scaffold(
         topBar = {
@@ -79,7 +93,7 @@ fun WordDetail(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 120.dp, 160.dp),
+                    .heightIn(min = 100.dp, 180.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
@@ -106,7 +120,9 @@ fun WordDetail(
                         }
                     },
                     fontSize = 32.sp,
-                    modifier = Modifier.weight(1f).padding(8.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(8.dp)
                 )
 
                 IconButton(onClick = {
@@ -148,12 +164,26 @@ fun WordDetail(
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
-            when (selectedTab) {
-                0 -> CharactersOfWord(characters, navController)
-                1 -> WordsOfWord(wordsOfWord, navController)
-                2 -> Text("Examples Tab", color = Color.White)
-                else -> Text("Invalid Tab", color = Color.White)
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalAlignment = Alignment.Top
+            ) { index ->
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.TopStart
+                ) {
+                    when (selectedTab) {
+                        0 -> CharactersOfWord(characters, navController)
+                        1 -> WordsOfWord(wordsOfWord, navController)
+                        2 -> Text("Examples Tab", color = Color.White)
+                        else -> Text("Invalid Tab", color = Color.White)
+                    }
+                }
             }
+
         }
     }
 }
