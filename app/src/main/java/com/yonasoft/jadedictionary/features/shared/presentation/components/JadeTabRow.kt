@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.yonasoft.jadedictionary.core.constants.CustomColor
 
 @Composable
 fun JadeTabRow(
@@ -22,7 +23,7 @@ fun JadeTabRow(
         indicator = { tabPositions ->
             SecondaryIndicator(
                 Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
-                color = Color.White
+                color = CustomColor.GREEN01.color
             )
         }
     ) {

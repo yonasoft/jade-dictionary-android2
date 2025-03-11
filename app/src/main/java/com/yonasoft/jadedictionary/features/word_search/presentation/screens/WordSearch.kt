@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
+import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
@@ -108,7 +109,7 @@ fun WordSearch(
                             Icon(
                                 imageVector = icon,
                                 contentDescription = "",
-                                tint = Color.White,
+                                tint = if (selectedInputTab == index) CustomColor.GREEN01.color else Color.White,
                                 modifier = Modifier
                                     .padding(6.dp)
                                     .size(28.dp)
@@ -123,13 +124,12 @@ fun WordSearch(
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            if (searchQuery.isNotEmpty()) {
+            if (words.isNotEmpty()) {
                 LazyColumn(
                     Modifier
                         .fillMaxWidth(),
                     state = rememberLazyListState()
                 ) {
-
                     itemsIndexed(
                         words,
                         key = { _, word -> word.id!! },

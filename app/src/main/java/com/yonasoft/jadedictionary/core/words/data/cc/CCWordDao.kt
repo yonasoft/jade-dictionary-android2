@@ -113,22 +113,21 @@ LIMIT 50
     @Query(
         """
 WITH RECURSIVE
-  chars(char) AS (
-    SELECT substr(:word, 1, 1)
+  chars(char, idx) AS (
+    SELECT substr(:word, 1, 1), 1
     UNION ALL
-    SELECT substr(:word, length(char) + 2, 1)
+    SELECT substr(:word, idx + 1, 1), idx + 1
     FROM chars
-    WHERE length(:word) > length(char)
+    WHERE idx < length(:word)
   )
 
 SELECT *
 FROM cc_words
-WHERE simplified LIKE '%' || (
-    SELECT char 
+WHERE simplified IN (
+    SELECT DISTINCT char 
     FROM chars 
     WHERE char <> ''
-    GROUP BY char
-) || '%'
+)
 ORDER BY length(simplified) ASC
 LIMIT 50
 """
