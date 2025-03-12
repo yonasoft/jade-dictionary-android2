@@ -1,6 +1,5 @@
 package com.yonasoft.jadedictionary.features.word_search.presentation.screens
 
-import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,8 +40,11 @@ import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWord
+import com.yonasoft.jadedictionary.core.words.data.sentences.Sentence
 import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
+import com.yonasoft.jadedictionary.core.words.presentation.components.SentenceColumn
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
+import com.yonasoft.jadedictionary.features.shared.presentation.components.openTTS
 import com.yonasoft.jadedictionary.features.shared.presentation.components.rememberTextToSpeech
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordDetailAppbar
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
@@ -64,7 +66,7 @@ fun WordDetail(
     val wordDetails by wordDetailViewModel.wordDetails.collectAsStateWithLifecycle()
     val characters by wordDetailViewModel.characters.collectAsStateWithLifecycle()
     val wordsOfWord by wordDetailViewModel.wordsOfWord.collectAsStateWithLifecycle()
-    val isSpeaking by wordDetailViewModel.isSpeaking.collectAsStateWithLifecycle()
+    val sentences by wordDetailViewModel.sentences.collectAsStateWithLifecycle()
 
     val tts = rememberTextToSpeech(Locale.CHINESE)
     val pagerState = rememberPagerState(initialPage = selectedTab) {
@@ -122,20 +124,14 @@ fun WordDetail(
                     fontSize = 32.sp,
                     modifier = Modifier
                         .weight(1f)
-                        .padding(8.dp)
-                    ,
+                        .padding(8.dp),
                 )
 
                 IconButton(onClick = {
-                    if (tts.value?.isSpeaking == true) {
-                        tts.value?.stop()
-                        wordDetailViewModel.setIsSpeaking(false)
-                    } else {
-                        tts.value?.speak(
-                            wordDetails!!.simplified, TextToSpeech.QUEUE_FLUSH, null, ""
-                        )
-                        wordDetailViewModel.setIsSpeaking(true)
-                    }
+                    openTTS(
+                        tts = tts.value!!,
+                        text = wordDetails!!.simplified ?: "",
+                        setSpeaking = { wordDetailViewModel.setIsSpeaking(it) })
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_volume_up_24),
@@ -171,7 +167,7 @@ fun WordDetail(
                     .fillMaxWidth()
                     .weight(1f),
                 verticalAlignment = Alignment.Top
-            ) { index ->
+            ) { _ ->
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.TopStart
@@ -179,7 +175,13 @@ fun WordDetail(
                     when (selectedTab) {
                         0 -> CharactersOfWord(characters, navController)
                         1 -> WordsOfWord(wordsOfWord, navController)
-                        2 -> Text("Examples Tab", color = Color.White)
+                        2 -> SentencesOfWord(sentences, onClick = { sentence ->
+                            openTTS(
+                                tts = tts.value!!,
+                                text = sentence,
+                                setSpeaking = { wordDetailViewModel.setIsSpeaking(it) })
+                        })
+
                         else -> Text("Invalid Tab", color = Color.White)
                     }
                 }
@@ -225,7 +227,7 @@ fun WordsOfWord(words: List<CCWord>, navController: NavHostController) {
     ) {
         itemsIndexed(
             words,
-            key = { _, word -> word.id!! },
+            key = { i, _ -> i },
         ) { _, word ->
             CCWordColumn(word = word, onClick = {
                 navController.navigate(WordRoutes.WordDetail.createRoute(word.id!!))
@@ -235,3 +237,27 @@ fun WordsOfWord(words: List<CCWord>, navController: NavHostController) {
     }
 }
 
+@Composable
+fun SentencesOfWord(sentences: List<Sentence>, onClick: (String) -> Unit) {
+    if (sentences.isEmpty()) {
+        return Text(
+            "No Sentences Found",
+            color = Color.White,
+            fontSize = 32.sp,
+            textAlign = TextAlign.Center,
+        )
+    }
+    LazyColumn(
+        Modifier
+            .fillMaxWidth(),
+        state = rememberLazyListState()
+    ) {
+        itemsIndexed(
+            sentences,
+            key = { _, sentence -> sentence.id },
+        ) { _, sentence ->
+            SentenceColumn(sentence, onClick = { onClick(it) })
+            HorizontalDivider()
+        }
+    }
+}

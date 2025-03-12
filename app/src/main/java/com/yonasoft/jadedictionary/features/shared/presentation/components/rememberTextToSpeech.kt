@@ -28,3 +28,15 @@ fun rememberTextToSpeech(locale: Locale): MutableState<TextToSpeech?> {
     }
     return tts
 }
+
+fun openTTS(tts: TextToSpeech, text: String, setSpeaking: (Boolean) -> Unit) {
+    if (tts.isSpeaking) {
+        tts.stop()
+        setSpeaking(false)
+    } else {
+        tts.speak(
+            text, TextToSpeech.QUEUE_FLUSH, null, ""
+        )
+        setSpeaking(true)
+    }
+}

@@ -22,6 +22,8 @@ koin-ksp-annotations = "1.4.0-RC4"
 annotation = "1.9.1"
 gms-google-services = "4.4.2"
 firebase-bom = "32.7.4"
+tinpinyin = "2.0.3"
+pinyin4j = "2.5.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -56,6 +58,9 @@ koin-ksp = { group = "io.insert-koin", name = "koin-ksp-compiler", version.ref =
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+tiny-pinyin = { group = "com.github.promeg", name = "tinypinyin", version.ref = "tinpinyin" }
+tiny-pinyin-lexicons = { group = "com.github.promeg", name = "tinypinyin-lexicons-android-cncity", version.ref = "tinpinyin" }
+pinyin4j = { group = "com.belerweb", name = "pinyin4j", version.ref = "pinyin4j" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -24,7 +24,7 @@ import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWord
 
 @Composable
-fun CCWordColumn(word: CCWord, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun CCWordColumn(word: CCWord, onClick: () -> Unit = {}, modifier: Modifier = Modifier) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

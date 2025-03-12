@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWordDatabase
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWordRepositoryImpl
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
+import com.yonasoft.jadedictionary.core.words.utils.PinyinUtils
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 import org.koin.android.ext.koin.androidContext
@@ -21,14 +22,10 @@ val appModule = module {
             Log.i("search", "word db init complete")
         }
     }
-
-    // Provide the DAO
     single { get<CCWordDatabase>().ccWordDao() }
+    single { PinyinUtils() }
+    single<CCWordRepository> { CCWordRepositoryImpl(get(), androidContext()) }
 
-    // Provide the repository implementation
-    single<CCWordRepository> { CCWordRepositoryImpl(get()) }
-
-    // Provide the ViewModel
     viewModel { WordSearchViewModel(get()) }
     viewModel { (savedStateHandle: SavedStateHandle) ->
         WordDetailViewModel(get(), savedStateHandle)
