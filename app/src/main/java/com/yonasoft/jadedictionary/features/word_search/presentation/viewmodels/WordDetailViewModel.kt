@@ -28,6 +28,7 @@ class WordDetailViewModel(
     private val _selectedTab = MutableStateFlow(0)
     private val _isSpeaking = MutableStateFlow(false)
 
+
     val wordDetails: StateFlow<CCWord?> = _wordDetails.asStateFlow()
     val characters: StateFlow<List<CCWord>> = _characters.asStateFlow()
     val wordsOfWord: StateFlow<List<CCWord>> = _wordsOfWord.asStateFlow()

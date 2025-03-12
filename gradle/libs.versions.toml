@@ -24,6 +24,8 @@ gms-google-services = "4.4.2"
 firebase-bom = "32.7.4"
 tinpinyin = "2.0.3"
 pinyin4j = "2.5.1"
+digitalInkRecognition = "18.1.0"
+common = "18.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -61,6 +63,8 @@ firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics
 tiny-pinyin = { group = "com.github.promeg", name = "tinypinyin", version.ref = "tinpinyin" }
 tiny-pinyin-lexicons = { group = "com.github.promeg", name = "tinypinyin-lexicons-android-cncity", version.ref = "tinpinyin" }
 pinyin4j = { group = "com.belerweb", name = "pinyin4j", version.ref = "pinyin4j" }
+digital-ink-recognition = { group = "com.google.mlkit", name = "digital-ink-recognition", version.ref = "digitalInkRecognition" }
+common = { group = "com.google.mlkit", name = "common", version.ref = "common" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

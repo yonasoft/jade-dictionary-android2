@@ -60,6 +60,8 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.annotation)
     implementation(libs.room.runtime)
+    implementation(libs.digital.ink.recognition)
+    implementation(libs.common)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.compose.ui.google.fonts)

@@ -36,6 +36,7 @@ import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
+import com.yonasoft.jadedictionary.features.word_search.presentation.components.HandwritingInputBottomSheet
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordSearchAppBar
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -60,11 +61,13 @@ fun WordSearch(
     val searchQuery by wordSearchViewModel.searchQuery.collectAsStateWithLifecycle()
     val words by wordSearchViewModel.words.collectAsStateWithLifecycle()
     val selectedInputTab by wordSearchViewModel.selectedInputTab.collectAsStateWithLifecycle()
+    val showHandwritingSheet by wordSearchViewModel.showHandwritingSheet.collectAsStateWithLifecycle()
+
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == Activity.RESULT_OK) {
             val data = it.data
             val result = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-           wordSearchViewModel.updateSearchQuery(result?.get(0) ?: "")
+            wordSearchViewModel.updateSearchQuery(result?.get(0) ?: "")
         }
     }
 
@@ -74,20 +77,23 @@ fun WordSearch(
         when (selectedInputTab) {
             0 -> {
                 keyboardController?.show()
+                wordSearchViewModel.setShowHandwritingSheet(false)
             }
 
             1 -> {
                 keyboardController?.hide()
+                wordSearchViewModel.setShowHandwritingSheet(true)
             }
 
             2 -> {
+                wordSearchViewModel.setShowHandwritingSheet(false)
+                keyboardController?.hide()
                 val supportedLanguages = arrayOf(
                     "zh-CN",  // Chinese (Simplified)
                     "zh-TW",  // Chinese (Traditional)
                     "en-US",  // English (United States)
                     "en-GB",  // English (United Kingdom)
                 )
-                keyboardController?.hide()
                 val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                     putExtra(
                         RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -104,8 +110,20 @@ fun WordSearch(
                 launcher.launch(intent)
             }
         }
-
     }
+
+    HandwritingInputBottomSheet(
+        isVisible = showHandwritingSheet,
+        onDismiss = {
+            wordSearchViewModel.setShowHandwritingSheet(false)
+            wordSearchViewModel.updateInputTab(0) // Switch back to keyboard
+        },
+        onCharacterDrawn = { points ->
+            // This is where you'll handle the recognition logic
+            // For now, just a placeholder to show integration
+            // You can implement your recognition logic here
+        }
+    )
 
     Scaffold(
         containerColor = Color.Black,
@@ -179,4 +197,3 @@ fun WordSearch(
         }
     }
 }
-
