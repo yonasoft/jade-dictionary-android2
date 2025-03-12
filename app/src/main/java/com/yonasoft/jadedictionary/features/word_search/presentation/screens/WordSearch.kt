@@ -35,12 +35,12 @@ import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
-import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
 import com.yonasoft.jadedictionary.features.handwriting.presentation.components.HandwritingInputBottomSheet
+import com.yonasoft.jadedictionary.features.ocr.presentation.components.OCRBottomSheet
+import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordSearchAppBar
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 import org.koin.androidx.compose.koinViewModel
-
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
@@ -51,7 +51,8 @@ fun WordSearch(
     val inputTabs = listOf(
         ImageVector.vectorResource(R.drawable.baseline_keyboard_24),
         ImageVector.vectorResource(R.drawable.baseline_draw_24),
-        ImageVector.vectorResource(R.drawable.outline_mic_24)
+        ImageVector.vectorResource(R.drawable.outline_mic_24),
+        ImageVector.vectorResource(R.drawable.outline_document_scanner_24),
     )
 
     val focusRequester = wordSearchViewModel.focusRequester
@@ -61,10 +62,16 @@ fun WordSearch(
     val searchQuery by wordSearchViewModel.searchQuery.collectAsStateWithLifecycle()
     val words by wordSearchViewModel.words.collectAsStateWithLifecycle()
     val selectedInputTab by wordSearchViewModel.selectedInputTab.collectAsStateWithLifecycle()
+
+    // Handwriting states
     val showHandwritingSheet by wordSearchViewModel.showHandwritingSheet.collectAsStateWithLifecycle()
     val suggestedWords by wordSearchViewModel.suggestedWords.collectAsStateWithLifecycle()
     val recognitionLoading by wordSearchViewModel.recognitionLoading.collectAsStateWithLifecycle()
     val resetCanvasSignal by wordSearchViewModel.resetCanvasSignal.collectAsStateWithLifecycle()
+
+    // OCR states
+    val showOCRSheet by wordSearchViewModel.showOCRSheet.collectAsStateWithLifecycle()
+    val ocrResults by wordSearchViewModel.ocrResults.collectAsStateWithLifecycle()
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -78,19 +85,20 @@ fun WordSearch(
     LaunchedEffect(selectedInputTab) {
         kotlinx.coroutines.delay(100)
         when (selectedInputTab) {
-            0 -> {
+            0 -> { // Keyboard
                 focusRequester.requestFocus()
                 keyboardController?.show()
                 wordSearchViewModel.setShowHandwritingSheet(false)
+                wordSearchViewModel.setShowOCRSheet(false)
             }
-
-            1 -> {
+            1 -> { // Handwriting
                 keyboardController?.hide()
                 wordSearchViewModel.setShowHandwritingSheet(true)
+                wordSearchViewModel.setShowOCRSheet(false)
             }
-
-            2 -> {
+            2 -> { // Voice
                 wordSearchViewModel.setShowHandwritingSheet(false)
+                wordSearchViewModel.setShowOCRSheet(false)
                 keyboardController?.hide()
                 val supportedLanguages = arrayOf(
                     "zh-CN",  // Chinese (Simplified)
@@ -108,14 +116,19 @@ fun WordSearch(
                         RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES,
                         supportedLanguages
                     )
-
                     putExtra(RecognizerIntent.EXTRA_PROMPT, "Go on then, say something.")
                 }
                 launcher.launch(intent)
             }
+            3 -> { // OCR
+                keyboardController?.hide()
+                wordSearchViewModel.setShowHandwritingSheet(false)
+                wordSearchViewModel.setShowOCRSheet(true)
+            }
         }
     }
 
+    // Handwriting bottom sheet
     HandwritingInputBottomSheet(
         isVisible = showHandwritingSheet,
         isRecognizing = recognitionLoading,
@@ -132,6 +145,24 @@ fun WordSearch(
             wordSearchViewModel.updateSearchQuery(suggestion)
             // Don't close the sheet or change input tab, just reset the canvas
             wordSearchViewModel.resetHandwritingCanvas()
+        }
+    )
+
+    // OCR bottom sheet
+    OCRBottomSheet(
+        isVisible = showOCRSheet,
+        onDismiss = {
+            wordSearchViewModel.setShowOCRSheet(false)
+            wordSearchViewModel.updateInputTab(0)
+        },
+        onOCRCompleted = { bitmap ->
+            wordSearchViewModel.processOCRImage(bitmap)
+        },
+        recognizedText = ocrResults,
+        isRecognizing = recognitionLoading,
+        onTextSelected = { text ->
+            wordSearchViewModel.updateSearchQuery(text)
+            wordSearchViewModel.resetOCRImage()
         }
     )
 
@@ -171,7 +202,13 @@ fun WordSearch(
                         content = {
                             Icon(
                                 imageVector = icon,
-                                contentDescription = "",
+                                contentDescription = when(index) {
+                                    0 -> "Keyboard"
+                                    1 -> "Handwriting"
+                                    2 -> "Voice"
+                                    3 -> "OCR Scanner"
+                                    else -> ""
+                                },
                                 tint = if (selectedInputTab == index) CustomColor.GREEN01.color else Color.White,
                                 modifier = Modifier
                                     .padding(6.dp)

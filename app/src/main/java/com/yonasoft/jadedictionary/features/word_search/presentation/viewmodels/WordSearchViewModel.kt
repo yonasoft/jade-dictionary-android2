@@ -1,6 +1,8 @@
 package com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels
 
 import android.app.Application
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
@@ -11,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
 import com.yonasoft.jadedictionary.features.handwriting.domain.services.HandwritingRecognizer
+import com.yonasoft.jadedictionary.features.ocr.domain.services.OCRService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +36,10 @@ class WordSearchViewModel(
     private val _recognitionLoading = MutableStateFlow(false)
     private val _resetCanvasSignal = MutableStateFlow(0L)
 
+    // OCR-related states
+    private val _showOCRSheet = MutableStateFlow(false)
+    private val _ocrResults = MutableStateFlow<List<String>>(emptyList())
+    private val _currentOCRImage = MutableStateFlow<Bitmap?>(null)
 
     val searchQuery: StateFlow<String> = _searchQuery
     val words: StateFlow<List<CCWord>> = _words
@@ -42,12 +49,20 @@ class WordSearchViewModel(
     val recognitionLoading: StateFlow<Boolean> = _recognitionLoading.asStateFlow()
     val resetCanvasSignal: StateFlow<Long> = _resetCanvasSignal.asStateFlow()
 
+    // OCR public states
+    val showOCRSheet: StateFlow<Boolean> = _showOCRSheet.asStateFlow()
+    val ocrResults: StateFlow<List<String>> = _ocrResults.asStateFlow()
+    val currentOCRImage: StateFlow<Bitmap?> = _currentOCRImage.asStateFlow()
+
     val focusRequester = FocusRequester()
     val localFocusManager = LocalFocusManager
     val localKeyboardController = LocalSoftwareKeyboardController
 
     // Handwriting recognizer
-    private val handwritingRecognizer = HandwritingRecognizer(application.applicationContext)
+    private val handwritingRecognizer = HandwritingRecognizer()
+
+    // OCR service
+    private val ocrService = OCRService(application.applicationContext)
 
     // Store strokes for recognition
     private val currentStrokes = mutableListOf<List<Offset>>()
@@ -77,10 +92,32 @@ class WordSearchViewModel(
     fun updateInputTab(index: Int) {
         _selectedInputTab.value = index
 
-        // Clear suggestions when switching away from handwriting
-        if (index != 1) {
-            _suggestedWords.value = emptyList()
-            currentStrokes.clear()
+        // Update visible sheet and reset data based on selected tab
+        when (index) {
+            0 -> { // Keyboard
+                _showHandwritingSheet.value = false
+                _showOCRSheet.value = false
+                _suggestedWords.value = emptyList()
+                currentStrokes.clear()
+            }
+            1 -> { // Handwriting
+                _showHandwritingSheet.value = true
+                _showOCRSheet.value = false
+                _suggestedWords.value = emptyList()
+                currentStrokes.clear()
+            }
+            2 -> { // Voice
+                _showHandwritingSheet.value = false
+                _showOCRSheet.value = false
+                _suggestedWords.value = emptyList()
+                currentStrokes.clear()
+            }
+            3 -> { // OCR
+                _showHandwritingSheet.value = false
+                _showOCRSheet.value = true
+                _ocrResults.value = emptyList()
+                _currentOCRImage.value = null
+            }
         }
     }
 
@@ -91,6 +128,16 @@ class WordSearchViewModel(
         if (!boolean) {
             _suggestedWords.value = emptyList()
             currentStrokes.clear()
+        }
+    }
+
+    fun setShowOCRSheet(boolean: Boolean) {
+        _showOCRSheet.value = boolean
+
+        // Clear OCR results when hiding the sheet
+        if (!boolean) {
+            _ocrResults.value = emptyList()
+            _currentOCRImage.value = null
         }
     }
 
@@ -139,6 +186,77 @@ class WordSearchViewModel(
         }
     }
 
+    // Process image for OCR
+    fun processOCRImage(bitmap: Bitmap) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _recognitionLoading.value = true
+                _currentOCRImage.value = bitmap
+
+                // Perform OCR on the image
+                val results = ocrService.recognizeText(bitmap)
+
+                withContext(Dispatchers.Main) {
+                    if (results.isNotEmpty()) {
+                        _ocrResults.value = results
+                    } else {
+                        // If no results, show empty state
+                        _ocrResults.value = emptyList()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("WordSearchViewModel", "OCR failed", e)
+                withContext(Dispatchers.Main) {
+                    _ocrResults.value = emptyList()
+                }
+            } finally {
+                _recognitionLoading.value = false
+            }
+        }
+    }
+
+    // Process image from URI for OCR
+    fun processOCRImage(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _recognitionLoading.value = true
+
+                // Perform OCR on the image URI
+                val results = ocrService.recognizeText(uri)
+
+                withContext(Dispatchers.Main) {
+                    if (results.isNotEmpty()) {
+                        _ocrResults.value = results
+                    } else {
+                        // If no results, show empty state
+                        _ocrResults.value = emptyList()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("WordSearchViewModel", "OCR failed", e)
+                withContext(Dispatchers.Main) {
+                    _ocrResults.value = emptyList()
+                }
+            } finally {
+                _recognitionLoading.value = false
+            }
+        }
+    }
+
+    fun resetOCRImage() {
+        _currentOCRImage.value = null
+        _ocrResults.value = emptyList()
+    }
+
+    fun resetHandwritingCanvas() {
+        // Clear current strokes to reset the canvas
+        currentStrokes.clear()
+        _suggestedWords.value = emptyList()
+
+        // Signal to the UI to clear the canvas
+        _resetCanvasSignal.value = System.currentTimeMillis()
+    }
+
     suspend fun search(query: String) {
         withContext(Dispatchers.IO) {
             try {
@@ -156,15 +274,6 @@ class WordSearchViewModel(
     override fun onCleared() {
         super.onCleared()
         handwritingRecognizer.close()
-    }
-
-    fun resetHandwritingCanvas() {
-        // Clear current strokes to reset the canvas
-        currentStrokes.clear()
-        _suggestedWords.value = emptyList()
-
-        // Signal to the UI to clear the canvas
-        // This will be picked up by the bottom sheet through the Flow
-        _resetCanvasSignal.value = System.currentTimeMillis()
+        ocrService.close()
     }
 }

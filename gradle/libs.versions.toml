@@ -26,6 +26,10 @@ tinpinyin = "2.0.3"
 pinyin4j = "2.5.1"
 digitalInkRecognition = "18.1.0"
 common = "18.11.0"
+playServicesMlkitTextRecognitionCommon = "19.1.0"
+visionCommon = "17.3.0"
+playServicesMlkitTextRecognitionChinese = "16.0.1"
+camerax = "1.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -65,6 +69,13 @@ tiny-pinyin-lexicons = { group = "com.github.promeg", name = "tinypinyin-lexicon
 pinyin4j = { group = "com.belerweb", name = "pinyin4j", version.ref = "pinyin4j" }
 digital-ink-recognition = { group = "com.google.mlkit", name = "digital-ink-recognition", version.ref = "digitalInkRecognition" }
 common = { group = "com.google.mlkit", name = "common", version.ref = "common" }
+play-services-mlkit-text-recognition-common = { group = "com.google.android.gms", name = "play-services-mlkit-text-recognition-common", version.ref = "playServicesMlkitTextRecognitionCommon" }
+vision-common = { group = "com.google.mlkit", name = "vision-common", version.ref = "visionCommon" }
+play-services-mlkit-text-recognition-chinese = { group = "com.google.android.gms", name = "play-services-mlkit-text-recognition-chinese", version.ref = "playServicesMlkitTextRecognitionChinese" }
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

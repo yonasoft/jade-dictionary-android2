@@ -62,6 +62,13 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.digital.ink.recognition)
     implementation(libs.common)
+    implementation(libs.play.services.mlkit.text.recognition.common)
+    implementation(libs.vision.common)
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.play.services.mlkit.text.recognition.chinese)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.view)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.compose.ui.google.fonts)
@@ -81,6 +88,11 @@ dependencies {
     implementation(libs.tiny.pinyin)
     implementation(libs.tiny.pinyin.lexicons)
     implementation(libs.pinyin4j)
+
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -1,6 +1,5 @@
 package com.yonasoft.jadedictionary.features.handwriting.domain.services
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import com.google.mlkit.common.model.DownloadConditions
@@ -15,7 +14,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.resume
 
-class HandwritingRecognizer(private val context: Context) {
+class HandwritingRecognizer {
     private val modelManager = RemoteModelManager.getInstance()
 
     // Define language identifiers with null safety
