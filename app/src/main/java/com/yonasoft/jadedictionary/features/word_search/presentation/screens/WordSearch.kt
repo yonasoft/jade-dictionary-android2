@@ -36,7 +36,7 @@ import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
-import com.yonasoft.jadedictionary.features.word_search.presentation.components.HandwritingInputBottomSheet
+import com.yonasoft.jadedictionary.features.handwriting.presentation.components.HandwritingInputBottomSheet
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordSearchAppBar
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -62,20 +62,24 @@ fun WordSearch(
     val words by wordSearchViewModel.words.collectAsStateWithLifecycle()
     val selectedInputTab by wordSearchViewModel.selectedInputTab.collectAsStateWithLifecycle()
     val showHandwritingSheet by wordSearchViewModel.showHandwritingSheet.collectAsStateWithLifecycle()
+    val suggestedWords by wordSearchViewModel.suggestedWords.collectAsStateWithLifecycle()
+    val recognitionLoading by wordSearchViewModel.recognitionLoading.collectAsStateWithLifecycle()
+    val resetCanvasSignal by wordSearchViewModel.resetCanvasSignal.collectAsStateWithLifecycle()
 
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            val data = it.data
-            val result = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-            wordSearchViewModel.updateSearchQuery(result?.get(0) ?: "")
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                val data = it.data
+                val result = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                wordSearchViewModel.updateSearchQuery(result?.get(0) ?: "")
+            }
         }
-    }
 
     LaunchedEffect(selectedInputTab) {
-        focusRequester.requestFocus()
         kotlinx.coroutines.delay(100)
         when (selectedInputTab) {
             0 -> {
+                focusRequester.requestFocus()
                 keyboardController?.show()
                 wordSearchViewModel.setShowHandwritingSheet(false)
             }
@@ -114,14 +118,20 @@ fun WordSearch(
 
     HandwritingInputBottomSheet(
         isVisible = showHandwritingSheet,
+        isRecognizing = recognitionLoading,
+        resetCanvasSignal = resetCanvasSignal,
         onDismiss = {
             wordSearchViewModel.setShowHandwritingSheet(false)
-            wordSearchViewModel.updateInputTab(0) // Switch back to keyboard
+            wordSearchViewModel.updateInputTab(0)
         },
         onCharacterDrawn = { points ->
-            // This is where you'll handle the recognition logic
-            // For now, just a placeholder to show integration
-            // You can implement your recognition logic here
+            wordSearchViewModel.processHandwritingStrokes(points)
+        },
+        suggestedWords = suggestedWords,
+        onSuggestionSelected = { suggestion ->
+            wordSearchViewModel.updateSearchQuery(suggestion)
+            // Don't close the sheet or change input tab, just reset the canvas
+            wordSearchViewModel.resetHandwritingCanvas()
         }
     )
 

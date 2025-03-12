@@ -34,12 +34,11 @@ fun SentenceColumn(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 60.dp, max = 150.dp)
+            .heightIn(min = 60.dp, max = 180.dp)
             .background(Color.Black)
             .padding(10.dp),
         verticalAlignment = Alignment.Top,
     ) {
-
         Column(
             modifier = Modifier
                 .weight(1f),

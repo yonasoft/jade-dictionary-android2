@@ -1,10 +1,14 @@
-package com.yonasoft.jadedictionary.features.word_search.presentation.components
+@file:OptIn(ExperimentalLayoutApi::class)
+
+package com.yonasoft.jadedictionary.features.handwriting.presentation.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,10 +19,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -57,7 +64,9 @@ fun HandwritingInputBottomSheet(
     onDismiss: () -> Unit,
     onCharacterDrawn: (List<Offset>) -> Unit,
     suggestedWords: List<String> = emptyList(),
-    onSuggestionSelected: (String) -> Unit = {}
+    onSuggestionSelected: (String) -> Unit = {},
+    isRecognizing: Boolean = false,
+    resetCanvasSignal: Long = 0
 ) {
     // State for stroke collection
     val strokes = remember { mutableStateListOf<PenStroke>() }
@@ -72,6 +81,13 @@ fun HandwritingInputBottomSheet(
     LaunchedEffect(isVisible) {
         if (!isVisible) {
             sheetState.hide()
+        }
+    }
+
+    // Reset canvas when signal changes
+    LaunchedEffect(resetCanvasSignal) {
+        if (resetCanvasSignal > 0) {
+            strokes.clear()
         }
     }
 
@@ -110,6 +126,10 @@ fun HandwritingInputBottomSheet(
                             onClick = {
                                 if (strokes.isNotEmpty()) {
                                     strokes.removeAt(strokes.lastIndex)
+
+                                    // Send updated stroke data for recognition
+                                    val allPoints = strokes.flatMap { it.points }
+                                    onCharacterDrawn(allPoints)
                                 }
                             },
                             enabled = strokes.isNotEmpty()
@@ -125,6 +145,7 @@ fun HandwritingInputBottomSheet(
                         IconButton(
                             onClick = {
                                 strokes.clear()
+                                onCharacterDrawn(emptyList()) // Signal to clear recognition data
                             },
                             enabled = strokes.isNotEmpty()
                         ) {
@@ -167,12 +188,8 @@ fun HandwritingInputBottomSheet(
                                         if (stroke.points.size > 1) {
                                             strokes.add(stroke)
 
-                                            // Send all points for recognition
-                                            val allPoints = mutableListOf<Offset>()
-                                            strokes.forEach { s ->
-                                                allPoints.addAll(s.points)
-                                            }
-                                            onCharacterDrawn(allPoints)
+                                            // Send only the current stroke points for recognition
+                                            onCharacterDrawn(stroke.points)
                                         }
                                     }
                                     currentStroke = null
@@ -226,7 +243,24 @@ fun HandwritingInputBottomSheet(
                 }
 
                 // Suggestions area
-                if (suggestedWords.isNotEmpty()) {
+                if (isRecognizing) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(
+                            color = CustomColor.GREEN01.color,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Text(
+                            text = "Recognizing handwriting...",
+                            color = Color.Gray,
+                            fontSize = 14.sp
+                        )
+                    }
+                } else if (suggestedWords.isNotEmpty()) {
                     Text(
                         text = "Suggestions",
                         fontWeight = FontWeight.Medium,
@@ -235,17 +269,31 @@ fun HandwritingInputBottomSheet(
                         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
                     )
 
-                    Row(
+                    FlowRow(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        maxItemsInEachRow = 5
                     ) {
                         suggestedWords.forEach { word ->
-                            androidx.compose.material3.SuggestionChip(
+                            SuggestionChip(
                                 onClick = { onSuggestionSelected(word) },
-                                label = { Text(word) },
-                                colors = androidx.compose.material3.SuggestionChipDefaults.suggestionChipColors(
+                                label = {
+                                    FlowRow(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    ) {
+                                        Text(
+                                            text = word,
+                                            fontSize = 22.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
+                                        )
+                                    }
+                                },
+                                colors = SuggestionChipDefaults.suggestionChipColors(
                                     containerColor = CustomColor.GREEN01.color.copy(alpha = 0.2f),
                                     labelColor = Color.White
                                 )
