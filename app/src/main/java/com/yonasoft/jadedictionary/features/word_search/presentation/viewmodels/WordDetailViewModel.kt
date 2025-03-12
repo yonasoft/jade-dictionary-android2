@@ -6,11 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class WordDetailViewModel(
     private val repository: CCWordRepository,
@@ -27,11 +29,11 @@ class WordDetailViewModel(
     val characters: StateFlow<List<CCWord>> = _characters.asStateFlow()
     val wordsOfWord: StateFlow<List<CCWord>> = _wordsOfWord.asStateFlow()
     val tabIndex: StateFlow<Int> = _selectedTab.asStateFlow()
-    val isSpeaking : StateFlow<Boolean> = _isSpeaking.asStateFlow()
+    val isSpeaking: StateFlow<Boolean> = _isSpeaking.asStateFlow()
 
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val id = savedStateHandle.get<Long>("wordId")
             _wordId.value = id
 
@@ -42,7 +44,7 @@ class WordDetailViewModel(
                 }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Unconfined) {
             _wordDetails
                 .filterNotNull()
                 .collect { word ->
@@ -58,34 +60,46 @@ class WordDetailViewModel(
         _selectedTab.value = index
     }
 
-    fun setIsSpeaking(boolean: Boolean){
+    fun setIsSpeaking(boolean: Boolean) {
         _isSpeaking.value = boolean
     }
 
     private suspend fun fetchWordDetails(wordId: Long) {
-        runCatching {
-            val wordDetails = repository.getWordById(wordId)
-            _wordDetails.value = wordDetails
-        }.onFailure { e ->
-            Log.e("WordDetailViewModel", "Error fetching word details", e)
+        withContext(Dispatchers.IO) {
+            try {
+                val wordDetails = repository.getWordById(wordId)
+                withContext(Dispatchers.Main) {
+                    _wordDetails.value = wordDetails
+                }
+            } catch (e: Exception) {
+                Log.e("WordDetailViewModel", "Error fetching word details", e)
+            }
         }
     }
 
     private suspend fun fetchCharacters(characters: String) {
-        runCatching {
-            val fetchedCharacters = repository.getCharsFromWord(characters)
-            _characters.value = fetchedCharacters
-        }.onFailure { e ->
-            Log.e("WordDetailViewModel", "Error fetching characters", e)
+        withContext(Dispatchers.IO) {
+            try {
+                val fetchedCharacters = repository.getCharsFromWord(characters)
+                withContext(Dispatchers.Main) {
+                    _characters.value = fetchedCharacters
+                }
+            } catch (e: Exception) {
+                Log.e("WordDetailViewModel", "Error fetching characters", e)
+            }
         }
     }
 
     private suspend fun fetchWordsOfWord(word: String) {
-        runCatching {
-            val fetchedWord = repository.getWordsFromWord(word)
-            _wordsOfWord.value = fetchedWord
-        }.onFailure { e ->
-            Log.e("WordDetailViewModel", "Error fetching characters", e)
+        withContext(Dispatchers.IO) {
+            try {
+                val fetchedWord = repository.getWordsFromWord(word)
+                withContext(Dispatchers.Main) {
+                    _wordsOfWord.value = fetchedWord
+                }
+            } catch (e: Exception) {
+                Log.e("WordDetailViewModel", "Error fetching words of word", e)
+            }
         }
     }
 }

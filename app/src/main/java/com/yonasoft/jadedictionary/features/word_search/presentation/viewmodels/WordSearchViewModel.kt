@@ -49,9 +49,11 @@ class WordSearchViewModel(private val repository: CCWordRepository) : ViewModel(
     suspend fun search(query: String) {
         withContext(Dispatchers.IO) {
             try {
-                delay(300)
+                delay(150)
                 val result = repository.searchWords(query)
-                _words.value = result
+                withContext(Dispatchers.Main) {
+                    _words.value = result
+                }
             } catch (e: Exception) {
                 Log.e("ViewModel", "Search failed", e)
             }
