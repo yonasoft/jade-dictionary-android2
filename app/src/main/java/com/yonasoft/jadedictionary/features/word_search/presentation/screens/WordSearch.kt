@@ -40,13 +40,11 @@ import com.yonasoft.jadedictionary.features.ocr.presentation.components.OCRBotto
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordSearchAppBar
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
-import org.koin.androidx.compose.koinViewModel
 
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun WordSearch(
     navController: NavHostController,
-    wordSearchViewModel: WordSearchViewModel = koinViewModel()
+    wordSearchViewModel: WordSearchViewModel
 ) {
     val inputTabs = listOf(
         ImageVector.vectorResource(R.drawable.baseline_keyboard_24),

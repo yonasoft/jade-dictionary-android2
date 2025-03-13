@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.Log
 import com.yonasoft.jadedictionary.core.words.data.sentences.Sentence
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
-import com.yonasoft.jadedictionary.core.words.utils.PinyinUtils
-import com.yonasoft.jadedictionary.core.words.utils.SentenceUtil
+import com.yonasoft.jadedictionary.core.words.domain.utils.PinyinUtils
+import com.yonasoft.jadedictionary.core.words.domain.utils.SentenceUtil
 
 class CCWordRepositoryImpl(private val dao: CCWordDao, private val context: Context) :
     CCWordRepository {

@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.core.words.utils
+package com.yonasoft.jadedictionary.core.words.domain.utils
 
 import net.sourceforge.pinyin4j.PinyinHelper
 

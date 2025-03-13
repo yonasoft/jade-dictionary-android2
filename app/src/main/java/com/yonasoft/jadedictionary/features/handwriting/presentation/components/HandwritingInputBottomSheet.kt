@@ -6,6 +6,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -34,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +53,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 // Model for storing pen stroke data
 data class PenStroke(
@@ -72,6 +77,10 @@ fun HandwritingInputBottomSheet(
     val strokes = remember { mutableStateListOf<PenStroke>() }
     var currentStroke by remember { mutableStateOf<PenStroke?>(null) }
 
+    // For debouncing recognition requests
+    val coroutineScope = rememberCoroutineScope()
+    var recognitionJob by remember { mutableStateOf<Job?>(null) }
+
     // Bottom sheet state
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -88,6 +97,16 @@ fun HandwritingInputBottomSheet(
     LaunchedEffect(resetCanvasSignal) {
         if (resetCanvasSignal > 0) {
             strokes.clear()
+        }
+    }
+
+    // Function to trigger recognition with debounce
+    val triggerRecognition = {
+        recognitionJob?.cancel()
+        recognitionJob = coroutineScope.launch {
+            delay(300) // Debounce for 300ms
+            val allPoints = strokes.flatMap { it.points }
+            onCharacterDrawn(allPoints)
         }
     }
 
@@ -126,10 +145,7 @@ fun HandwritingInputBottomSheet(
                             onClick = {
                                 if (strokes.isNotEmpty()) {
                                     strokes.removeAt(strokes.lastIndex)
-
-                                    // Send updated stroke data for recognition
-                                    val allPoints = strokes.flatMap { it.points }
-                                    onCharacterDrawn(allPoints)
+                                    triggerRecognition()
                                 }
                             },
                             enabled = strokes.isNotEmpty()
@@ -146,6 +162,7 @@ fun HandwritingInputBottomSheet(
                             onClick = {
                                 strokes.clear()
                                 onCharacterDrawn(emptyList()) // Signal to clear recognition data
+                                recognitionJob?.cancel()
                             },
                             enabled = strokes.isNotEmpty()
                         ) {
@@ -187,9 +204,8 @@ fun HandwritingInputBottomSheet(
                                     currentStroke?.let { stroke ->
                                         if (stroke.points.size > 1) {
                                             strokes.add(stroke)
-
-                                            // Send only the current stroke points for recognition
-                                            onCharacterDrawn(stroke.points)
+                                            // Debounce recognition calls
+                                            triggerRecognition()
                                         }
                                     }
                                     currentStroke = null
@@ -242,73 +258,74 @@ fun HandwritingInputBottomSheet(
                     }
                 }
 
-                // Suggestions area
-                if (isRecognizing) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(
-                            color = CustomColor.GREEN01.color,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                        Text(
-                            text = "Recognizing handwriting...",
-                            color = Color.Gray,
-                            fontSize = 14.sp
-                        )
-                    }
-                } else if (suggestedWords.isNotEmpty()) {
-                    Text(
-                        text = "Suggestions",
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                        color = Color.White,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-                    )
+                // Suggestions area with FIXED HEIGHT to prevent layout jumps
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp) // Fixed height for suggestions area
+                        .padding(top = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    when {
+                        isRecognizing -> {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                CircularProgressIndicator(
+                                    color = CustomColor.GREEN01.color,
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                                Text(
+                                    text = "Recognizing handwriting...",
+                                    color = Color.Gray,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                        suggestedWords.isNotEmpty() -> {
+                            Column {
+                                Text(
+                                    text = "Suggestions",
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
 
-                    FlowRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        maxItemsInEachRow = 5
-                    ) {
-                        suggestedWords.forEach { word ->
-                            SuggestionChip(
-                                onClick = { onSuggestionSelected(word) },
-                                label = {
-                                    FlowRow(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                    ) {
-                                        Text(
-                                            text = word,
-                                            fontSize = 22.sp,
-                                            fontWeight = FontWeight.Medium,
-                                            modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
+                                FlowRow(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    maxItemsInEachRow = 5
+                                ) {
+                                    suggestedWords.forEach { word ->
+                                        SuggestionChip(
+                                            onClick = { onSuggestionSelected(word) },
+                                            label = {
+                                                Text(
+                                                    text = word,
+                                                    fontSize = 28.sp,
+                                                    fontWeight = FontWeight.Medium,
+                                                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 6.dp)
+                                                )
+                                            },
+                                            colors = SuggestionChipDefaults.suggestionChipColors(
+                                                containerColor = CustomColor.GREEN01.color.copy(alpha = 0.2f),
+                                                labelColor = Color.White
+                                            )
                                         )
                                     }
-                                },
-                                colors = SuggestionChipDefaults.suggestionChipColors(
-                                    containerColor = CustomColor.GREEN01.color.copy(alpha = 0.2f),
-                                    labelColor = Color.White
-                                )
+                                }
+                            }
+                        }
+                        else -> {
+                            Text(
+                                text = "Draw to see suggestions",
+                                color = Color.Gray,
+                                fontSize = 14.sp
                             )
                         }
                     }
-                } else {
-                    // Placeholder for suggestions area
-                    Spacer(modifier = Modifier.height(60.dp))
-                    Text(
-                        text = "Draw to see suggestions",
-                        color = Color.Gray,
-                        fontSize = 14.sp,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
                 }
 
                 // Bottom margin for better UX

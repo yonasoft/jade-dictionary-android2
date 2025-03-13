@@ -48,13 +48,12 @@ import com.yonasoft.jadedictionary.features.shared.presentation.components.openT
 import com.yonasoft.jadedictionary.features.shared.presentation.components.rememberTextToSpeech
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordDetailAppbar
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
-import org.koin.androidx.compose.koinViewModel
 import java.util.Locale
 
 @Composable
 fun WordDetail(
     navController: NavHostController,
-    wordDetailViewModel: WordDetailViewModel = koinViewModel(),
+    wordDetailViewModel: WordDetailViewModel
 ) {
     val tabs = listOf(
 //        { Text("Strokes") },

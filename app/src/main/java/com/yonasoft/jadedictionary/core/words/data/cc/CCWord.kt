@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.yonasoft.jadedictionary.core.words.data.Word
-import com.yonasoft.jadedictionary.core.words.utils.PinyinUtils
+import com.yonasoft.jadedictionary.core.words.domain.utils.PinyinUtils
 
 @Entity(
     tableName = "cc_words",

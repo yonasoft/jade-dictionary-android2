@@ -16,7 +16,10 @@ import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
 import com.yonasoft.jadedictionary.features.word_search.presentation.screens.WordDetail
 import com.yonasoft.jadedictionary.features.word_search.presentation.screens.WordSearch
+import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
+import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 import com.yonasoft.jadedictionary.ui.theme.JadeDictionaryTheme
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,8 +44,10 @@ class MainActivity : ComponentActivity() {
                         route = MainRoutes.Words.name
                     ) {
                         composable(route = WordRoutes.WordSearch.route) {
+                            val wordSearchViewModel = koinViewModel<WordSearchViewModel>()
                             WordSearch(
                                 navController = navController,
+                                wordSearchViewModel = wordSearchViewModel
                             )
                         }
                         composable(
@@ -51,8 +56,10 @@ class MainActivity : ComponentActivity() {
                                 navArgument("wordId") { type = NavType.LongType }
                             )
                         ) {
+                            val wordDetailViewModel:WordDetailViewModel = koinViewModel<WordDetailViewModel>()
                             WordDetail(
                                 navController = navController,
+                                wordDetailViewModel = wordDetailViewModel
                             )
                         }
                     }

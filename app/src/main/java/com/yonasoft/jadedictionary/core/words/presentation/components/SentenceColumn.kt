@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.words.data.sentences.Sentence
-import com.yonasoft.jadedictionary.core.words.utils.PinyinUtils
+import com.yonasoft.jadedictionary.core.words.domain.utils.PinyinUtils
 
 @Composable
 fun SentenceColumn(

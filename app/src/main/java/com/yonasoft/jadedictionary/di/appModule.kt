@@ -6,7 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWordDatabase
 import com.yonasoft.jadedictionary.core.words.data.cc.CCWordRepositoryImpl
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
-import com.yonasoft.jadedictionary.core.words.utils.PinyinUtils
+import com.yonasoft.jadedictionary.core.words.domain.utils.PinyinUtils
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 import org.koin.android.ext.koin.androidContext
