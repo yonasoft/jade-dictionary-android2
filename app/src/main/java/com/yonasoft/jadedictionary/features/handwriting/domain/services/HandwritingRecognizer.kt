@@ -48,6 +48,9 @@ class HandwritingRecognizer {
     // Flag to track initialization attempt
     private var initializationAttempted = false
 
+    // Default single character fallbacks for Chinese
+    private val defaultChineseSingleChars = listOf("你", "我", "的", "是", "了", "在", "有", "和", "人", "这")
+
     // Initialize by downloading models
     suspend fun initialize() {
         if (initializationAttempted) return
@@ -115,6 +118,29 @@ class HandwritingRecognizer {
         return ready
     }
 
+    // Helper function to filter for single characters
+    private fun filterSingleCharacters(results: List<String>): List<String> {
+        // For Chinese, we want only single characters
+        return results.filter { it.length == 1 }
+    }
+
+    // Extract single characters from multi-character results
+    private fun extractSingleCharacters(results: List<String>): List<String> {
+        val singleChars = mutableSetOf<String>()
+
+        // First add any single character results directly
+        singleChars.addAll(results.filter { it.length == 1 })
+
+        // Then extract individual characters from multi-character results
+        results.filter { it.length > 1 }.forEach { word ->
+            word.forEach { char ->
+                singleChars.add(char.toString())
+            }
+        }
+
+        return singleChars.toList()
+    }
+
     // Recognize handwriting
     suspend fun recognizeHandwriting(strokes: List<List<Offset>>): List<String> {
         if (!isReady()) {
@@ -124,7 +150,7 @@ class HandwritingRecognizer {
             // If still not ready after initialization, return fallback suggestions
             if (!isReady()) {
                 Log.w("HandwritingRecognizer", "Models still not ready after initialization, returning fallbacks")
-                return listOf("你", "我", "的", "是", "了")
+                return defaultChineseSingleChars.take(5)
             }
         }
 
@@ -158,31 +184,39 @@ class HandwritingRecognizer {
                 try {
                     val zhResults = recognizeWithModel(ink, zhRecognizer!!)
                     Log.d("HandwritingRecognizer", "Chinese recognition results: $zhResults")
-                    results.addAll(zhResults.take(3))  // Take top 3 Chinese results
+
+                    // Extract single characters from the results
+                    val singleChars = extractSingleCharacters(zhResults)
+                    Log.d("HandwritingRecognizer", "Filtered Chinese single characters: $singleChars")
+
+                    results.addAll(singleChars.take(10))  // Take up to 10 single Chinese characters
                 } catch (e: Exception) {
                     Log.e("HandwritingRecognizer", "Chinese recognition failed", e)
                 }
             }
 
-            // Then try English recognition if available
-            if (enModelDownloaded && enRecognizer != null) {
+            // Only try English for single letters if needed to fill out results
+            if (results.size < 5 && enModelDownloaded && enRecognizer != null) {
                 try {
                     val enResults = recognizeWithModel(ink, enRecognizer!!)
                     Log.d("HandwritingRecognizer", "English recognition results: $enResults")
-                    results.addAll(enResults.take(2))  // Take top 2 English results
+
+                    // Filter for single characters (letters)
+                    val singleLetters = filterSingleCharacters(enResults)
+                    results.addAll(singleLetters.take(5 - results.size))  // Fill remaining spots
                 } catch (e: Exception) {
                     Log.e("HandwritingRecognizer", "English recognition failed", e)
                 }
             }
 
             // Return unique results, or fallback if empty
-            val uniqueResults = results.distinct().take(5)
+            val uniqueResults = results.distinct().take(10)
             return uniqueResults.ifEmpty {
-                listOf("你", "我", "的", "是", "了")
+                defaultChineseSingleChars.take(5)
             }
         } catch (e: Exception) {
             Log.e("HandwritingRecognizer", "Recognition failed", e)
-            return listOf("你", "我", "的", "是", "了")
+            return defaultChineseSingleChars.take(5)
         }
     }
 

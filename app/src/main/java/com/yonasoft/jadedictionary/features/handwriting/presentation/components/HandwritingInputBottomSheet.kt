@@ -4,6 +4,8 @@ package com.yonasoft.jadedictionary.features.handwriting.presentation.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,9 +14,12 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -25,8 +30,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SuggestionChip
-import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -49,6 +52,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yonasoft.jadedictionary.R
@@ -285,42 +289,56 @@ fun HandwritingInputBottomSheet(
                         suggestedWords.isNotEmpty() -> {
                             Column {
                                 Text(
-                                    text = "Suggestions",
+                                    text = "Character Suggestions",
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 16.sp,
                                     color = Color.White,
                                     modifier = Modifier.padding(bottom = 8.dp)
                                 )
 
+                                // Use a grid-like layout for single characters
                                 FlowRow(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(12.dp),
                                     maxItemsInEachRow = 5
                                 ) {
-                                    suggestedWords.forEach { word ->
-                                        SuggestionChip(
-                                            onClick = { onSuggestionSelected(word) },
-                                            label = {
-                                                Text(
-                                                    text = word,
-                                                    fontSize = 28.sp,
-                                                    fontWeight = FontWeight.Medium,
-                                                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 6.dp)
+                                    suggestedWords.forEach { character ->
+                                        // Single character circular container
+                                        Box(
+                                            modifier = Modifier
+                                                .size(56.dp)
+                                                .clip(CircleShape)
+                                                .background(CustomColor.GREEN01.color.copy(alpha = 0.1f))
+                                                .border(
+                                                    width = 1.dp,
+                                                    color = CustomColor.GREEN01.color.copy(alpha = 0.5f),
+                                                    shape = CircleShape
                                                 )
-                                            },
-                                            colors = SuggestionChipDefaults.suggestionChipColors(
-                                                containerColor = CustomColor.GREEN01.color.copy(alpha = 0.2f),
-                                                labelColor = Color.White
+                                                .aspectRatio(1f)
+                                                .padding(4.dp)
+                                                .clip(CircleShape)
+                                                .background(Color.Transparent),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = character,
+                                                fontSize = 32.sp,
+                                                textAlign = TextAlign.Center,
+                                                color = Color.White,
+                                                fontWeight = FontWeight.Normal,
+                                                modifier = Modifier.clickable {
+                                                    onSuggestionSelected(character)
+                                                }
                                             )
-                                        )
+                                        }
                                     }
                                 }
                             }
                         }
                         else -> {
                             Text(
-                                text = "Draw to see suggestions",
+                                text = "Draw to see character suggestions",
                                 color = Color.Gray,
                                 fontSize = 14.sp
                             )
