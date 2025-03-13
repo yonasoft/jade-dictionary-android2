@@ -31,7 +31,7 @@ data class CCWord(
 
     @ColumnInfo(name = "definition")
     val definition: String? = null
-) : Word() {
+) : Word {
     val displayText: String
         get() = buildString {
             simplified?.let { append(it) }

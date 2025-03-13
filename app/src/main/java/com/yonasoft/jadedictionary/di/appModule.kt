@@ -25,8 +25,7 @@ val appModule = module {
     single { get<CCWordDatabase>().ccWordDao() }
     single { PinyinUtils() }
     single<CCWordRepository> { CCWordRepositoryImpl(get(), androidContext()) }
-
-    viewModel { WordSearchViewModel(application = get(), repository = get()) }
+    single { WordSearchViewModel(application = get(), repository = get()) }
     viewModel { (savedStateHandle: SavedStateHandle) ->
         WordDetailViewModel(get(), savedStateHandle)
     }

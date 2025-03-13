@@ -65,11 +65,9 @@ class OCRService(private val context: Context) {
      */
     private suspend fun processImage(image: InputImage): Text {
         return suspendCancellableCoroutine { continuation ->
-            recognizer.process(image)
-                .addOnSuccessListener { text ->
+            recognizer.process(image).addOnSuccessListener { text ->
                     continuation.resume(text)
-                }
-                .addOnFailureListener { e ->
+                }.addOnFailureListener { e ->
                     Log.e("OCRService", "Text recognition failed", e)
                     // Instead of trying to create a Text object, just resume with exception
                     // which will be caught in the calling function
