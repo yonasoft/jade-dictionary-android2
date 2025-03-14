@@ -43,8 +43,9 @@ fun SearchTextField(
     modifier: Modifier = Modifier,
     searchQuery: String,
     onValueChange: (String) -> Unit,
-    onCancel: () -> Unit,
-    focusRequester: FocusRequester?
+    onCancel: () -> Unit = {},
+    placeholder: String = "Search...",
+    focusRequester: FocusRequester? = null
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -61,7 +62,7 @@ fun SearchTextField(
             },
             placeholder = {
                 Text(
-                    "Search for words...",
+                    placeholder,
                     color = Color.White.copy(alpha = 0.6f),
                     fontSize = 18.sp
                 )
@@ -129,7 +130,8 @@ fun SearchTextField(
                 .clip(RoundedCornerShape(26.dp))
                 .let { base ->
                     focusRequester?.let { base.focusRequester(it) } ?: base
-                }
+                },
+            maxLines = 2
         )
     }
 }

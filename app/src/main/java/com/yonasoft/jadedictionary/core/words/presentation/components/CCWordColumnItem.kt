@@ -5,14 +5,25 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -21,17 +32,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
+import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
+import com.yonasoft.jadedictionary.features.word_lists.presentation.components.WordListSelectionDialog
+import kotlinx.coroutines.launch
 
 @Composable
 fun CCWordColumn(
     word: CCWord,
     onClick: () -> Unit = {},
-    action: () -> Unit = {}, modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    wordLists: List<CCWordList> = emptyList(),
+    onAddToWordList: (CCWord, CCWordList) -> Unit = { _, _ -> },
+    snackbarHostState: SnackbarHostState? = null
 ) {
     // Use remember to ensure we always display the full word, not just the first character
     val fullDisplayText = remember(word.displayText) {
         word.displayText // Use the entire string, not word.displayText.take(1)
     }
+
+    val coroutineScope = rememberCoroutineScope()
+    var showWordListDialog by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier
@@ -96,7 +116,40 @@ fun CCWordColumn(
                     modifier = Modifier.weight(0.7f)
                 )
             }
-            action()
+
+            // Add to word list button
+            IconButton(
+                onClick = { showWordListDialog = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add to word list",
+                    tint = CustomColor.GREEN01.color,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .alpha(0.9f)
+                )
+            }
         }
+    }
+
+    // Word list selection dialog
+    if (showWordListDialog) {
+        WordListSelectionDialog(
+            wordLists = wordLists,
+            onDismiss = { showWordListDialog = false },
+            onWordListSelected = { selectedList ->
+                onAddToWordList(word, selectedList)
+
+                // Show confirmation snackbar if available
+                snackbarHostState?.let { hostState ->
+                    coroutineScope.launch {
+                        hostState.showSnackbar(
+                            message = "Added \"${word.displayText}\" to ${selectedList.title}"
+                        )
+                    }
+                }
+            },
+        )
     }
 }

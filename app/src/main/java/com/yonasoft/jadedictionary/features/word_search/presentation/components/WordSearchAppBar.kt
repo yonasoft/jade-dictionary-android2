@@ -101,7 +101,8 @@ fun WordSearchAppBar(
                 searchQuery = searchQuery,
                 onValueChange = { onValueChange(it) },
                 onCancel = { onCancel() },
-                focusRequester = focusRequester
+                focusRequester = focusRequester,
+                placeholder = "Search for words..."
             )
         },
         actions = {

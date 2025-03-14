@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.yonasoft.jadedictionary.features.word_lists.presentation.screens
 
 import androidx.compose.foundation.background
@@ -21,10 +23,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,8 +46,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.core.constants.CustomColor
-import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
+import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRowAlternative
+import com.yonasoft.jadedictionary.features.shared.presentation.components.SearchTextField
 import com.yonasoft.jadedictionary.features.word_lists.domain.WordList
+import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
 import com.yonasoft.jadedictionary.features.word_lists.presentation.components.CreateWordListDialog
 import com.yonasoft.jadedictionary.features.word_lists.presentation.components.WordListColumnItem
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListsViewModel
@@ -83,14 +90,26 @@ fun WordLists(
 
     Scaffold(
         containerColor = Color.Black,
-        topBar = { /* Your top bar content */ }
+        topBar = {
+            TopAppBar(
+                title = {
+                    SearchTextField(
+                        searchQuery = searchQuery,
+                        onValueChange = { wordListsViewModel.updateSearchQuery(it) },
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF121212)
+                ),
+            )
+        }
     ) { paddingValue ->
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(paddingValue)
         ) {
-            JadeTabRow(selectedIndex = selectedTab, modifier = Modifier.fillMaxWidth()) {
+            JadeTabRowAlternative(selectedIndex = selectedTab, modifier = Modifier.fillMaxWidth()) {
                 tabs.forEachIndexed { index, text ->
                     Tab(
                         selectedContentColor = CustomColor.GREEN01.color,
@@ -130,7 +149,7 @@ fun WordLists(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             HorizontalPager(
                 state = pagerState,
@@ -144,14 +163,21 @@ fun WordLists(
                     contentAlignment = Alignment.TopStart
                 ) {
                     when (page) {
-                        0 -> { /* HSK 2 content */ }
-                        1 -> { /* HSK 3.0 content */ }
+                        0 -> { /* HSK 2 content */
+                        }
+
+                        1 -> { /* HSK 3.0 content */
+                        }
+
                         2 -> {
                             MyLists(
                                 wordList = myWordLists,
                                 onClick = { /* Navigate to list details */ },
                                 onCreateNewList = { title, description ->
                                     wordListsViewModel.createNewWordList(title, description)
+                                },
+                                onDelete = {
+                                    wordListsViewModel.deleteWordList(it)
                                 }
                             )
                         }
@@ -166,7 +192,8 @@ fun WordLists(
 fun MyLists(
     wordList: List<WordList>,
     onClick: () -> Unit,
-    onCreateNewList: (title: String, description: String?) -> Unit
+    onCreateNewList: (title: String, description: String?) -> Unit,
+    onDelete: (CCWordList) ->Unit
 ) {
     val showDialog = rememberSaveable { mutableStateOf(false) }
 
@@ -180,23 +207,24 @@ fun MyLists(
             }
         )
     }
-
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        // Add New List button as first item
-        item {
-            AddNewListButton(
-                onClick = { showDialog.value = true }
-            )
-        }
-
-        // Existing word lists
-        itemsIndexed(wordList, key = { i, wordList -> i }) { i, wordList ->
-            WordListColumnItem(
-                wordList = wordList,
-                onClick = { onClick() }
-            ) { }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        AddNewListButton(
+            onClick = { showDialog.value = true }
+        )
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // Add New List button as first item
+            // Existing word lists
+            itemsIndexed(wordList, key = { i, wordList -> i }) { i, wordList ->
+                WordListColumnItem(
+                    wordList = wordList,
+                    onClick = { onClick() },
+                    onDelete = {
+                        onDelete(it)
+                    }
+                )
+            }
         }
     }
 }

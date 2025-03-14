@@ -10,11 +10,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
 import com.yonasoft.jadedictionary.features.handwriting.domain.services.HandwritingRecognizer
 import com.yonasoft.jadedictionary.features.ocr.domain.services.OCRService
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordListRepository
+import com.yonasoft.jadedictionary.features.word_lists.presentation.state.WordListsState
 import com.yonasoft.jadedictionary.features.word_search.presentation.state.HandwritingState
 import com.yonasoft.jadedictionary.features.word_search.presentation.state.InputMethodState
 import com.yonasoft.jadedictionary.features.word_search.presentation.state.OCRState
@@ -40,6 +42,9 @@ class WordSearchViewModel(
 
     private val _searchState = MutableStateFlow(SearchState())
     val searchState: StateFlow<SearchState> = _searchState.asStateFlow()
+
+    private val _wordListsState = MutableStateFlow(WordListsState())
+    val wordListsState: StateFlow<WordListsState> = _wordListsState.asStateFlow()
 
     private val _inputMethodState = MutableStateFlow(InputMethodState())
     val inputMethodState: StateFlow<InputMethodState> = _inputMethodState.asStateFlow()
@@ -73,7 +78,6 @@ class WordSearchViewModel(
             }
         }
 
-        // Initialize handwriting recognizer
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 handwritingRecognizer.initialize()
@@ -81,6 +85,8 @@ class WordSearchViewModel(
                 Log.e("WordSearchViewModel", "Failed to initialize handwriting recognizer", e)
             }
         }
+
+        loadWordLists()
     }
 
     // ======== Search Functions ========
@@ -279,6 +285,54 @@ class WordSearchViewModel(
         _ocrState.update { it.copy(currentImage = null, results = emptyList()) }
     }
 
+    // Load all word lists from repository
+    private fun loadWordLists() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val lists = wordListsRepository.getAllWordLists()
+                withContext(Dispatchers.Main) {
+                    _wordListsState.update {  it.copy(myWordLists = lists)}
+                }
+            } catch (e: Exception) {
+                Log.e("WordSearchViewModel", "Failed to load word lists", e)
+            }
+        }
+    }
+
+    // Add word to word list function
+    fun addWordToWordList(word: CCWord, wordList: CCWordList) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Check if word is already in the list
+                val existingIds = wordList.wordIds.toMutableList()
+
+                // Only add if not already in list
+                if (!existingIds.contains(word.id)) {
+                    existingIds.add(word.id!!)
+
+                    // Update the word list with new wordIds and count
+                    val updatedList = wordList.copy(
+                        wordIds = existingIds,
+                        numberOfWords = existingIds.size.toLong(),
+                        updatedAt = System.currentTimeMillis()
+                    )
+
+                    // Update in database
+                    wordListsRepository.updateWordList(updatedList)
+
+                    // Refresh word lists
+                    loadWordLists()
+                }
+            } catch (e: Exception) {
+                Log.e("WordSearchViewModel", "Failed to add word to list", e)
+            }
+        }
+    }
+
+    // ======== Search Functions ========
+    // ... existing functions ...
+
+    // ======== Word List Functions ========
     fun createNewWordList(title: String, description: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             val newWordList = CCWordList(
@@ -292,8 +346,12 @@ class WordSearchViewModel(
             )
 
             val insertedId = wordListsRepository.insertWordList(newWordList)
+
+            // Refresh the word lists
+            loadWordLists()
         }
     }
+
     override fun onCleared() {
         super.onCleared()
         handwritingRecognizer.close()

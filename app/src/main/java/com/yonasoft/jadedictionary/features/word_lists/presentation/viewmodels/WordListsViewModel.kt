@@ -85,6 +85,21 @@ class WordListsViewModel(private val repository: CCWordListRepository) : ViewMod
         }
     }
 
+    fun deleteWordList(wordList: CCWordList) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                repository.deleteWordList(wordList)
+
+                // Refresh the list after deletion
+                searchMyWordLists()
+
+            } catch (e: Exception) {
+                Log.e("WordListsViewModel", "Error deleting word list", e)
+                _uiState.update { it.copy(errorMessage = "Failed to delete word list") }
+            }
+        }
+    }
+
     private suspend fun getMyWordLists() {
         withContext(Dispatchers.IO) {
             val lists = repository.getAllWordLists()

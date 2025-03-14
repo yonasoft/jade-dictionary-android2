@@ -74,6 +74,7 @@ fun WordSearch(
     val keyboardController = wordSearchViewModel.localKeyboardController.current
 
     val searchState by wordSearchViewModel.searchState.collectAsStateWithLifecycle()
+    val wordListsState by wordSearchViewModel.wordListsState.collectAsStateWithLifecycle()
     val inputMethodState by wordSearchViewModel.inputMethodState.collectAsStateWithLifecycle()
     val handwritingState by wordSearchViewModel.handwritingState.collectAsStateWithLifecycle()
     val ocrState by wordSearchViewModel.ocrState.collectAsStateWithLifecycle()
@@ -82,6 +83,7 @@ fun WordSearch(
     // Now you can use the bundled states in your UI
     val searchQuery = searchState.query
     val searchResults = searchState.results
+    val wordLists = wordListsState.myWordLists
     val selectedTab = inputMethodState.selectedTab
     val showHandwritingSheet = handwritingState.showSheet
     val suggestedWords = handwritingState.suggestedWords
@@ -358,8 +360,8 @@ fun WordSearch(
                 }
             }
 
-            // Word list
             if (searchResults.isNotEmpty()) {
+
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     state = rememberLazyListState()
@@ -368,9 +370,17 @@ fun WordSearch(
                         searchResults,
                         key = { _, word -> word.id!! },
                     ) { _, word ->
-                        CCWordColumn(word = word, onClick = {
-                            navController.navigate(WordRoutes.WordDetail.createRoute(word.id!!))
-                        })
+                        CCWordColumn(
+                            word = word,
+                            onClick = {
+                                navController.navigate(WordRoutes.WordDetail.createRoute(word.id!!))
+                            },
+                            wordLists = wordLists,
+                            onAddToWordList = { selectedWord, selectedList ->
+                                wordSearchViewModel.addWordToWordList(selectedWord, selectedList)
+                            },
+                            snackbarHostState = snackbarHostState
+                        )
                     }
 
                     // Add space at bottom for better UX
