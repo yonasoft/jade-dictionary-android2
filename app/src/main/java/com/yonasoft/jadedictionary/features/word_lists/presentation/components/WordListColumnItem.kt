@@ -29,7 +29,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yonasoft.jadedictionary.core.constants.CustomColor
-import com.yonasoft.jadedictionary.features.word_lists.domain.WordList
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -37,9 +36,10 @@ import java.util.Locale
 
 @Composable
 fun WordListColumnItem(
-    wordList: WordList,
-    onClick: () -> Unit,
+    wordList: CCWordList,
+    onClick: (Long) -> Unit,
     onDelete: ((CCWordList) -> Unit)? = null,
+    actions: @Composable () -> Unit = {}
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
@@ -48,7 +48,7 @@ fun WordListColumnItem(
             wordList = wordList,
             onDismiss = { showDeleteDialog = false },
             onConfirmDelete = {
-                onDelete?.let { it1 -> it1(wordList as CCWordList) }
+                onDelete?.let { it1 -> it1(wordList) }
                 showDeleteDialog = false
             }
         )
@@ -62,7 +62,7 @@ fun WordListColumnItem(
                 elevation = 2.dp,
                 shape = RoundedCornerShape(12.dp)
             )
-            .clickable { onClick() },
+            .clickable { wordList.id?.let { onClick(it) } },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF121212)
@@ -123,8 +123,8 @@ fun WordListColumnItem(
                     lineHeight = 14.sp,
                 )
             }
+
             if (onDelete != null) {
-                // Delete button
                 IconButton(
                     onClick = { showDeleteDialog = true }
                 ) {
@@ -138,6 +138,9 @@ fun WordListColumnItem(
                     )
                 }
             }
+
+            // Additional actions if provided
+            actions()
         }
     }
 }

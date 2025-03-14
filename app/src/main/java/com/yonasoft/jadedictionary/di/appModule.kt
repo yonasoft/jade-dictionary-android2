@@ -9,6 +9,7 @@ import com.yonasoft.jadedictionary.core.words.domain.utils.PinyinUtils
 import com.yonasoft.jadedictionary.features.word_lists.data.cc.CCWordListDatabase
 import com.yonasoft.jadedictionary.features.word_lists.data.cc.CCWordListRepositoryImpl
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordListRepository
+import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListDetailViewModel
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListsViewModel
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
@@ -49,5 +50,8 @@ val appModule = module {
     viewModel { WordListsViewModel(get()) }
     viewModel { (savedStateHandle: SavedStateHandle) ->
         WordDetailViewModel(get(), get(), savedStateHandle) // Pass both repositories
+    }
+    viewModel { (savedStateHandle: SavedStateHandle) ->
+        WordListDetailViewModel(get(), get(), savedStateHandle)
     }
 }

@@ -42,8 +42,9 @@ fun CCWordColumn(
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     wordLists: List<CCWordList> = emptyList(),
-    onAddToWordList: (CCWord, CCWordList) -> Unit = { _, _ -> },
-    snackbarHostState: SnackbarHostState? = null
+    onAddToWordList: ((CCWord, CCWordList) -> Unit)? = null,
+    snackbarHostState: SnackbarHostState? = null,
+    actions: @Composable () -> Unit = {}
 ) {
     // Use remember to ensure we always display the full word, not just the first character
     val fullDisplayText = remember(word.displayText) {
@@ -117,19 +118,21 @@ fun CCWordColumn(
                 )
             }
 
-            // Add to word list button
-            IconButton(
-                onClick = { showWordListDialog = true }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add to word list",
-                    tint = CustomColor.GREEN01.color,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .alpha(0.9f)
-                )
+            if (onAddToWordList != null) {
+                IconButton(
+                    onClick = { showWordListDialog = true }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add to word list",
+                        tint = CustomColor.GREEN01.color,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .alpha(0.9f)
+                    )
+                }
             }
+            actions()
         }
     }
 
@@ -139,7 +142,7 @@ fun CCWordColumn(
             wordLists = wordLists,
             onDismiss = { showWordListDialog = false },
             onWordListSelected = { selectedList ->
-                onAddToWordList(word, selectedList)
+                onAddToWordList?.let { it(word, selectedList) }
 
                 // Show confirmation snackbar if available
                 snackbarHostState?.let { hostState ->
@@ -150,6 +153,8 @@ fun CCWordColumn(
                     }
                 }
             },
-        )
+
+            )
+
     }
 }

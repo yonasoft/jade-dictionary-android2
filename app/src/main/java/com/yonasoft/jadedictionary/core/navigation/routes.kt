@@ -14,5 +14,8 @@ sealed class WordRoutes(val route: String) {
 }
 
 sealed class WordListRoutes(val route: String) {
-    data object WordLists : WordRoutes("word_lists")
+    data object WordLists : WordListRoutes("word_lists")
+    data object WordListDetail : WordListRoutes("word_list_detail/{wordListId}") {
+        fun createRoute(wordListId: Long) = "word_list_detail/$wordListId"
+    }
 }

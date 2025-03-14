@@ -137,12 +137,12 @@ fun WordListSelectionDialog(
                             .height(300.dp)
                     ) {
                         items(filteredLists) { wordList ->
-                            WordListColumnItem (
+                            WordListColumnItem(
                                 wordList = wordList,
                                 onClick = {
                                     onWordListSelected(wordList)
                                     onDismiss()
-                                }
+                                },
                             )
                         }
                     }

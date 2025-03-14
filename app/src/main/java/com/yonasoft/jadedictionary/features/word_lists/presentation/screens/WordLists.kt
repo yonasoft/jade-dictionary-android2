@@ -26,6 +26,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -34,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,9 +49,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.core.constants.CustomColor
+import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRowAlternative
 import com.yonasoft.jadedictionary.features.shared.presentation.components.SearchTextField
-import com.yonasoft.jadedictionary.features.word_lists.domain.WordList
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
 import com.yonasoft.jadedictionary.features.word_lists.presentation.components.CreateWordListDialog
 import com.yonasoft.jadedictionary.features.word_lists.presentation.components.WordListColumnItem
@@ -71,6 +74,9 @@ fun WordLists(
     val isLoading = wordListsState.isLoading
     val errorMessage = uiState.errorMessage
 
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val tabs = listOf(
         "HSK 2",
         "HSK 3.0",
@@ -90,6 +96,7 @@ fun WordLists(
 
     Scaffold(
         containerColor = Color.Black,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -97,6 +104,9 @@ fun WordLists(
                         searchQuery = searchQuery,
                         onValueChange = { wordListsViewModel.updateSearchQuery(it) },
                     )
+                },
+                actions = {
+
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF121212)
@@ -172,7 +182,10 @@ fun WordLists(
                         2 -> {
                             MyLists(
                                 wordList = myWordLists,
-                                onClick = { /* Navigate to list details */ },
+                                onClick = { wordListId ->
+                                    // Navigate to word list detail
+                                    navController.navigate(WordListRoutes.WordListDetail.createRoute(wordListId))
+                                },
                                 onCreateNewList = { title, description ->
                                     wordListsViewModel.createNewWordList(title, description)
                                 },
@@ -190,10 +203,10 @@ fun WordLists(
 
 @Composable
 fun MyLists(
-    wordList: List<WordList>,
-    onClick: () -> Unit,
+    wordList: List<CCWordList>,
+    onClick: (Long) -> Unit,
     onCreateNewList: (title: String, description: String?) -> Unit,
-    onDelete: (CCWordList) ->Unit
+    onDelete: (CCWordList) -> Unit
 ) {
     val showDialog = rememberSaveable { mutableStateOf(false) }
 
@@ -214,15 +227,12 @@ fun MyLists(
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Add New List button as first item
             // Existing word lists
-            itemsIndexed(wordList, key = { i, wordList -> i }) { i, wordList ->
+            itemsIndexed(wordList, key = { _, wordList -> wordList.id ?: 0 }) { _, wordList ->
                 WordListColumnItem(
                     wordList = wordList,
-                    onClick = { onClick() },
-                    onDelete = {
-                        onDelete(it)
-                    }
+                    onClick = { id -> onClick(id) },
+                    onDelete = { onDelete(it) }
                 )
             }
         }
@@ -269,4 +279,3 @@ fun AddNewListButton(onClick: () -> Unit) {
         }
     }
 }
-
