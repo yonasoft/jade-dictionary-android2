@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -88,7 +89,14 @@ fun Home(navController: NavHostController) {
                 onClick = {},
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            LinkDirector(
+                modifier = Modifier.fillMaxWidth(),
+                icon = Icons.Default.ShoppingCart,
+                contentDescription = "Store",
+                label = "Store",
+                description = "Get premium word lists, practice modules and learning tools",
+                onClick = {},
+            )
         }
     }
 }

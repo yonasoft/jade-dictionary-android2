@@ -2,7 +2,6 @@
 
 package com.yonasoft.jadedictionary.core.words.presentation.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -18,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -50,19 +48,6 @@ fun CCWordColumn(word: CCWord, onClick: () -> Unit = {}, modifier: Modifier = Mo
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Character display in accent color circle
-            Text(
-                text = word.simplified!!.take(1), // Take first character for icon
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .shadow(8.dp, RoundedCornerShape(50))
-                    .clip(RoundedCornerShape(50))
-                    .background(CustomColor.GREEN01.color.copy(alpha = 0.8f))
-                    .padding(12.dp)
-            )
-
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.Start
