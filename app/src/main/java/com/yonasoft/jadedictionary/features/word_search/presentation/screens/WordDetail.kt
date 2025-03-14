@@ -25,11 +25,15 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,6 +77,9 @@ fun WordDetail(
     val wordsOfWord by wordDetailViewModel.wordsOfWord.collectAsStateWithLifecycle()
     val sentences by wordDetailViewModel.sentences.collectAsStateWithLifecycle()
 
+    // Create a SnackbarHostState for snackbar display
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val tts = rememberTextToSpeech(Locale.CHINESE)
     val pagerState = rememberPagerState(initialPage = selectedTab) {
         tabs.size
@@ -86,9 +93,40 @@ fun WordDetail(
 
     Scaffold(
         topBar = {
-            WordDetailAppbar(title = wordDetails?.displayText ?: "", navigateUp = {
-                navController.navigateUp()
-            })
+            WordDetailAppbar(
+                title = wordDetails?.displayText ?: "",
+                navigateUp = {
+                    navController.navigateUp()
+                },
+                createNewWordList = { title, description ->
+                    wordDetailViewModel.createNewWordList(title, description)
+                },
+                snackbarHostState = snackbarHostState
+            )
+        },
+        // Set up the snackbar host
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(16.dp)
+            ) { snackbarData ->
+                // Custom snackbar appearance
+                Snackbar(
+                    modifier = Modifier
+                        .shadow(8.dp, RoundedCornerShape(8.dp)),
+                    containerColor = Color(0xFF303030),
+                    contentColor = Color.White,
+                    actionContentColor = CustomColor.GREEN01.color,
+                    dismissActionContentColor = CustomColor.GREEN01.color,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = snackbarData.visuals.message,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }
+            }
         },
         containerColor = Color(0xFF121212)
     ) { paddingValue ->

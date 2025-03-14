@@ -1,10 +1,7 @@
-@file:OptIn(ExperimentalLayoutApi::class)
-
 package com.yonasoft.jadedictionary.core.words.presentation.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,17 +23,24 @@ import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 
 @Composable
-fun CCWordColumn(word: CCWord, onClick: () -> Unit = {}, modifier: Modifier = Modifier) {
+fun CCWordColumn(
+    word: CCWord,
+    onClick: () -> Unit = {},
+    action: () -> Unit = {}, modifier: Modifier = Modifier
+) {
     // Use remember to ensure we always display the full word, not just the first character
     val fullDisplayText = remember(word.displayText) {
         word.displayText // Use the entire string, not word.displayText.take(1)
     }
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp) // Reduced vertical padding
-            .shadow(elevation = 2.dp, shape = RoundedCornerShape(12.dp)) // Smaller elevation and corners
+            .shadow(
+                elevation = 2.dp,
+                shape = RoundedCornerShape(12.dp)
+            ) // Smaller elevation and corners
             .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -50,43 +54,49 @@ fun CCWordColumn(word: CCWord, onClick: () -> Unit = {}, modifier: Modifier = Mo
                 .padding(12.dp), // Reduced padding
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left side: Character and Pinyin
-            Column(
+            Row(
                 modifier = Modifier
-                    .weight(0.3f)
-                    .padding(end = 8.dp)
+                    .weight(1f),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Chinese character
-                Text(
-                    text = fullDisplayText,
-                    color = CustomColor.GREEN01.color,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp, // Smaller font size
-                    lineHeight = 24.sp,
-                    overflow = TextOverflow.Visible
-                )
+                Column(
+                    modifier = Modifier
+                        .weight(0.3f)
+                        .padding(end = 8.dp)
+                ) {
+                    // Chinese character
+                    Text(
+                        text = fullDisplayText,
+                        color = CustomColor.GREEN01.color,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp, // Smaller font size
+                        lineHeight = 24.sp,
+                        overflow = TextOverflow.Visible
+                    )
 
-                // Pinyin
+                    // Pinyin
+                    Text(
+                        text = word.displayPinyin,
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontSize = 14.sp, // Smaller font size
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 16.sp,
+                        overflow = TextOverflow.Visible
+                    )
+                }
+
+                // Right side: Definition
                 Text(
-                    text = word.displayPinyin,
-                    color = Color.White.copy(alpha = 0.9f),
+                    text = word.definition ?: "",
+                    color = Color.White.copy(alpha = 0.7f),
                     fontSize = 14.sp, // Smaller font size
-                    fontWeight = FontWeight.Medium,
-                    lineHeight = 16.sp,
-                    overflow = TextOverflow.Visible
+                    lineHeight = 18.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(0.7f)
                 )
             }
-
-            // Right side: Definition
-            Text(
-                text = word.definition ?: "",
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 14.sp, // Smaller font size
-                lineHeight = 18.sp,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(0.7f)
-            )
+            action()
         }
     }
 }

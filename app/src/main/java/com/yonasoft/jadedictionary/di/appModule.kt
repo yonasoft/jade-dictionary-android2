@@ -1,4 +1,3 @@
-// File: AppModule.kt
 package com.yonasoft.jadedictionary.di
 
 import android.util.Log
@@ -46,9 +45,9 @@ val appModule = module {
     single<CCWordListRepository> { CCWordListRepositoryImpl(get(), androidContext()) }
 
     // ViewModels
-    single { WordSearchViewModel(application = get(), repository = get()) }
-    single { WordListsViewModel(get()) }
+    viewModel { WordSearchViewModel(application = get(), get(), get()) }
+    viewModel { WordListsViewModel(get()) }
     viewModel { (savedStateHandle: SavedStateHandle) ->
-        WordDetailViewModel(get(), savedStateHandle)
+        WordDetailViewModel(get(), get(), savedStateHandle) // Pass both repositories
     }
 }

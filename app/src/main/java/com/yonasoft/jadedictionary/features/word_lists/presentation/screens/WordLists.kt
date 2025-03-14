@@ -1,25 +1,39 @@
 package com.yonasoft.jadedictionary.features.word_lists.presentation.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,24 +42,33 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
+import com.yonasoft.jadedictionary.features.word_lists.domain.WordList
+import com.yonasoft.jadedictionary.features.word_lists.presentation.components.CreateWordListDialog
+import com.yonasoft.jadedictionary.features.word_lists.presentation.components.WordListColumnItem
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListsViewModel
 
 @Composable
-fun WordLists(navController: NavHostController, wordListsViewModel: WordListsViewModel, modifier: Modifier = Modifier) {
+fun WordLists(
+    navController: NavHostController,
+    wordListsViewModel: WordListsViewModel,
+    modifier: Modifier = Modifier
+) {
+    // Collect all state flows using the new bundled approach
+    val wordListsState by wordListsViewModel.wordListsState.collectAsStateWithLifecycle()
+    val uiState by wordListsViewModel.uiState.collectAsStateWithLifecycle()
+
+    // Extract individual values from the states
+    val myWordLists = wordListsState.myWordLists
+    val searchQuery = wordListsState.searchQuery
+    val selectedTab = uiState.selectedTab
+    val isLoading = wordListsState.isLoading
+    val errorMessage = uiState.errorMessage
 
     val tabs = listOf(
         "HSK 2",
         "HSK 3.0",
-//        "Premade",
         "My Lists",
     )
-
-    val focusRequester = wordListsViewModel.focusRequester
-    val focusManager = wordListsViewModel.localFocusManager.current
-    val keyboardController = wordListsViewModel.localKeyboardController.current
-
-    val searchQuery by wordListsViewModel.searchQuery.collectAsStateWithLifecycle()
-    val selectedTab by wordListsViewModel.selectedTab.collectAsStateWithLifecycle()
 
     val pagerState = rememberPagerState(initialPage = selectedTab) {
         tabs.size
@@ -58,12 +81,9 @@ fun WordLists(navController: NavHostController, wordListsViewModel: WordListsVie
         wordListsViewModel.updateInputTab(pagerState.currentPage)
     }
 
-
     Scaffold(
         containerColor = Color.Black,
-        topBar = {
-
-        }
+        topBar = { /* Your top bar content */ }
     ) { paddingValue ->
         Column(
             modifier = Modifier
@@ -96,7 +116,9 @@ fun WordLists(navController: NavHostController, wordListsViewModel: WordListsVie
                                     text = text,
                                     fontSize = 16.sp,
                                     fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (selectedTab == index) CustomColor.GREEN01.color else Color.White.copy(alpha = 0.7f),
+                                    color = if (selectedTab == index) CustomColor.GREEN01.color else Color.White.copy(
+                                        alpha = 0.7f
+                                    ),
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                                 )
                             }
@@ -109,24 +131,112 @@ fun WordLists(navController: NavHostController, wordListsViewModel: WordListsVie
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
+
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
                 verticalAlignment = Alignment.Top
-            ) { _ ->
+            ) { page ->
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.TopStart
                 ) {
-                    when (selectedTab) {
-                        0 ->{}
-                        1 ->{}
-                        2 ->{}
-                        3 ->{}
+                    when (page) {
+                        0 -> { /* HSK 2 content */ }
+                        1 -> { /* HSK 3.0 content */ }
+                        2 -> {
+                            MyLists(
+                                wordList = myWordLists,
+                                onClick = { /* Navigate to list details */ },
+                                onCreateNewList = { title, description ->
+                                    wordListsViewModel.createNewWordList(title, description)
+                                }
+                            )
+                        }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun MyLists(
+    wordList: List<WordList>,
+    onClick: () -> Unit,
+    onCreateNewList: (title: String, description: String?) -> Unit
+) {
+    val showDialog = rememberSaveable { mutableStateOf(false) }
+
+    // Show dialog if state is true
+    if (showDialog.value) {
+        CreateWordListDialog(
+            onDismiss = { showDialog.value = false },
+            onConfirm = { title, description ->
+                onCreateNewList(title, description)
+                showDialog.value = false
+            }
+        )
+    }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Add New List button as first item
+        item {
+            AddNewListButton(
+                onClick = { showDialog.value = true }
+            )
+        }
+
+        // Existing word lists
+        itemsIndexed(wordList, key = { i, wordList -> i }) { i, wordList ->
+            WordListColumnItem(
+                wordList = wordList,
+                onClick = { onClick() }
+            ) { }
+        }
+    }
+}
+
+@Composable
+fun AddNewListButton(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
+                .clickable { onClick() },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFF121212)
+            )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Create new list",
+                    tint = CustomColor.GREEN01.color,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = "Create New Word List",
+                    color = CustomColor.GREEN01.color,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp
+                )
             }
         }
     }

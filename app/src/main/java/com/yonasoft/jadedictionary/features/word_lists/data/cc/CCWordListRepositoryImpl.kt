@@ -3,14 +3,13 @@ package com.yonasoft.jadedictionary.features.word_lists.data.cc
 import android.content.Context
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordListRepository
-import kotlinx.coroutines.flow.Flow
 
 class CCWordListRepositoryImpl(
     private val wordListDao: CCWordListDao,
     private val context: Context
 ) : CCWordListRepository {
 
-    override fun getAllWordLists(): Flow<List<CCWordList>> {
+    override fun getAllWordLists(): List<CCWordList> {
         return wordListDao.getAllWordLists()
     }
 
@@ -18,7 +17,7 @@ class CCWordListRepositoryImpl(
         return wordListDao.getWordListById(id)
     }
 
-    override fun searchWordLists(query: String): Flow<List<CCWordList>> {
+    override fun searchWordLists(query: String): List<CCWordList> {
         return wordListDao.searchWordLists(query)
     }
 

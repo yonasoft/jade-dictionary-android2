@@ -11,19 +11,27 @@ import com.yonasoft.jadedictionary.features.word_lists.domain.WordList
 data class CCWordList(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
-    val id: Long,
+    val id: Long? = null,
 
     @ColumnInfo(name = "title")
-    val title: String = "",
+    override val title: String = "",
 
     @ColumnInfo(name = "description")
-    val description: String = "",
+    override val description: String = "",
 
     @ColumnInfo(name = "wordIds")
-    val wordIds: List<Long> = emptyList(),
+    override val wordIds: List<Long> = emptyList(),
 
-    ) : WordList {
+    @ColumnInfo(name = "created_at")
+    override val createdAt: Long,
 
-}
+    @ColumnInfo(name = "updated_at")
+    override val updatedAt: Long,
+
+    @ColumnInfo(name = "number_of_words")
+    override val numberOfWords: Long,
+) : WordList
+
+
 
 

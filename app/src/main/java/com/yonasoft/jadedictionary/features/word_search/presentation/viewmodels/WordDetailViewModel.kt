@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.data.sentences.Sentence
+import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
+import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
+import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordListRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +20,7 @@ import kotlinx.coroutines.withContext
 
 class WordDetailViewModel(
     private val repository: CCWordRepository,
+    private val wordListRepository: CCWordListRepository, // Add this for word list operations
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _wordId = MutableStateFlow<Long?>(null)
@@ -28,14 +31,12 @@ class WordDetailViewModel(
     private val _selectedTab = MutableStateFlow(0)
     private val _isSpeaking = MutableStateFlow(false)
 
-
     val wordDetails: StateFlow<CCWord?> = _wordDetails.asStateFlow()
     val characters: StateFlow<List<CCWord>> = _characters.asStateFlow()
     val wordsOfWord: StateFlow<List<CCWord>> = _wordsOfWord.asStateFlow()
     val sentences: StateFlow<List<Sentence>> = _sentences.asStateFlow()
     val tabIndex: StateFlow<Int> = _selectedTab.asStateFlow()
     val isSpeaking: StateFlow<Boolean> = _isSpeaking.asStateFlow()
-
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -68,6 +69,30 @@ class WordDetailViewModel(
 
     fun setIsSpeaking(boolean: Boolean) {
         _isSpeaking.value = boolean
+    }
+
+    /**
+     * Creates a new word list
+     */
+    fun createNewWordList(title: String, description: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val newWordList = CCWordList(
+                    id = null, // Let Room generate the ID
+                    title = title,
+                    description = description?:"",
+                    createdAt = System.currentTimeMillis(),
+                    updatedAt = System.currentTimeMillis(),
+                    numberOfWords = 0,
+                    wordIds = emptyList()
+                )
+
+                val insertedId = wordListRepository.insertWordList(newWordList)
+                Log.d("WordDetailViewModel", "Created new word list with ID: $insertedId")
+            } catch (e: Exception) {
+                Log.e("WordDetailViewModel", "Error creating word list", e)
+            }
+        }
     }
 
     private suspend fun fetchWordDetails(wordId: Long) {

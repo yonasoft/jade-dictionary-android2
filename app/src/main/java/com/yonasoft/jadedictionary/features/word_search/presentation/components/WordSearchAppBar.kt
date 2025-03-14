@@ -18,10 +18,13 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -46,6 +49,7 @@ import androidx.compose.ui.window.Popup
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.features.shared.presentation.components.SearchTextField
+import com.yonasoft.jadedictionary.features.word_lists.presentation.components.CreateWordListDialog
 
 @Composable
 fun WordSearchAppBar(
@@ -53,9 +57,25 @@ fun WordSearchAppBar(
     searchQuery: String,
     onCancel: () -> Unit,
     onValueChange: (String) -> Unit,
-    focusRequester: FocusRequester
+    createNewWordList: (title: String, description: String?) -> Unit,
+    focusRequester: FocusRequester,
+    snackbarHostState: SnackbarHostState // Pass in the snackbar host state from parent
 ) {
     var helpExpanded by rememberSaveable { mutableStateOf(false) }
+    var showCreateDialog by rememberSaveable { mutableStateOf(false) }
+    var showSnackbarTrigger by rememberSaveable { mutableStateOf<String?>(null) }
+
+    // Move LaunchedEffect outside of the callback
+    LaunchedEffect(showSnackbarTrigger) {
+        showSnackbarTrigger?.let { title ->
+            snackbarHostState.showSnackbar(
+                message = "Word list \"$title\" created successfully",
+                duration = SnackbarDuration.Short
+            )
+            // Reset after showing
+            showSnackbarTrigger = null
+        }
+    }
 
     TopAppBar(
         navigationIcon = {
@@ -80,16 +100,13 @@ fun WordSearchAppBar(
             SearchTextField(
                 searchQuery = searchQuery,
                 onValueChange = { onValueChange(it) },
-                onCancel = {
-                    onCancel()
-                },
+                onCancel = { onCancel() },
                 focusRequester = focusRequester
             )
         },
         actions = {
             Box(
-                modifier = Modifier
-                    .padding(end = 8.dp)
+                modifier = Modifier.padding(end = 8.dp)
             ) {
                 IconButton(
                     onClick = { helpExpanded = !helpExpanded },
@@ -108,9 +125,23 @@ fun WordSearchAppBar(
                 }
                 HelpDropdown(
                     expanded = helpExpanded,
-                    onDismiss = {
-                        helpExpanded = false
-                    },
+                    onDismiss = { helpExpanded = false },
+                )
+            }
+
+            IconButton(
+                onClick = { showCreateDialog = true },
+                modifier = Modifier
+                    .shadow(4.dp, CircleShape)
+                    .clip(CircleShape)
+                    .background(Color(0xFF1A1A1A))
+                    .size(40.dp)
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.outline_playlist_add_24),
+                    contentDescription = "Add to word list",
+                    tint = Color.LightGray,
+                    modifier = Modifier.size(24.dp)
                 )
             }
         },
@@ -119,6 +150,19 @@ fun WordSearchAppBar(
         ),
         modifier = Modifier.shadow(8.dp)
     )
+
+    if (showCreateDialog) {
+        CreateWordListDialog(
+            onDismiss = { showCreateDialog = false },
+            onConfirm = { title, description ->
+                createNewWordList(title, description)
+                showCreateDialog = false
+
+                // Instead of LaunchedEffect in the callback, set the trigger value
+                showSnackbarTrigger = title
+            }
+        )
+    }
 }
 
 @Composable

@@ -10,58 +10,56 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
 import com.yonasoft.jadedictionary.features.handwriting.domain.services.HandwritingRecognizer
 import com.yonasoft.jadedictionary.features.ocr.domain.services.OCRService
+import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
+import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordListRepository
+import com.yonasoft.jadedictionary.features.word_search.presentation.state.HandwritingState
+import com.yonasoft.jadedictionary.features.word_search.presentation.state.InputMethodState
+import com.yonasoft.jadedictionary.features.word_search.presentation.state.OCRState
+import com.yonasoft.jadedictionary.features.word_search.presentation.state.RecognitionState
+import com.yonasoft.jadedictionary.features.word_search.presentation.state.SearchState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class WordSearchViewModel(
     application: Application,
-    private val repository: CCWordRepository
+    private val ccWordRepository: CCWordRepository,
+    private val wordListsRepository: CCWordListRepository
 ) : AndroidViewModel(application) {
 
-    private val _searchQuery = MutableStateFlow("")
-    private val _words = MutableStateFlow<List<CCWord>>(emptyList())
-    private val _selectedInputTab = MutableStateFlow(0)
-    private val _suggestedWords = MutableStateFlow<List<String>>(emptyList())
-    private val _showHandwritingSheet = MutableStateFlow(false)
-    private val _recognitionLoading = MutableStateFlow(false)
-    private val _resetCanvasSignal = MutableStateFlow(0L)
+    // ======== StateFlows for Each Group ========
 
-    // OCR-related states
-    private val _showOCRSheet = MutableStateFlow(false)
-    private val _ocrResults = MutableStateFlow<List<String>>(emptyList())
-    private val _currentOCRImage = MutableStateFlow<Bitmap?>(null)
+    private val _searchState = MutableStateFlow(SearchState())
+    val searchState: StateFlow<SearchState> = _searchState.asStateFlow()
 
-    val searchQuery: StateFlow<String> = _searchQuery
-    val words: StateFlow<List<CCWord>> = _words
-    val selectedInputTab: StateFlow<Int> = _selectedInputTab
-    val suggestedWords: StateFlow<List<String>> = _suggestedWords.asStateFlow()
-    val showHandwritingSheet: StateFlow<Boolean> = _showHandwritingSheet.asStateFlow()
-    val recognitionLoading: StateFlow<Boolean> = _recognitionLoading.asStateFlow()
-    val resetCanvasSignal: StateFlow<Long> = _resetCanvasSignal.asStateFlow()
+    private val _inputMethodState = MutableStateFlow(InputMethodState())
+    val inputMethodState: StateFlow<InputMethodState> = _inputMethodState.asStateFlow()
 
-    // OCR public states
-    val showOCRSheet: StateFlow<Boolean> = _showOCRSheet.asStateFlow()
-    val ocrResults: StateFlow<List<String>> = _ocrResults.asStateFlow()
-    val currentOCRImage: StateFlow<Bitmap?> = _currentOCRImage.asStateFlow()
+    private val _handwritingState = MutableStateFlow(HandwritingState())
+    val handwritingState: StateFlow<HandwritingState> = _handwritingState.asStateFlow()
 
+    private val _ocrState = MutableStateFlow(OCRState())
+    val ocrState: StateFlow<OCRState> = _ocrState.asStateFlow()
+
+    private val _recognitionState = MutableStateFlow(RecognitionState())
+    val recognitionState: StateFlow<RecognitionState> = _recognitionState.asStateFlow()
+
+    // Utility objects
     val focusRequester = FocusRequester()
     val localFocusManager = LocalFocusManager
     val localKeyboardController = LocalSoftwareKeyboardController
 
-    // Handwriting recognizer
+    // Service objects
     private val handwritingRecognizer = HandwritingRecognizer()
-
-    // OCR service
     private val ocrService = OCRService(application.applicationContext)
 
     // Store strokes for recognition
@@ -70,8 +68,8 @@ class WordSearchViewModel(
     init {
         viewModelScope.launch(Dispatchers.Main) {
             focusRequester.requestFocus()
-            _searchQuery.collectLatest {
-                search(it)
+            _searchState.collectLatest {
+                search(it.query)
             }
         }
 
@@ -85,59 +83,68 @@ class WordSearchViewModel(
         }
     }
 
+    // ======== Search Functions ========
+
     fun updateSearchQuery(newValue: String) {
-        _searchQuery.value = newValue
+        _searchState.update { it.copy(query = newValue) }
     }
 
+    suspend fun search(query: String) {
+        withContext(Dispatchers.IO) {
+            try {
+                delay(150)
+                val result = ccWordRepository.searchWords(query)
+                withContext(Dispatchers.Main) {
+                    _searchState.update { it.copy(results = result) }
+                }
+            } catch (e: Exception) {
+                Log.e("ViewModel", "Search failed", e)
+            }
+        }
+    }
+
+    // ======== Input Tab Functions ========
+
     fun updateInputTab(index: Int) {
-        _selectedInputTab.value = index
+        _inputMethodState.update { it.copy(selectedTab = index) }
 
         // Update visible sheet and reset data based on selected tab
         when (index) {
             0 -> { // Keyboard
-                _showHandwritingSheet.value = false
-                _showOCRSheet.value = false
-                _suggestedWords.value = emptyList()
+                setShowHandwritingSheet(false)
+                setShowOCRSheet(false)
+                _handwritingState.update { it.copy(suggestedWords = emptyList()) }
                 currentStrokes.clear()
             }
             1 -> { // Handwriting
-                _showHandwritingSheet.value = true
-                _showOCRSheet.value = false
-                _suggestedWords.value = emptyList()
+                setShowHandwritingSheet(true)
+                setShowOCRSheet(false)
+                _handwritingState.update { it.copy(suggestedWords = emptyList()) }
                 currentStrokes.clear()
             }
             2 -> { // Voice
-                _showHandwritingSheet.value = false
-                _showOCRSheet.value = false
-                _suggestedWords.value = emptyList()
+                setShowHandwritingSheet(false)
+                setShowOCRSheet(false)
+                _handwritingState.update { it.copy(suggestedWords = emptyList()) }
                 currentStrokes.clear()
             }
             3 -> { // OCR
-                _showHandwritingSheet.value = false
-                _showOCRSheet.value = true
-                _ocrResults.value = emptyList()
-                _currentOCRImage.value = null
+                setShowHandwritingSheet(false)
+                setShowOCRSheet(true)
+                _ocrState.update { it.copy(results = emptyList(), currentImage = null) }
             }
         }
     }
 
-    fun setShowHandwritingSheet(boolean: Boolean) {
-        _showHandwritingSheet.value = boolean
+    // ======== Handwriting Functions ========
+
+    fun setShowHandwritingSheet(show: Boolean) {
+        _handwritingState.update { it.copy(showSheet = show) }
 
         // Clear suggestions when hiding the sheet
-        if (!boolean) {
-            _suggestedWords.value = emptyList()
+        if (!show) {
+            _handwritingState.update { it.copy(suggestedWords = emptyList()) }
             currentStrokes.clear()
-        }
-    }
-
-    fun setShowOCRSheet(boolean: Boolean) {
-        _showOCRSheet.value = boolean
-
-        // Clear OCR results when hiding the sheet
-        if (!boolean) {
-            _ocrResults.value = emptyList()
-            _currentOCRImage.value = null
         }
     }
 
@@ -145,7 +152,7 @@ class WordSearchViewModel(
         if (points.isEmpty()) {
             // Clear data if empty points (clear button was pressed)
             currentStrokes.clear()
-            _suggestedWords.value = emptyList()
+            _handwritingState.update { it.copy(suggestedWords = emptyList()) }
             return
         }
 
@@ -159,7 +166,7 @@ class WordSearchViewModel(
     private fun recognizeHandwriting() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _recognitionLoading.value = true
+                _recognitionState.update { it.copy(isLoading = true) }
 
                 // Wait until we have at least 1 stroke
                 if (currentStrokes.isNotEmpty()) {
@@ -167,10 +174,12 @@ class WordSearchViewModel(
 
                     withContext(Dispatchers.Main) {
                         if (results.isNotEmpty()) {
-                            _suggestedWords.value = results
+                            _handwritingState.update { it.copy(suggestedWords = results) }
                         } else {
                             // Provide some fallback suggestions if recognition fails
-                            _suggestedWords.value = listOf("你", "我", "的", "是", "了")
+                            _handwritingState.update {
+                                it.copy(suggestedWords = listOf("你", "我", "的", "是", "了"))
+                            }
                         }
                     }
                 }
@@ -178,39 +187,62 @@ class WordSearchViewModel(
                 Log.e("WordSearchViewModel", "Handwriting recognition failed", e)
                 // Fallback to some default suggestions if recognition fails
                 withContext(Dispatchers.Main) {
-                    _suggestedWords.value = listOf("你", "好", "的", "是", "了")
+                    _handwritingState.update {
+                        it.copy(suggestedWords = listOf("你", "好", "的", "是", "了"))
+                    }
                 }
             } finally {
-                _recognitionLoading.value = false
+                _recognitionState.update { it.copy(isLoading = false) }
             }
         }
     }
 
-    // Process image for OCR
+    fun resetHandwritingCanvas() {
+        // Clear current strokes to reset the canvas
+        currentStrokes.clear()
+        _handwritingState.update {
+            it.copy(
+                suggestedWords = emptyList(),
+                resetCanvasSignal = System.currentTimeMillis()
+            )
+        }
+    }
+
+    // ======== OCR Functions ========
+
+    fun setShowOCRSheet(show: Boolean) {
+        _ocrState.update { it.copy(showSheet = show) }
+
+        // Clear OCR results when hiding the sheet
+        if (!show) {
+            _ocrState.update { it.copy(results = emptyList(), currentImage = null) }
+        }
+    }
+
     fun processOCRImage(bitmap: Bitmap) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _recognitionLoading.value = true
-                _currentOCRImage.value = bitmap
+                _recognitionState.update { it.copy(isLoading = true) }
+                _ocrState.update { it.copy(currentImage = bitmap) }
 
                 // Perform OCR on the image
                 val results = ocrService.recognizeText(bitmap)
 
                 withContext(Dispatchers.Main) {
                     if (results.isNotEmpty()) {
-                        _ocrResults.value = results
+                        _ocrState.update { it.copy(results = results) }
                     } else {
                         // If no results, show empty state
-                        _ocrResults.value = emptyList()
+                        _ocrState.update { it.copy(results = emptyList()) }
                     }
                 }
             } catch (e: Exception) {
                 Log.e("WordSearchViewModel", "OCR failed", e)
                 withContext(Dispatchers.Main) {
-                    _ocrResults.value = emptyList()
+                    _ocrState.update { it.copy(results = emptyList()) }
                 }
             } finally {
-                _recognitionLoading.value = false
+                _recognitionState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -219,58 +251,49 @@ class WordSearchViewModel(
     fun processOCRImage(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _recognitionLoading.value = true
+                _recognitionState.update { it.copy(isLoading = true) }
 
                 // Perform OCR on the image URI
                 val results = ocrService.recognizeText(uri)
 
                 withContext(Dispatchers.Main) {
                     if (results.isNotEmpty()) {
-                        _ocrResults.value = results
+                        _ocrState.update { it.copy(results = results) }
                     } else {
                         // If no results, show empty state
-                        _ocrResults.value = emptyList()
+                        _ocrState.update { it.copy(results = emptyList()) }
                     }
                 }
             } catch (e: Exception) {
                 Log.e("WordSearchViewModel", "OCR failed", e)
                 withContext(Dispatchers.Main) {
-                    _ocrResults.value = emptyList()
+                    _ocrState.update { it.copy(results = emptyList()) }
                 }
             } finally {
-                _recognitionLoading.value = false
+                _recognitionState.update { it.copy(isLoading = false) }
             }
         }
     }
 
     fun resetOCRImage() {
-        _currentOCRImage.value = null
-        _ocrResults.value = emptyList()
+        _ocrState.update { it.copy(currentImage = null, results = emptyList()) }
     }
 
-    fun resetHandwritingCanvas() {
-        // Clear current strokes to reset the canvas
-        currentStrokes.clear()
-        _suggestedWords.value = emptyList()
+    fun createNewWordList(title: String, description: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val newWordList = CCWordList(
+                id = null, // Let Room generate the ID
+                title = title,
+                description = description ?: "",
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis(),
+                numberOfWords = 0,
+                wordIds = emptyList()
+            )
 
-        // Signal to the UI to clear the canvas
-        _resetCanvasSignal.value = System.currentTimeMillis()
-    }
-
-    suspend fun search(query: String) {
-        withContext(Dispatchers.IO) {
-            try {
-                delay(150)
-                val result = repository.searchWords(query)
-                withContext(Dispatchers.Main) {
-                    _words.value = result
-                }
-            } catch (e: Exception) {
-                Log.e("ViewModel", "Search failed", e)
-            }
+            val insertedId = wordListsRepository.insertWordList(newWordList)
         }
     }
-
     override fun onCleared() {
         super.onCleared()
         handwritingRecognizer.close()

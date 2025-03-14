@@ -21,18 +21,24 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -67,19 +73,25 @@ fun WordSearch(
     val focusManager = wordSearchViewModel.localFocusManager.current
     val keyboardController = wordSearchViewModel.localKeyboardController.current
 
-    val searchQuery by wordSearchViewModel.searchQuery.collectAsStateWithLifecycle()
-    val words by wordSearchViewModel.words.collectAsStateWithLifecycle()
-    val selectedInputTab by wordSearchViewModel.selectedInputTab.collectAsStateWithLifecycle()
+    val searchState by wordSearchViewModel.searchState.collectAsStateWithLifecycle()
+    val inputMethodState by wordSearchViewModel.inputMethodState.collectAsStateWithLifecycle()
+    val handwritingState by wordSearchViewModel.handwritingState.collectAsStateWithLifecycle()
+    val ocrState by wordSearchViewModel.ocrState.collectAsStateWithLifecycle()
+    val recognitionState by wordSearchViewModel.recognitionState.collectAsStateWithLifecycle()
 
-    // Handwriting states
-    val showHandwritingSheet by wordSearchViewModel.showHandwritingSheet.collectAsStateWithLifecycle()
-    val suggestedWords by wordSearchViewModel.suggestedWords.collectAsStateWithLifecycle()
-    val recognitionLoading by wordSearchViewModel.recognitionLoading.collectAsStateWithLifecycle()
-    val resetCanvasSignal by wordSearchViewModel.resetCanvasSignal.collectAsStateWithLifecycle()
+    // Now you can use the bundled states in your UI
+    val searchQuery = searchState.query
+    val searchResults = searchState.results
+    val selectedTab = inputMethodState.selectedTab
+    val showHandwritingSheet = handwritingState.showSheet
+    val suggestedWords = handwritingState.suggestedWords
+    val resetCanvasSignal = handwritingState.resetCanvasSignal
+    val showOCRSheet = ocrState.showSheet
+    val ocrResults = ocrState.results
+    val isRecognizing = recognitionState.isLoading
 
-    // OCR states
-    val showOCRSheet by wordSearchViewModel.showOCRSheet.collectAsStateWithLifecycle()
-    val ocrResults by wordSearchViewModel.ocrResults.collectAsStateWithLifecycle()
+    // Create a SnackbarHostState that will be used by both the Scaffold and the AppBar
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -90,9 +102,9 @@ fun WordSearch(
             }
         }
 
-    LaunchedEffect(selectedInputTab) {
+    LaunchedEffect(selectedTab) {
         kotlinx.coroutines.delay(100)
-        when (selectedInputTab) {
+        when (selectedTab) {
             0 -> { // Keyboard
                 focusRequester.requestFocus()
                 keyboardController?.show()
@@ -139,7 +151,7 @@ fun WordSearch(
     // Handwriting bottom sheet
     HandwritingInputBottomSheet(
         isVisible = showHandwritingSheet,
-        isRecognizing = recognitionLoading,
+        isRecognizing = isRecognizing,
         resetCanvasSignal = resetCanvasSignal,
         onDismiss = {
             wordSearchViewModel.setShowHandwritingSheet(false)
@@ -167,7 +179,7 @@ fun WordSearch(
             wordSearchViewModel.processOCRImage(bitmap)
         },
         recognizedText = ocrResults,
-        isRecognizing = recognitionLoading,
+        isRecognizing = isRecognizing,
         onTextSelected = { text ->
             wordSearchViewModel.updateSearchQuery(text)
             wordSearchViewModel.resetOCRImage()
@@ -176,6 +188,30 @@ fun WordSearch(
 
     Scaffold(
         containerColor = Color(0xFF121212),
+        // Use the shared snackbarHostState in the Scaffold
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(16.dp)
+            ) { snackbarData ->
+                // Custom snackbar appearance
+                Snackbar(
+                    modifier = Modifier
+                        .shadow(8.dp, RoundedCornerShape(8.dp)),
+                    containerColor = Color(0xFF303030),
+                    contentColor = Color.White,
+                    actionContentColor = CustomColor.GREEN01.color,
+                    dismissActionContentColor = CustomColor.GREEN01.color,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = snackbarData.visuals.message,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+        },
         topBar = {
             WordSearchAppBar(
                 navigateUp = {
@@ -192,7 +228,12 @@ fun WordSearch(
                 onValueChange = { newQuery ->
                     wordSearchViewModel.updateSearchQuery(newQuery)
                 },
-                focusRequester = focusRequester
+                focusRequester = focusRequester,
+                createNewWordList = { title, description ->
+                    wordSearchViewModel.createNewWordList(title, description)
+                },
+                // Pass the shared snackbarHostState to the app bar
+                snackbarHostState = snackbarHostState
             )
         }
     ) { paddingValue ->
@@ -203,7 +244,7 @@ fun WordSearch(
         ) {
             // Enhanced Tab Row
             JadeTabRowAlternative(
-                selectedIndex = selectedInputTab,
+                selectedIndex = selectedTab,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
@@ -219,7 +260,7 @@ fun WordSearch(
                                     .padding(vertical = 8.dp)
                             ) {
                                 // Circle background for selected tab
-                                if (selectedInputTab == index) {
+                                if (selectedTab == index) {
                                     Box(
                                         modifier = Modifier
                                             .size(48.dp)
@@ -230,20 +271,22 @@ fun WordSearch(
 
                                 Icon(
                                     imageVector = icon,
-                                    contentDescription = when(index) {
+                                    contentDescription = when (index) {
                                         0 -> "Keyboard"
                                         1 -> "Handwriting"
                                         2 -> "Voice"
                                         3 -> "OCR Scanner"
                                         else -> ""
                                     },
-                                    tint = if (selectedInputTab == index) CustomColor.GREEN01.color else Color.White.copy(alpha = 0.7f),
+                                    tint = if (selectedTab == index) CustomColor.GREEN01.color else Color.White.copy(
+                                        alpha = 0.7f
+                                    ),
                                     modifier = Modifier
                                         .size(28.dp)
                                 )
                             }
                         },
-                        selected = selectedInputTab == index,
+                        selected = selectedTab == index,
                         onClick = {
                             wordSearchViewModel.updateInputTab(index)
                         }
@@ -253,7 +296,7 @@ fun WordSearch(
 
             // Results count
             AnimatedVisibility(
-                visible = words.isNotEmpty(),
+                visible = searchResults.isNotEmpty(),
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
@@ -263,7 +306,7 @@ fun WordSearch(
                         .padding(horizontal = 16.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "${words.size} result${if (words.size != 1) "s" else ""} found",
+                        text = "${searchResults.size} result${if (searchResults.size != 1) "s" else ""} found",
                         fontSize = 14.sp,
                         color = Color.White.copy(alpha = 0.6f),
                         fontWeight = FontWeight.Medium,
@@ -274,7 +317,7 @@ fun WordSearch(
 
             // Empty state
             AnimatedVisibility(
-                visible = words.isEmpty() && searchQuery.isNotEmpty(),
+                visible = searchResults.isEmpty() && searchQuery.isNotEmpty(),
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
@@ -316,13 +359,13 @@ fun WordSearch(
             }
 
             // Word list
-            if (words.isNotEmpty()) {
+            if (searchResults.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     state = rememberLazyListState()
                 ) {
                     itemsIndexed(
-                        words,
+                        searchResults,
                         key = { _, word -> word.id!! },
                     ) { _, word ->
                         CCWordColumn(word = word, onClick = {
