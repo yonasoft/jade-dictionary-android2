@@ -2,14 +2,17 @@ package com.yonasoft.jadedictionary.features.word_search.presentation.screens
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.speech.RecognizerIntent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,18 +20,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
@@ -114,7 +124,7 @@ fun WordSearch(
                         RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES,
                         supportedLanguages
                     )
-                    putExtra(RecognizerIntent.EXTRA_PROMPT, "Go on then, say something.")
+                    putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to search...")
                 }
                 launcher.launch(intent)
             }
@@ -165,7 +175,7 @@ fun WordSearch(
     )
 
     Scaffold(
-        containerColor = Color.Black,
+        containerColor = Color(0xFF121212),
         topBar = {
             WordSearchAppBar(
                 navigateUp = {
@@ -191,28 +201,47 @@ fun WordSearch(
                 .fillMaxWidth()
                 .padding(paddingValue)
         ) {
+            // Enhanced Tab Row
             JadeTabRow(
                 selectedIndex = selectedInputTab,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
             ) {
                 inputTabs.forEachIndexed { index, icon ->
                     Tab(
-                        selectedContentColor = Color.White,
+                        selectedContentColor = CustomColor.GREEN01.color,
+                        unselectedContentColor = Color.White.copy(alpha = 0.7f),
                         content = {
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = when(index) {
-                                    0 -> "Keyboard"
-                                    1 -> "Handwriting"
-                                    2 -> "Voice"
-                                    3 -> "OCR Scanner"
-                                    else -> ""
-                                },
-                                tint = if (selectedInputTab == index) CustomColor.GREEN01.color else Color.White,
+                            Box(
+                                contentAlignment = Alignment.Center,
                                 modifier = Modifier
-                                    .padding(6.dp)
-                                    .size(28.dp)
-                                    .background(color = Color.Black),
-                            )
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                // Circle background for selected tab
+                                if (selectedInputTab == index) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .clip(CircleShape)
+                                            .background(CustomColor.GREEN01.color.copy(alpha = 0.15f))
+                                    )
+                                }
+
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = when(index) {
+                                        0 -> "Keyboard"
+                                        1 -> "Handwriting"
+                                        2 -> "Voice"
+                                        3 -> "OCR Scanner"
+                                        else -> ""
+                                    },
+                                    tint = if (selectedInputTab == index) CustomColor.GREEN01.color else Color.White.copy(alpha = 0.7f),
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                )
+                            }
                         },
                         selected = selectedInputTab == index,
                         onClick = {
@@ -221,11 +250,75 @@ fun WordSearch(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
+
+            // Results count
+            AnimatedVisibility(
+                visible = words.isNotEmpty(),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "${words.size} result${if (words.size != 1) "s" else ""} found",
+                        fontSize = 14.sp,
+                        color = Color.White.copy(alpha = 0.6f),
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+            }
+
+            // Empty state
+            AnimatedVisibility(
+                visible = words.isEmpty() && searchQuery.isNotEmpty(),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "No results",
+                            tint = Color.White.copy(alpha = 0.3f),
+                            modifier = Modifier.size(64.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "No results found",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White.copy(alpha = 0.7f)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Try a different search term or input method",
+                            fontSize = 16.sp,
+                            color = Color.White.copy(alpha = 0.5f),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                }
+            }
+
+            // Word list
             if (words.isNotEmpty()) {
                 LazyColumn(
-                    Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxSize(),
                     state = rememberLazyListState()
                 ) {
                     itemsIndexed(
@@ -235,7 +328,11 @@ fun WordSearch(
                         CCWordColumn(word = word, onClick = {
                             navController.navigate(WordRoutes.WordDetail.createRoute(word.id!!))
                         })
-                        HorizontalDivider()
+                    }
+
+                    // Add space at bottom for better UX
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }

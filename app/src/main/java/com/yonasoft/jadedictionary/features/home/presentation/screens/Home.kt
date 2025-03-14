@@ -4,6 +4,8 @@ package com.yonasoft.jadedictionary.features.home.presentation.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,13 +14,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.navigation.MainRoutes
@@ -34,13 +39,13 @@ fun Home(navController: NavHostController) {
                 navController.navigate(MainRoutes.Words.name)
             }
         },
-        containerColor = Color.Black,
+        containerColor = Color(0xFF121212), // Darker background for better contrast
     ) { padding ->
         val scrollState = rememberScrollState()
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -48,30 +53,42 @@ fun Home(navController: NavHostController) {
             JadeBanner(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
+                    .height(200.dp)
             )
-            LinkDirector(
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "EXPLORE",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
                 modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-                    .height(50.dp),
+                    .align(Alignment.Start)
+                    .padding(start = 24.dp, bottom = 8.dp)
+            )
+
+            LinkDirector(
+                modifier = Modifier.fillMaxWidth(),
                 icon = Icons.AutoMirrored.Filled.List,
-                contentDescription = "Lists",
-                label = "Lists",
+                contentDescription = "Word Lists",
+                label = "Word Lists",
+                description = "Organize and manage your vocabulary",
                 onClick = {
                     navController.navigate(MainRoutes.WordLists.name)
                 },
             )
+
             LinkDirector(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-                    .height(42.dp),
+                modifier = Modifier.fillMaxWidth(),
                 icon = ImageVector.vectorResource(id = R.drawable.baseline_videogame_asset_24),
                 contentDescription = "Practice",
                 label = "Practice",
+                description = "Test your knowledge with exercises",
                 onClick = {},
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }

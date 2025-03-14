@@ -11,21 +11,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 
@@ -34,14 +38,14 @@ fun HomeAppBar(onClickSearch: () -> Unit) {
     TopAppBar(
         navigationIcon = {
             Image(
-                painter =
-                painterResource(R.drawable.jade_icon),
+                painter = painterResource(R.drawable.jade_icon),
                 contentDescription = "Jade Icon",
                 contentScale = ContentScale.Inside,
                 modifier = Modifier
-                    .padding(start = 10.dp)
-                    .width(48.dp)
-                    .height(48.dp),
+                    .padding(start = 16.dp)
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .shadow(4.dp, CircleShape)
             )
         },
         title = {
@@ -49,18 +53,11 @@ fun HomeAppBar(onClickSearch: () -> Unit) {
                 onClickSearch()
             }
         },
-        actions = {
-//            IconButton(onClick = {}) {
-//                Icon(
-//                    imageVector = Icons.Default.MoreVert,
-//                    contentDescription = "More menu",
-//                    modifier = Modifier.size(28.dp),
-//                )
-//            }
-        },
+        actions = {},
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = CustomColor.GRAY01.color
         ),
+        modifier = Modifier.shadow(8.dp)
     )
 }
 
@@ -72,20 +69,29 @@ fun HomeSearchBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp) // Set height for better visibility
-            .padding(10.dp)
-            .clip(RoundedCornerShape(12.dp)) // ✅ Use RoundedCornerShape
+            .height(48.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .clip(RoundedCornerShape(24.dp))
             .background(color = CustomColor.GRAY02.color)
-            .clickable { onClickSearch() },
+            .clickable { onClickSearch() }
+            .shadow(elevation = 4.dp, shape = RoundedCornerShape(24.dp)),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = Icons.Default.Search,
             contentDescription = "Search Icon",
-            Modifier
-                .size(28.dp)
-                .padding(start = 2.dp),
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .size(24.dp),
+            tint = Color.White.copy(alpha = 0.8f)
+        )
+
+        Text(
+            text = "Search for words...",
+            color = Color.White.copy(alpha = 0.6f),
+            fontSize = 16.sp,
+            modifier = Modifier.padding(start = 4.dp, end = 16.dp)
         )
     }
 }

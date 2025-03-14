@@ -1,9 +1,17 @@
 package com.yonasoft.jadedictionary.features.shared.presentation.components
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -11,21 +19,24 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.yonasoft.jadedictionary.core.constants.CustomColor
 
 @Composable
 fun SearchTextField(
@@ -35,66 +46,90 @@ fun SearchTextField(
     onCancel: () -> Unit,
     focusRequester: FocusRequester?
 ) {
-    TextField(
-        value = searchQuery,
-        singleLine = true,
-        onValueChange = {
-            onValueChange(it)
-        },
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Black,
-            unfocusedContainerColor = Color.Black,
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            focusedIndicatorColor = Color.DarkGray,
-            unfocusedIndicatorColor = Color.DarkGray,
-            unfocusedLabelColor = Color.DarkGray,
-            cursorColor = lerp(Color.Green, Color.White, .5f),
-        ),
-        textStyle = TextStyle.Default.copy(
-            fontSize = 20.sp
-        ),
-        trailingIcon = {
-            Row(
-                modifier = Modifier.fillMaxHeight(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = {
-                        onCancel()
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Cancel Icon",
-                        tint = Color.LightGray,
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Back arrow",
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        },
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Search,
-            hintLocales = LocaleList(
-                Locale("en"),
-                Locale("zh"),
-            ),
-        ),
-        keyboardActions = KeyboardActions(
-            onSearch = {
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-            }
-        ),
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .let { base ->
-                focusRequester?.let { base.focusRequester(it) } ?: base
-            }
-    )
+            .padding(vertical = 8.dp, horizontal = 4.dp)
+    ) {
+        TextField(
+            value = searchQuery,
+            singleLine = true,
+            onValueChange = {
+                onValueChange(it)
+            },
+            placeholder = {
+                Text(
+                    "Search for words...",
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 16.sp
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search Icon",
+                    tint = CustomColor.GREEN01.color,
+                    modifier = Modifier.size(24.dp)
+                )
+            },
+            trailingIcon = {
+                AnimatedVisibility(
+                    visible = searchQuery.isNotEmpty(),
+                    enter = fadeIn(animationSpec = tween(150)),
+                    exit = fadeOut(animationSpec = tween(150))
+                ) {
+                    IconButton(
+                        onClick = onCancel,
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF333333))
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Clear search",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFF1A1A1A),
+                unfocusedContainerColor = Color(0xFF1A1A1A),
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                cursorColor = CustomColor.GREEN01.color,
+            ),
+            textStyle = TextStyle.Default.copy(
+                fontSize = 16.sp
+            ),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Search,
+                hintLocales = LocaleList(
+                    Locale("en"),
+                    Locale("zh"),
+                ),
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    keyboardController?.hide()
+                }
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .shadow(4.dp, RoundedCornerShape(26.dp))
+                .clip(RoundedCornerShape(26.dp))
+                .let { base ->
+                    focusRequester?.let { base.focusRequester(it) } ?: base
+                }
+        )
+    }
 }
