@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yonasoft.jadedictionary.core.constants.CustomColor
-import com.yonasoft.jadedictionary.core.words.data.cc.CCWord
+import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 
 @Composable
 fun CCWordColumn(word: CCWord, onClick: () -> Unit = {}, modifier: Modifier = Modifier) {

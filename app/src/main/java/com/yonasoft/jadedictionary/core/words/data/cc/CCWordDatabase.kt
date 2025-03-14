@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import org.koin.android.ext.koin.androidContext
+import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 
 @Database(entities = [CCWord::class], version = 1)
 abstract class CCWordDatabase : RoomDatabase() {

@@ -39,7 +39,7 @@ import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
-import com.yonasoft.jadedictionary.core.words.data.cc.CCWord
+import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.data.sentences.Sentence
 import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.core.words.presentation.components.SentenceColumn

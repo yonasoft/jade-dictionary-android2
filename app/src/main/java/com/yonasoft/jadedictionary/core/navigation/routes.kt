@@ -2,7 +2,8 @@ package com.yonasoft.jadedictionary.core.navigation
 
 enum class MainRoutes {
     Home,
-    Words
+    Words,
+    WordLists,
 }
 
 sealed class WordRoutes(val route: String) {
@@ -10,4 +11,8 @@ sealed class WordRoutes(val route: String) {
     data object WordDetail : WordRoutes("word_detail/{wordId}") {
         fun createRoute(wordId: Long) = "word_detail/$wordId"
     }
+}
+
+sealed class WordListRoutes(val route: String) {
+    data object WordLists : WordRoutes("word_lists")
 }

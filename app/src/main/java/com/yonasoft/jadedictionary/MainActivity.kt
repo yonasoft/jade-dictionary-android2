@@ -12,8 +12,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.yonasoft.jadedictionary.core.navigation.MainRoutes
+import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
+import com.yonasoft.jadedictionary.features.word_lists.presentation.screens.WordLists
+import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListsViewModel
 import com.yonasoft.jadedictionary.features.word_search.presentation.screens.WordDetail
 import com.yonasoft.jadedictionary.features.word_search.presentation.screens.WordSearch
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
@@ -60,6 +63,19 @@ class MainActivity : ComponentActivity() {
                             WordDetail(
                                 navController = navController,
                                 wordDetailViewModel = wordDetailViewModel
+                            )
+                        }
+                    }
+
+                    navigation(
+                        startDestination = WordListRoutes.WordLists.route,
+                        route = MainRoutes.WordLists.name
+                    ) {
+                        composable(route = WordListRoutes.WordLists.route) {
+                            val wordListsViewModel = koinViewModel<WordListsViewModel>()
+                            WordLists(
+                                navController = navController,
+                                wordListsViewModel = wordListsViewModel,
                             )
                         }
                     }

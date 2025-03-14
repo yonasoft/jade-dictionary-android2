@@ -1,10 +1,10 @@
-package com.yonasoft.jadedictionary.core.words.data.cc
+package com.yonasoft.jadedictionary.core.words.domain.cc
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.yonasoft.jadedictionary.core.words.data.Word
+import com.yonasoft.jadedictionary.core.words.domain.Word
 import com.yonasoft.jadedictionary.core.words.domain.utils.PinyinUtils
 
 @Entity(

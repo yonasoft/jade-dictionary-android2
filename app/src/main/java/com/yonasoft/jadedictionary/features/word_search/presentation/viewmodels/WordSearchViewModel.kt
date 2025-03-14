@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.yonasoft.jadedictionary.core.words.data.cc.CCWord
+import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
 import com.yonasoft.jadedictionary.features.handwriting.domain.services.HandwritingRecognizer
 import com.yonasoft.jadedictionary.features.ocr.domain.services.OCRService

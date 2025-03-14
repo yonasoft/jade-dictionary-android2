@@ -3,6 +3,7 @@ package com.yonasoft.jadedictionary.core.words.data.cc
 import android.content.Context
 import android.util.Log
 import com.yonasoft.jadedictionary.core.words.data.sentences.Sentence
+import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
 import com.yonasoft.jadedictionary.core.words.domain.utils.PinyinUtils
 import com.yonasoft.jadedictionary.core.words.domain.utils.SentenceUtil
@@ -10,16 +11,12 @@ import com.yonasoft.jadedictionary.core.words.domain.utils.SentenceUtil
 class CCWordRepositoryImpl(private val dao: CCWordDao, private val context: Context) :
     CCWordRepository {
     override suspend fun getWordById(id: Long): CCWord? = dao.getWordById(id)
+    override suspend fun getWordByIds(ids: List<Long>): List<CCWord> = dao.getWordsByIds(ids)
 
     override suspend fun searchWords(query: String): List<CCWord> {
 
         if (query.isBlank()) return emptyList()
-
-        // Normalize the query, handling pinyin variations
         val normalizedQuery = PinyinUtils.normalizeQuery(query)
-
-        Log.d("Repository", "Original query: '$query'")
-        Log.d("Repository", "Normalized query: '$normalizedQuery'")
 
         return dao.searchWords(normalizedQuery)
     }

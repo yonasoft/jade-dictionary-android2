@@ -3,11 +3,15 @@ package com.yonasoft.jadedictionary.core.words.data.cc
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
+import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 
 @Dao
 interface CCWordDao {
     @Query("SELECT * FROM cc_words WHERE _id = :id")
     suspend fun getWordById(id: Long): CCWord?
+
+    @Query("SELECT * FROM cc_words WHERE _id IN (:ids)")
+    suspend fun getWordsByIds(ids: List<Long>): List<CCWord>
 
     @RewriteQueriesToDropUnusedColumns
     @Query(
