@@ -51,7 +51,7 @@ fun SearchTextField(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 4.dp)
+            .padding(vertical = 4.dp, horizontal = 4.dp)
     ) {
         TextField(
             value = searchQuery,
@@ -63,7 +63,7 @@ fun SearchTextField(
                 Text(
                     "Search for words...",
                     color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 16.sp
+                    fontSize = 18.sp
                 )
             },
             leadingIcon = {
@@ -108,7 +108,7 @@ fun SearchTextField(
                 cursorColor = CustomColor.GREEN01.color,
             ),
             textStyle = TextStyle.Default.copy(
-                fontSize = 16.sp
+                fontSize = 18.sp
             ),
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Search,
@@ -124,7 +124,7 @@ fun SearchTextField(
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(64.dp)
                 .shadow(4.dp, RoundedCornerShape(26.dp))
                 .clip(RoundedCornerShape(26.dp))
                 .let { base ->
