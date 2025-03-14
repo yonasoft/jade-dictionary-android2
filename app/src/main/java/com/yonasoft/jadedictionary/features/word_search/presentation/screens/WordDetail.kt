@@ -76,6 +76,7 @@ fun WordDetail(
     val characters by wordDetailViewModel.characters.collectAsStateWithLifecycle()
     val wordsOfWord by wordDetailViewModel.wordsOfWord.collectAsStateWithLifecycle()
     val sentences by wordDetailViewModel.sentences.collectAsStateWithLifecycle()
+    val wordLists by wordDetailViewModel.wordLists.collectAsStateWithLifecycle()
 
     // Create a SnackbarHostState for snackbar display
     val snackbarHostState = remember { SnackbarHostState() }
@@ -101,6 +102,10 @@ fun WordDetail(
                 createNewWordList = { title, description ->
                     wordDetailViewModel.createNewWordList(title, description)
                 },
+                addWordToList = { selectedList ->
+                    wordDetailViewModel.addWordToList(selectedList)
+                },
+                wordLists = wordLists,
                 snackbarHostState = snackbarHostState
             )
         },
@@ -198,10 +203,13 @@ fun WordDetail(
 
                         IconButton(
                             onClick = {
-                                openTTS(
-                                    tts = tts.value!!,
-                                    text = wordDetails!!.simplified ?: "",
-                                    setSpeaking = { wordDetailViewModel.setIsSpeaking(it) })
+                                wordDetails?.simplified?.let { simplifiedText ->
+                                    openTTS(
+                                        tts = tts.value!!,
+                                        text = simplifiedText,
+                                        setSpeaking = { wordDetailViewModel.setIsSpeaking(it) }
+                                    )
+                                }
                             },
                             modifier = Modifier
                                 .shadow(8.dp, CircleShape)
