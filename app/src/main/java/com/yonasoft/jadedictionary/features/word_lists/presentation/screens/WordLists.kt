@@ -1,13 +1,16 @@
 package com.yonasoft.jadedictionary.features.word_lists.presentation.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -16,7 +19,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -69,12 +74,32 @@ fun WordLists(navController: NavHostController, wordListsViewModel: WordListsVie
                 tabs.forEachIndexed { index, text ->
                     Tab(
                         selectedContentColor = CustomColor.GREEN01.color,
+                        unselectedContentColor = Color.White.copy(alpha = 0.7f),
                         content = {
-                            Text(
-                                text,
-                                fontSize = 20.sp,
-                                color = if (selectedTab == index) CustomColor.GREEN01.color else Color.White
-                            )
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                // Circle background for selected tab
+                                if (selectedTab == index) {
+                                    Box(
+                                        modifier = Modifier
+                                            .height(36.dp)
+                                            .width(120.dp)
+                                            .clip(RoundedCornerShape(18.dp))
+                                            .background(CustomColor.GREEN01.color.copy(alpha = 0.15f))
+                                    )
+                                }
+
+                                Text(
+                                    text = text,
+                                    fontSize = 16.sp,
+                                    fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (selectedTab == index) CustomColor.GREEN01.color else Color.White.copy(alpha = 0.7f),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                                )
+                            }
                         },
                         selected = selectedTab == index,
                         onClick = {

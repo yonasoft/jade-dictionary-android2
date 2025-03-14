@@ -50,7 +50,7 @@ import com.yonasoft.jadedictionary.core.words.data.sentences.Sentence
 import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
 import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.core.words.presentation.components.SentenceColumn
-import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRow
+import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRowAlternative
 import com.yonasoft.jadedictionary.features.shared.presentation.components.openTTS
 import com.yonasoft.jadedictionary.features.shared.presentation.components.rememberTextToSpeech
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordDetailAppbar
@@ -185,7 +185,7 @@ fun WordDetail(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Improved Tab Row
-            JadeTabRow(
+            JadeTabRowAlternative(
                 selectedIndex = selectedTab,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -214,7 +214,7 @@ fun WordDetail(
 
                                 Text(
                                     text = text,
-                                    fontSize = 18.sp,
+                                    fontSize = 16.sp,
                                     fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
                                     color = if (selectedTab == index) CustomColor.GREEN01.color else Color.White.copy(alpha = 0.7f),
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
