@@ -12,5 +12,7 @@ data class WordListDetailState(
     val isEditing: Boolean = false,
     val editTitle: String = "",
     val editDescription: String = "",
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val lastRemovedWord: CCWord? = null,
+    val isUndoAvailable: Boolean = false
 )

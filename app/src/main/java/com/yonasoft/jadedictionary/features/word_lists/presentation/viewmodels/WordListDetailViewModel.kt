@@ -9,6 +9,8 @@ import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordListRepository
 import com.yonasoft.jadedictionary.features.word_lists.presentation.state.WordListDetailState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +28,12 @@ class WordListDetailViewModel(
 
     private val _uiState = MutableStateFlow(WordListDetailState())
     val uiState: StateFlow<WordListDetailState> = _uiState.asStateFlow()
+
+    // Track the current undo job to cancel it if needed
+    private var undoJob: Job? = null
+
+    // How long the undo option remains available (in milliseconds)
+    private val UNDO_TIMEOUT = 5000L
 
     init {
         loadWordList()
@@ -155,6 +163,9 @@ class WordListDetailViewModel(
     }
 
     fun removeWord(word: CCWord) {
+        // Cancel any existing undo job
+        undoJob?.cancel()
+
         viewModelScope.launch {
             try {
                 val currentWordList = _uiState.value.wordList ?: return@launch
@@ -181,15 +192,21 @@ class WordListDetailViewModel(
                                 wordList = updatedWordList,
                                 words = updatedWords,
                                 filteredWords = if (it.searchQuery.isBlank()) updatedWords else
-                                    updatedWords.filter { word ->
-                                        word.displayText.contains(it.searchQuery, ignoreCase = true) ||
-                                                word.pinyin?.contains(it.searchQuery, ignoreCase = true) == true  ||
-                                                word.definition?.contains(it.searchQuery, ignoreCase = true) == true
-                                    }
+                                    updatedWords.filter { filterWord ->
+                                        filterWord.displayText.contains(it.searchQuery, ignoreCase = true) ||
+                                                filterWord.pinyin?.contains(it.searchQuery, ignoreCase = true) == true ||
+                                                filterWord.definition?.contains(it.searchQuery, ignoreCase = true) == true
+                                    },
+                                lastRemovedWord = word,
+                                isUndoAvailable = true
                             )
                         }
                     }
                 }
+
+                // Start undo timeout
+                undoJob = startUndoTimeout()
+
             } catch (e: Exception) {
                 Log.e("WordListDetailVM", "Error removing word", e)
                 _uiState.update {
@@ -197,6 +214,89 @@ class WordListDetailViewModel(
                         errorMessage = "Failed to remove word: ${e.message}"
                     )
                 }
+            }
+        }
+    }
+
+    /**
+     * Undoes the last word removal
+     */
+    fun undoWordRemoval() {
+        undoJob?.cancel()
+
+        viewModelScope.launch {
+            try {
+                val currentWordList = _uiState.value.wordList ?: return@launch
+                val lastRemovedWord = _uiState.value.lastRemovedWord ?: return@launch
+
+                // Add the word ID back to the list
+                val updatedWordIds = currentWordList.wordIds.toMutableList()
+                lastRemovedWord.id?.let { updatedWordIds.add(it) }
+
+                val updatedWordList = currentWordList.copy(
+                    wordIds = updatedWordIds,
+                    numberOfWords = updatedWordIds.size.toLong(),
+                    updatedAt = System.currentTimeMillis()
+                )
+
+                withContext(Dispatchers.IO) {
+                    wordListRepository.updateWordList(updatedWordList)
+
+                    // Add the word back to the lists
+                    val updatedWords = _uiState.value.words.toMutableList()
+                    updatedWords.add(lastRemovedWord)
+
+                    // Re-filter if needed
+                    val updatedFilteredWords = if (_uiState.value.searchQuery.isBlank()) {
+                        updatedWords
+                    } else {
+                        updatedWords.filter { word ->
+                            word.displayText.contains(_uiState.value.searchQuery, ignoreCase = true) ||
+                                    word.pinyin?.contains(_uiState.value.searchQuery, ignoreCase = true) == true ||
+                                    word.definition?.contains(_uiState.value.searchQuery, ignoreCase = true) == true
+                        }
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        _uiState.update {
+                            it.copy(
+                                wordList = updatedWordList,
+                                words = updatedWords,
+                                filteredWords = updatedFilteredWords,
+                                lastRemovedWord = null,
+                                isUndoAvailable = false
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("WordListDetailVM", "Error undoing word removal", e)
+                _uiState.update {
+                    it.copy(
+                        errorMessage = "Failed to undo word removal: ${e.message}",
+                        isUndoAvailable = false
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Starts a timeout after which the undo option will no longer be available
+     */
+    private fun startUndoTimeout(): Job {
+        return viewModelScope.launch {
+            try {
+                delay(UNDO_TIMEOUT)
+                // After timeout, remove the undo option
+                _uiState.update {
+                    it.copy(
+                        isUndoAvailable = false,
+                        lastRemovedWord = null
+                    )
+                }
+            } catch (e: Exception) {
+                // Job was likely canceled, no action needed
             }
         }
     }

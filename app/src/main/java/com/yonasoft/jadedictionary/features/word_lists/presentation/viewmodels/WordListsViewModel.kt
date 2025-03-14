@@ -1,9 +1,6 @@
 package com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels
 
 import android.util.Log
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
@@ -32,16 +29,6 @@ class WordListsViewModel(private val repository: CCWordListRepository) : ViewMod
     val searchQuery: StateFlow<String>
         get() = MutableStateFlow(_wordListsState.value.searchQuery)
 
-    val selectedTab: StateFlow<Int>
-        get() = MutableStateFlow(_uiState.value.selectedTab)
-
-    val myWordLists: StateFlow<List<CCWordList>>
-        get() = MutableStateFlow(_wordListsState.value.myWordLists)
-
-    // Utility objects
-    val focusRequester = FocusRequester()
-    val localFocusManager = LocalFocusManager
-    val localKeyboardController = LocalSoftwareKeyboardController
 
     init {
         viewModelScope.launch {

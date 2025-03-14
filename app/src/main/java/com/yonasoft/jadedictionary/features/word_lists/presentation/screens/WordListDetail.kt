@@ -24,8 +24,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -66,6 +68,22 @@ fun WordListDetailScreen(
         uiState.errorMessage?.let {
             scope.launch {
                 snackbarHostState.showSnackbar(it)
+            }
+        }
+    }
+
+    // Show undo option when a word is removed
+    LaunchedEffect(uiState.isUndoAvailable, uiState.lastRemovedWord) {
+        if (uiState.isUndoAvailable && uiState.lastRemovedWord != null) {
+            val wordName = uiState.lastRemovedWord!!.displayText
+            val result = snackbarHostState.showSnackbar(
+                message = "Removed \"$wordName\" from list",
+                actionLabel = "UNDO",
+                duration = SnackbarDuration.Short
+            )
+
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.undoWordRemoval()
             }
         }
     }
