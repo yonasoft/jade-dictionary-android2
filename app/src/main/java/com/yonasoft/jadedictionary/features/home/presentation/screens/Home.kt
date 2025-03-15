@@ -82,6 +82,15 @@ fun Home(navController: NavHostController) {
 
             LinkDirector(
                 modifier = Modifier.fillMaxWidth(),
+                icon = ImageVector.vectorResource(R.drawable.outline_cards_star_24),
+                contentDescription = "Flash Cards",
+                label = "Cards",
+                description = "Practice vocabulary with interactive flashcards",
+                onClick = {},
+            )
+
+            LinkDirector(
+                modifier = Modifier.fillMaxWidth(),
                 icon = ImageVector.vectorResource(id = R.drawable.baseline_videogame_asset_24),
                 contentDescription = "Practice",
                 label = "Practice",
@@ -97,6 +106,7 @@ fun Home(navController: NavHostController) {
                 description = "Get premium word lists, practice modules and learning tools",
                 onClick = {},
             )
+
         }
     }
 }
