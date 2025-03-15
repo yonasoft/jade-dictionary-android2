@@ -57,7 +57,7 @@ fun CCWordColumn(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp) // Reduced vertical padding
+            .padding(horizontal = 12.dp, vertical = 4.dp) // Reduced vertical padding
             .shadow(
                 elevation = 2.dp,
                 shape = RoundedCornerShape(12.dp)

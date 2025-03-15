@@ -39,7 +39,7 @@ fun SentenceColumn(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
             .shadow(elevation = 4.dp, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -51,7 +51,7 @@ fun SentenceColumn(
             modifier = modifier
                 .fillMaxWidth()
                 .heightIn(min = 64.dp)
-                .padding(16.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.Top,
         ) {
             Column(

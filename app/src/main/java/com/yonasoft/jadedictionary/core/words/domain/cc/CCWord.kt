@@ -43,7 +43,7 @@ data class CCWord(
     val displayPinyin:String
         get() = buildString {
         pinyin?.let {
-            append(" - ${PinyinUtils.decodePinyin(it)}")
+            append(PinyinUtils.decodePinyin(it))
         }
     }
 }
