@@ -1,8 +1,9 @@
-package com.yonasoft.jadedictionary.core.words.domain.utils
+package com.yonasoft.jadedictionary.features.word.domain.utils
 
 sealed interface Result<out D, out E: Error> {
     data class Success<out D>(val data: D): Result<D, Nothing>
-    data class Error<out E: com.yonasoft.jadedictionary.core.words.domain.utils.Error>(val error: E): Result<Nothing, E>
+    data class Error<out E: com.yonasoft.jadedictionary.features.word.domain.utils.Error>(val error: E):
+        Result<Nothing, E>
 }
 
 inline fun <T, E: Error, R> Result<T, E>.map(map: (T) -> R): Result<R, E> {

@@ -1,6 +1,6 @@
-package com.yonasoft.jadedictionary.core.words.domain.cc
+package com.yonasoft.jadedictionary.features.word.domain.cc
 
-import com.yonasoft.jadedictionary.core.words.data.sentences.Sentence
+import com.yonasoft.jadedictionary.features.word.data.local.sentences.Sentence
 
 interface CCWordRepository {
     suspend fun getWordById(id: Long): CCWord?

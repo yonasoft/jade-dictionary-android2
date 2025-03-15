@@ -50,7 +50,7 @@ import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
-import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
+import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.features.handwriting.presentation.components.HandwritingInputBottomSheet
 import com.yonasoft.jadedictionary.features.ocr.presentation.components.OCRBottomSheet
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRowAlternative

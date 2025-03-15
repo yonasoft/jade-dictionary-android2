@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.yonasoft.jadedictionary.core.words.data.cc.CCWordDatabase
+import com.yonasoft.jadedictionary.features.word.data.local.cc.CCWordDatabase
 import kotlinx.coroutines.runBlocking
 
 import org.junit.Test

@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yonasoft.jadedictionary.core.words.data.sentences.Sentence
-import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
-import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
+import com.yonasoft.jadedictionary.features.word.data.local.sentences.Sentence
+import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
+import com.yonasoft.jadedictionary.features.word.domain.cc.CCWordRepository
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordListRepository
 import kotlinx.coroutines.Dispatchers

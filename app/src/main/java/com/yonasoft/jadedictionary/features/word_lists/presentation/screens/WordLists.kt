@@ -81,7 +81,7 @@ fun WordLists(
 
     val tabs = listOf(
         "HSK 2",
-        "HSK 3.0",
+        "HSK 3",
         "My Lists",
     )
 

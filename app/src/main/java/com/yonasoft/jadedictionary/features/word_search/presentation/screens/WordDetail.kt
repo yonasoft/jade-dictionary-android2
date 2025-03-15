@@ -50,10 +50,10 @@ import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
-import com.yonasoft.jadedictionary.core.words.data.sentences.Sentence
-import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
-import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
-import com.yonasoft.jadedictionary.core.words.presentation.components.SentenceColumn
+import com.yonasoft.jadedictionary.features.word.data.local.sentences.Sentence
+import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
+import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordColumn
+import com.yonasoft.jadedictionary.features.word.presentation.components.SentenceColumn
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRowAlternative
 import com.yonasoft.jadedictionary.features.shared.presentation.components.openTTS
 import com.yonasoft.jadedictionary.features.shared.presentation.components.rememberTextToSpeech

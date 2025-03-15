@@ -1,11 +1,11 @@
-package com.yonasoft.jadedictionary.core.words.domain.cc
+package com.yonasoft.jadedictionary.features.word.domain.cc
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.yonasoft.jadedictionary.core.words.domain.Word
-import com.yonasoft.jadedictionary.core.words.domain.utils.PinyinUtils
+import com.yonasoft.jadedictionary.features.word.domain.Word
+import com.yonasoft.jadedictionary.features.word.domain.utils.PinyinUtils
 
 @Entity(
     tableName = "cc_words",

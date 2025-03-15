@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.core.words.presentation.components
+package com.yonasoft.jadedictionary.features.word.presentation.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yonasoft.jadedictionary.core.constants.CustomColor
-import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
+import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
 import com.yonasoft.jadedictionary.features.word_lists.presentation.components.WordListSelectionDialog
 import kotlinx.coroutines.launch

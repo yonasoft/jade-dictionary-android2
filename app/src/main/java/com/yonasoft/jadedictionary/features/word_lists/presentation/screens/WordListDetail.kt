@@ -48,8 +48,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
-import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
-import com.yonasoft.jadedictionary.core.words.presentation.components.CCWordColumn
+import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
+import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.features.shared.presentation.components.SearchTextField
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListDetailViewModel
 import kotlinx.coroutines.launch

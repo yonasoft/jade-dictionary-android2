@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.features.word_search.presentation.state
+package com.yonasoft.jadedictionary.features.handwriting.presentation.state
 
 data class HandwritingState(
     val showSheet: Boolean = false,

@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.core.words.presentation.components
+package com.yonasoft.jadedictionary.features.word.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
-import com.yonasoft.jadedictionary.core.words.data.sentences.Sentence
-import com.yonasoft.jadedictionary.core.words.domain.utils.PinyinUtils
+import com.yonasoft.jadedictionary.features.word.data.local.sentences.Sentence
+import com.yonasoft.jadedictionary.features.word.domain.utils.PinyinUtils
 
 @Composable
 fun SentenceColumn(

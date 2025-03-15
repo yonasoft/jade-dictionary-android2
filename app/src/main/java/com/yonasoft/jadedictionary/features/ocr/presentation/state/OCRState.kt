@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.features.word_search.presentation.state
+package com.yonasoft.jadedictionary.features.ocr.presentation.state
 
 import android.graphics.Bitmap
 

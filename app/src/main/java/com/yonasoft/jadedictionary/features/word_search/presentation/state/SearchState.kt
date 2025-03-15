@@ -1,6 +1,6 @@
 package com.yonasoft.jadedictionary.features.word_search.presentation.state
 
-import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
+import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 
 data class SearchState(
     val query: String = "",

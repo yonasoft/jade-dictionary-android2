@@ -1,9 +1,9 @@
-package com.yonasoft.jadedictionary.core.words.data.cc
+package com.yonasoft.jadedictionary.features.word.data.local.cc
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
-import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
+import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 
 @Dao
 interface CCWordDao {

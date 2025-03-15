@@ -2,10 +2,10 @@ package com.yonasoft.jadedictionary.di
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
-import com.yonasoft.jadedictionary.core.words.data.cc.CCWordDatabase
-import com.yonasoft.jadedictionary.core.words.data.cc.CCWordRepositoryImpl
-import com.yonasoft.jadedictionary.core.words.domain.cc.CCWordRepository
-import com.yonasoft.jadedictionary.core.words.domain.utils.PinyinUtils
+import com.yonasoft.jadedictionary.features.word.data.local.cc.CCWordDatabase
+import com.yonasoft.jadedictionary.features.word.data.local.cc.CCWordRepositoryImpl
+import com.yonasoft.jadedictionary.features.word.domain.cc.CCWordRepository
+import com.yonasoft.jadedictionary.features.word.domain.utils.PinyinUtils
 import com.yonasoft.jadedictionary.features.word_lists.data.cc.CCWordListDatabase
 import com.yonasoft.jadedictionary.features.word_lists.data.cc.CCWordListRepositoryImpl
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordListRepository

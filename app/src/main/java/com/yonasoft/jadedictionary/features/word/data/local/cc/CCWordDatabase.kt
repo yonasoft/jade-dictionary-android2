@@ -1,10 +1,10 @@
-package com.yonasoft.jadedictionary.core.words.data.cc
+package com.yonasoft.jadedictionary.features.word.data.local.cc
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.yonasoft.jadedictionary.core.words.domain.cc.CCWord
+import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 
 @Database(entities = [CCWord::class], version = 1)
 abstract class CCWordDatabase : RoomDatabase() {
