@@ -83,9 +83,10 @@ fun WordLists(
     val snackbarHostState = remember { SnackbarHostState() }
 
     val tabs = listOf(
-        "HSK 2",
-        "HSK 3",
-        "My Lists",
+        "HSK2",
+        "HSK3",
+        "Preset",
+        "Custom",
     )
 
     val pagerState = rememberPagerState(initialPage = selectedTab) {
@@ -208,14 +209,18 @@ fun WordLists(
                 ) {
                     when (page) {
                         0 -> { /* HSK 2 content */
-                            EmptyTabContent("HSK 2 content coming soon")
+                            EmptyTabContent("HSK 2.0 content coming soon")
                         }
 
                         1 -> { /* HSK 3.0 content */
-                            EmptyTabContent("HSK 3 content coming soon")
+                            EmptyTabContent("HSK 3.0 content coming soon")
                         }
 
-                        2 -> {
+                        2 -> { /* HSK 3.0 content */
+                            EmptyTabContent("Preset lists content coming soon")
+                        }
+
+                        3 -> {
                             MyLists(
                                 wordList = myWordLists,
                                 onClick = { wordListId ->
