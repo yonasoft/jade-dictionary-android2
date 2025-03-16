@@ -24,15 +24,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun LinkDirector(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     contentDescription: String,
     label: String,
     onClick: () -> Unit,
@@ -42,71 +43,82 @@ fun LinkDirector(
     Card(
         modifier = modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { onClick() }
-            .shadow(elevation = 6.dp, shape = RoundedCornerShape(16.dp)),
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1A237E), // Deep blue color
+            containerColor = Color.Transparent, // Transparent background for gradient
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // Remove elevation for cleaner look
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            Color(0xFF0D47A1), // Deeper blue start
+                            Color(0xFF1565C0)  // Lighter blue end
+                        )
+                    )
+                )
         ) {
             Row(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp), // Increased padding for more space
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.15f)),
-                    contentAlignment = Alignment.Center
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = contentDescription,
-                        tint = Color.White,
-                        modifier = Modifier.size(28.dp),
-                    )
-                }
-
-                Column(
-                    modifier = Modifier.padding(start = 16.dp)
-                ) {
-                    Text(
-                        text = label,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
-
-                    AnimatedVisibility(
-                        visible = description.isNotEmpty(),
-                        enter = fadeIn(),
-                        exit = fadeOut()
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp) // Slightly larger icon
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.2f)), // More transparent background
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = description,
-                            color = Color.White.copy(alpha = 0.7f),
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(top = 4.dp)
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = contentDescription,
+                            tint = Color.White,
+                            modifier = Modifier.size(26.dp),
                         )
                     }
-                }
-            }
 
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Right Arrow",
-                tint = Color.White,
-                modifier = Modifier.size(32.dp),
-            )
+                    Column(
+                        modifier = Modifier.padding(start = 16.dp)
+                    ) {
+                        Text(
+                            text = label,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp // Slightly smaller for cleaner look
+                        )
+
+                        AnimatedVisibility(
+                            visible = description.isNotEmpty(),
+                            enter = fadeIn(),
+                            exit = fadeOut()
+                        ) {
+                            Text(
+                                text = description,
+                                color = Color.White.copy(alpha = 0.8f), // Increased opacity for better readability
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                    }
+                }
+
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Right Arrow",
+                    tint = Color.White.copy(alpha = 0.7f), // Slightly transparent for subtlety
+                    modifier = Modifier.size(32.dp),
+                )
+            }
         }
     }
 }

@@ -32,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -51,6 +50,7 @@ import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.features.shared.presentation.components.SearchTextField
 import com.yonasoft.jadedictionary.features.word_lists.presentation.components.CreateWordListDialog
 
+
 @Composable
 fun WordSearchAppBar(
     navigateUp: () -> Unit,
@@ -59,7 +59,7 @@ fun WordSearchAppBar(
     onValueChange: (String) -> Unit,
     createNewWordList: (title: String, description: String?) -> Unit,
     focusRequester: FocusRequester,
-    snackbarHostState: SnackbarHostState // Pass in the snackbar host state from parent
+    snackbarHostState: SnackbarHostState
 ) {
     var helpExpanded by rememberSaveable { mutableStateOf(false) }
     var showCreateDialog by rememberSaveable { mutableStateOf(false) }
@@ -77,13 +77,15 @@ fun WordSearchAppBar(
         }
     }
 
+    // Darker app bar color for better contrast
+    val appBarColor = Color(0xFF050505)
+
     TopAppBar(
         navigationIcon = {
             IconButton(
                 onClick = { navigateUp() },
                 modifier = Modifier
                     .padding(start = 8.dp)
-                    .shadow(4.dp, CircleShape)
                     .clip(CircleShape)
                     .background(Color(0xFF1A1A1A))
                     .size(40.dp)
@@ -92,7 +94,7 @@ fun WordSearchAppBar(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back arrow",
                     tint = Color.White,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(22.dp)
                 )
             }
         },
@@ -107,12 +109,11 @@ fun WordSearchAppBar(
         },
         actions = {
             Box(
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.padding(end = 4.dp)
             ) {
                 IconButton(
                     onClick = { helpExpanded = !helpExpanded },
                     modifier = Modifier
-                        .shadow(4.dp, CircleShape)
                         .clip(CircleShape)
                         .background(Color(0xFF1A1A1A))
                         .size(40.dp)
@@ -121,7 +122,7 @@ fun WordSearchAppBar(
                         imageVector = ImageVector.vectorResource(R.drawable.outline_help_24),
                         contentDescription = "Help Icon",
                         tint = CustomColor.GREEN01.color,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 }
                 HelpDropdown(
@@ -133,7 +134,7 @@ fun WordSearchAppBar(
             IconButton(
                 onClick = { showCreateDialog = true },
                 modifier = Modifier
-                    .shadow(4.dp, CircleShape)
+                    .padding(end = 8.dp)
                     .clip(CircleShape)
                     .background(Color(0xFF1A1A1A))
                     .size(40.dp)
@@ -141,15 +142,14 @@ fun WordSearchAppBar(
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.outline_playlist_add_24),
                     contentDescription = "Add to word list",
-                    tint = Color.LightGray,
-                    modifier = Modifier.size(24.dp)
+                    tint = Color.White.copy(alpha = 0.8f),
+                    modifier = Modifier.size(22.dp)
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFF121212)
-        ),
-        modifier = Modifier.shadow(8.dp)
+            containerColor = appBarColor
+        )
     )
 
     if (showCreateDialog) {
@@ -158,8 +158,6 @@ fun WordSearchAppBar(
             onConfirm = { title, description ->
                 createNewWordList(title, description)
                 showCreateDialog = false
-
-                // Instead of LaunchedEffect in the callback, set the trigger value
                 showSnackbarTrigger = title
             }
         )
@@ -183,12 +181,12 @@ fun HelpDropdown(expanded: Boolean, onDismiss: () -> Unit, modifier: Modifier = 
         ) {
             Card(
                 modifier = modifier
-                    .width(280.dp)
-                    .shadow(8.dp, RoundedCornerShape(16.dp)),
+                    .width(280.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF202020)
-                )
+                    containerColor = Color.Transparent // Use transparent for gradient
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // Remove elevation for cleaner look
             ) {
                 Box(
                     modifier = Modifier
@@ -196,8 +194,8 @@ fun HelpDropdown(expanded: Boolean, onDismiss: () -> Unit, modifier: Modifier = 
                         .background(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
-                                    Color(0xFF1A237E).copy(alpha = 0.3f),
-                                    Color(0xFF121212)
+                                    Color(0xFF0D47A1), // Deeper blue start
+                                    Color(0xFF1565C0)  // Lighter blue end
                                 )
                             )
                         )
@@ -209,9 +207,10 @@ fun HelpDropdown(expanded: Boolean, onDismiss: () -> Unit, modifier: Modifier = 
                     ) {
                         Text(
                             text = "Search Tips",
-                            color = CustomColor.GREEN01.color,
+                            color = Color.White,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
+                            letterSpacing = 0.4.sp,
                             modifier = Modifier.padding(bottom = 12.dp)
                         )
 
@@ -221,15 +220,15 @@ fun HelpDropdown(expanded: Boolean, onDismiss: () -> Unit, modifier: Modifier = 
                                     style = SpanStyle(
                                         color = Color.White,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp
+                                        fontSize = 15.sp
                                     )
                                 ) {
                                     append("Pinyin: ")
                                 }
                                 withStyle(
                                     style = SpanStyle(
-                                        color = Color.White.copy(alpha = 0.8f),
-                                        fontSize = 15.sp
+                                        color = Color.White.copy(alpha = 0.9f),
+                                        fontSize = 14.sp
                                     )
                                 ) {
                                     append("dian4 shi4, dian4shi4, diàn shì")
@@ -237,8 +236,8 @@ fun HelpDropdown(expanded: Boolean, onDismiss: () -> Unit, modifier: Modifier = 
 
                                 withStyle(
                                     style = SpanStyle(
-                                        color = Color.White.copy(alpha = 0.6f),
-                                        fontSize = 14.sp,
+                                        color = Color.White.copy(alpha = 0.7f),
+                                        fontSize = 13.sp,
                                         fontWeight = FontWeight.Light,
                                         fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                                     )
@@ -246,7 +245,7 @@ fun HelpDropdown(expanded: Boolean, onDismiss: () -> Unit, modifier: Modifier = 
                                     append("\nSpacing between syllables recommended")
                                 }
                             },
-                            modifier = Modifier.padding(bottom = 16.dp)
+                            modifier = Modifier.padding(bottom = 14.dp)
                         )
 
                         Text(
@@ -255,21 +254,21 @@ fun HelpDropdown(expanded: Boolean, onDismiss: () -> Unit, modifier: Modifier = 
                                     style = SpanStyle(
                                         color = Color.White,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp
+                                        fontSize = 15.sp
                                     )
                                 ) {
                                     append("Definition: ")
                                 }
                                 withStyle(
                                     style = SpanStyle(
-                                        color = Color.White.copy(alpha = 0.8f),
-                                        fontSize = 15.sp
+                                        color = Color.White.copy(alpha = 0.9f),
+                                        fontSize = 14.sp
                                     )
                                 ) {
                                     append("Ice cream, Chinese language")
                                 }
                             },
-                            modifier = Modifier.padding(bottom = 16.dp)
+                            modifier = Modifier.padding(bottom = 14.dp)
                         )
 
                         Text(
@@ -278,15 +277,15 @@ fun HelpDropdown(expanded: Boolean, onDismiss: () -> Unit, modifier: Modifier = 
                                     style = SpanStyle(
                                         color = Color.White,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp
+                                        fontSize = 15.sp
                                     )
                                 ) {
                                     append("Chinese: ")
                                 }
                                 withStyle(
                                     style = SpanStyle(
-                                        color = Color.White.copy(alpha = 0.8f),
-                                        fontSize = 15.sp
+                                        color = Color.White.copy(alpha = 0.9f),
+                                        fontSize = 14.sp
                                     )
                                 ) {
                                     append("电视, 中文")

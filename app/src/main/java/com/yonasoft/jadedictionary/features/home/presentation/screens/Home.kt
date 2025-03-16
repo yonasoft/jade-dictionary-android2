@@ -1,9 +1,6 @@
-@file:OptIn(ExperimentalLayoutApi::class)
-
 package com.yonasoft.jadedictionary.features.home.presentation.screens
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,13 +31,16 @@ import com.yonasoft.jadedictionary.features.home.presentation.components.LinkDir
 
 @Composable
 fun Home(navController: NavHostController) {
+    // Use a slightly darker background for better contrast with cards
+    val backgroundColor = Color(0xFF0A0A0A)
+
     Scaffold(
         topBar = {
             HomeAppBar {
                 navController.navigate(MainRoutes.Words.name)
             }
         },
-        containerColor = Color(0xFF121212), // Darker background for better contrast
+        containerColor = backgroundColor,
     ) { padding ->
         val scrollState = rememberScrollState()
 
@@ -54,21 +54,24 @@ fun Home(navController: NavHostController) {
             JadeBanner(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(200.dp) // Slightly taller banner for better visual impact
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp)) // More space after banner
 
+            // Updated section header with subtle accent
             Text(
                 text = "EXPLORE",
-                color = Color.White,
+                color = Color(0xFF64B5F6), // Light blue that matches the theme
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
+                fontSize = 16.sp, // Smaller size for minimalist look
+                letterSpacing = 1.sp, // Letter spacing for modern look
                 modifier = Modifier
                     .align(Alignment.Start)
                     .padding(start = 24.dp, bottom = 8.dp)
             )
 
+            // Link directors with improved spacing
             LinkDirector(
                 modifier = Modifier.fillMaxWidth(),
                 icon = Icons.AutoMirrored.Filled.List,
@@ -89,6 +92,8 @@ fun Home(navController: NavHostController) {
                 onClick = {},
             )
 
+            Spacer(modifier = Modifier.height(8.dp)) // Additional spacing between groups
+
             LinkDirector(
                 modifier = Modifier.fillMaxWidth(),
                 icon = ImageVector.vectorResource(id = R.drawable.baseline_videogame_asset_24),
@@ -107,7 +112,8 @@ fun Home(navController: NavHostController) {
                 onClick = {},
             )
 
+            // Add some bottom padding for scrolling comfort
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
-

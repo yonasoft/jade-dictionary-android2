@@ -1,3 +1,4 @@
+// Improved CreateWordListDialog
 package com.yonasoft.jadedictionary.features.word_lists.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
@@ -42,8 +43,8 @@ fun CreateWordListDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = Color(0xFF121212)
+            shape = RoundedCornerShape(20.dp), // Larger corners for more modern look
+            color = Color(0xFF0A0A0A) // Slightly darker for better contrast
         ) {
             Column(
                 modifier = Modifier
@@ -55,10 +56,11 @@ fun CreateWordListDialog(
                     text = "Create New Word List",
                     color = Color.White,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.3.sp // Slight letter spacing for modern look
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp)) // Increased space
 
                 // Title TextField
                 OutlinedTextField(
@@ -67,7 +69,12 @@ fun CreateWordListDialog(
                         title = it
                         titleError = it.isBlank()
                     },
-                    label = { Text("Title (Required)") },
+                    label = {
+                        Text(
+                            "Title (Required)",
+                            letterSpacing = 0.3.sp
+                        )
+                    },
                     isError = titleError,
                     supportingText = {
                         if (titleError) {
@@ -77,8 +84,8 @@ fun CreateWordListDialog(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = CustomColor.GREEN01.color,
                         focusedLabelColor = CustomColor.GREEN01.color,
-                        unfocusedBorderColor = Color.Gray,
-                        unfocusedLabelColor = Color.Gray,
+                        unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f), // More subtle when unfocused
+                        unfocusedLabelColor = Color.Gray.copy(alpha = 0.7f),
                         errorBorderColor = MaterialTheme.colorScheme.error,
                         errorLabelColor = MaterialTheme.colorScheme.error,
                         focusedTextColor = Color.White,
@@ -93,13 +100,18 @@ fun CreateWordListDialog(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description (Optional)") },
+                    label = {
+                        Text(
+                            "Description (Optional)",
+                            letterSpacing = 0.3.sp
+                        )
+                    },
                     minLines = 3,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = CustomColor.GREEN01.color,
                         focusedLabelColor = CustomColor.GREEN01.color,
-                        unfocusedBorderColor = Color.Gray,
-                        unfocusedLabelColor = Color.Gray,
+                        unfocusedBorderColor = Color.Gray.copy(alpha = 0.5f), // More subtle when unfocused
+                        unfocusedLabelColor = Color.Gray.copy(alpha = 0.7f),
                         focusedTextColor = Color.White,
                         unfocusedTextColor = Color.White,
                     ),
@@ -119,7 +131,10 @@ fun CreateWordListDialog(
                             contentColor = Color.Gray
                         )
                     ) {
-                        Text("Cancel")
+                        Text(
+                            "Cancel",
+                            letterSpacing = 0.5.sp
+                        )
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -138,9 +153,14 @@ fun CreateWordListDialog(
                             contentColor = Color.Black,
                             disabledContainerColor = CustomColor.GREEN01.color.copy(alpha = 0.5f),
                             disabledContentColor = Color.Black.copy(alpha = 0.5f)
-                        )
+                        ),
+                        shape = RoundedCornerShape(8.dp) // Slightly rounded corners for buttons
                     ) {
-                        Text("Create")
+                        Text(
+                            "Create",
+                            letterSpacing = 0.5.sp,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
             }

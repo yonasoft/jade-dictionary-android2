@@ -23,16 +23,16 @@ fun JadeTabRow(
 ) {
     TabRow(
         modifier = modifier
-            .padding(horizontal = 12.dp, vertical = 4.dp)
+            .padding(horizontal = 16.dp, vertical = 4.dp) // Increased horizontal padding
             .height(48.dp),
         selectedTabIndex = selectedIndex,
-        containerColor = Color(0xFF121212), // Slightly lighter than pure black for better depth
+        containerColor = Color(0xFF0A0A0A), // Slightly darker for better contrast with content
         contentColor = Color.White,
         divider = {
             if (dividerVisible) {
                 HorizontalDivider(
                     thickness = 1.dp,
-                    color = Color(0xFF333333) // Subtle divider color
+                    color = Color(0xFF252525) // Slightly darker for better visibility
                 )
             }
         },
@@ -42,7 +42,7 @@ fun JadeTabRow(
                 SecondaryIndicator(
                     modifier = Modifier
                         .tabIndicatorOffset(tabPositions[selectedIndex])
-                        .padding(horizontal = 8.dp), // Add some padding to make indicator shorter than tab
+                        .padding(horizontal = 12.dp), // Add some padding for shorter indicator
                     height = 3.dp, // Thicker indicator for better visibility
                     color = CustomColor.GREEN01.color
                 )
@@ -64,16 +64,16 @@ fun JadeTabRowAlternative(
 ) {
     TabRow(
         modifier = modifier
-            .padding(horizontal = 12.dp, vertical = 4.dp)
+            .padding(horizontal = 16.dp, vertical = 4.dp) // Increased horizontal padding
             .height(48.dp),
         selectedTabIndex = selectedIndex,
-        containerColor = Color(0xFF121212),
+        containerColor = Color(0xFF0A0A0A), // Slightly darker for better contrast with content
         contentColor = Color.White,
         divider = {
             if (dividerVisible) {
                 HorizontalDivider(
                     thickness = 1.dp,
-                    color = Color(0xFF333333)
+                    color = Color(0xFF252525) // Slightly darker for better visibility
                 )
             }
         },
@@ -82,8 +82,8 @@ fun JadeTabRowAlternative(
                 TabRowDefaults.PrimaryIndicator(
                     modifier = Modifier
                         .tabIndicatorOffset(tabPositions[selectedIndex])
-                        .padding(horizontal = 16.dp),
-                    height = 4.dp,
+                        .padding(horizontal = 20.dp), // Increased padding for shorter indicator
+                    height = 3.dp, // Slightly shorter for cleaner look
                     color = CustomColor.GREEN01.color
                 )
             }

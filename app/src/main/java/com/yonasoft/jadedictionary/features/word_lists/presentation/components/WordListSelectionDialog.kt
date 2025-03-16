@@ -65,12 +65,13 @@ fun WordListSelectionDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(20.dp), // Larger corners for more modern look
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF1A1A1A)
-            )
+                containerColor = Color(0xFF0A0A0A) // Darker background for better contrast
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // Remove elevation for cleaner look
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(20.dp)) { // Increased padding for better spacing
                 // Header with close button
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -80,8 +81,9 @@ fun WordListSelectionDialog(
                     Text(
                         text = "Add to Word List",
                         color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.3.sp // Slight letter spacing for modern look
                     )
 
                     IconButton(onClick = onDismiss) {
@@ -101,7 +103,7 @@ fun WordListSelectionDialog(
                     onValueChange = { searchQuery = it },
                     onCancel = { searchQuery = "" },
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 if (filteredLists.isEmpty()) {
                     // Empty state
@@ -118,6 +120,8 @@ fun WordListSelectionDialog(
                                 "No word lists match your search",
                             color = Color.White.copy(alpha = 0.6f),
                             fontSize = 16.sp,
+                            letterSpacing = 0.3.sp,
+                            lineHeight = 24.sp,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                     }
@@ -128,7 +132,8 @@ fun WordListSelectionDialog(
                         color = Color.White.copy(alpha = 0.8f),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        letterSpacing = 0.3.sp,
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
 
                     LazyColumn(

@@ -38,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -50,10 +49,10 @@ import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
-import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.features.handwriting.presentation.components.HandwritingInputBottomSheet
 import com.yonasoft.jadedictionary.features.ocr.presentation.components.OCRBottomSheet
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRowAlternative
+import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordSearchAppBar
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 
@@ -94,6 +93,9 @@ fun WordSearch(
 
     // Create a SnackbarHostState that will be used by both the Scaffold and the AppBar
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Update background color to be darker for better contrast
+    val backgroundColor = Color(0xFF0A0A0A)
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -189,7 +191,7 @@ fun WordSearch(
     )
 
     Scaffold(
-        containerColor = Color(0xFF121212),
+        containerColor = backgroundColor,
         // Use the shared snackbarHostState in the Scaffold
         snackbarHost = {
             SnackbarHost(
@@ -198,13 +200,11 @@ fun WordSearch(
             ) { snackbarData ->
                 // Custom snackbar appearance
                 Snackbar(
-                    modifier = Modifier
-                        .shadow(8.dp, RoundedCornerShape(8.dp)),
                     containerColor = Color(0xFF303030),
                     contentColor = Color.White,
                     actionContentColor = CustomColor.GREEN01.color,
                     dismissActionContentColor = CustomColor.GREEN01.color,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = snackbarData.visuals.message,
@@ -249,12 +249,12 @@ fun WordSearch(
                 selectedIndex = selectedTab,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 inputTabs.forEachIndexed { index, icon ->
                     Tab(
                         selectedContentColor = CustomColor.GREEN01.color,
-                        unselectedContentColor = Color.White.copy(alpha = 0.7f),
+                        unselectedContentColor = Color.White.copy(alpha = 0.6f),
                         content = {
                             Box(
                                 contentAlignment = Alignment.Center,
@@ -281,10 +281,10 @@ fun WordSearch(
                                         else -> ""
                                     },
                                     tint = if (selectedTab == index) CustomColor.GREEN01.color else Color.White.copy(
-                                        alpha = 0.7f
+                                        alpha = 0.6f
                                     ),
                                     modifier = Modifier
-                                        .size(28.dp)
+                                        .size(24.dp)
                                 )
                             }
                         },
@@ -296,7 +296,7 @@ fun WordSearch(
                 }
             }
 
-            // Results count
+            // Results count with improved styling
             AnimatedVisibility(
                 visible = searchResults.isNotEmpty(),
                 enter = fadeIn(),
@@ -305,19 +305,19 @@ fun WordSearch(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     Text(
                         text = "${searchResults.size} result${if (searchResults.size != 1) "s" else ""} found",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.6f),
+                        color = Color.White.copy(alpha = 0.5f),
                         fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        letterSpacing = 0.3.sp
                     )
                 }
             }
 
-            // Empty state
+            // Empty state with improved styling
             AnimatedVisibility(
                 visible = searchResults.isEmpty() && searchQuery.isNotEmpty(),
                 enter = fadeIn(),
@@ -335,7 +335,7 @@ fun WordSearch(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "No results",
-                            tint = Color.White.copy(alpha = 0.3f),
+                            tint = Color.White.copy(alpha = 0.2f),
                             modifier = Modifier.size(64.dp)
                         )
 
@@ -345,7 +345,8 @@ fun WordSearch(
                             text = "No results found",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White.copy(alpha = 0.7f)
+                            color = Color.White.copy(alpha = 0.6f),
+                            letterSpacing = 0.3.sp
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -353,7 +354,7 @@ fun WordSearch(
                         Text(
                             text = "Try a different search term or input method",
                             fontSize = 16.sp,
-                            color = Color.White.copy(alpha = 0.5f),
+                            color = Color.White.copy(alpha = 0.4f),
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                     }
@@ -361,7 +362,6 @@ fun WordSearch(
             }
 
             if (searchResults.isNotEmpty()) {
-
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     state = rememberLazyListState()

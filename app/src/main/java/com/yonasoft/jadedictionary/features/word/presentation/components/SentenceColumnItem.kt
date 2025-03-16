@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,19 +38,18 @@ fun SentenceColumn(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-            .shadow(elevation = 4.dp, shape = RoundedCornerShape(16.dp)),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF121212)
+            containerColor = Color(0xFF1A1A1A) // Slightly lighter for contrast
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // Remove elevation for cleaner look
     ) {
         Row(
             modifier = modifier
                 .fillMaxWidth()
                 .heightIn(min = 64.dp)
-                .padding(12.dp),
+                .padding(16.dp), // Increased padding
             verticalAlignment = Alignment.Top,
         ) {
             Column(
@@ -64,8 +62,9 @@ fun SentenceColumn(
                     color = CustomColor.GREEN01.color,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
+                    letterSpacing = (-0.5).sp, // Tighter spacing for Chinese characters
                     overflow = TextOverflow.Visible,
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    modifier = Modifier.padding(bottom = 6.dp) // More space after Chinese
                 )
                 Text(
                     text = PinyinUtils.toPinyinWithTones(sentence.chineseSentence),
@@ -74,7 +73,7 @@ fun SentenceColumn(
                     fontSize = 15.sp,
                     lineHeight = 22.sp,
                     overflow = TextOverflow.Visible,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 10.dp) // More space after pinyin
                 )
                 Text(
                     text = sentence.englishTranslation,
@@ -88,7 +87,6 @@ fun SentenceColumn(
                 onClick = { onClick(sentence.chineseSentence) },
                 modifier = Modifier
                     .padding(start = 8.dp)
-                    .shadow(4.dp, CircleShape)
                     .clip(CircleShape)
                     .background(CustomColor.GREEN01.color.copy(alpha = 0.15f))
                     .size(44.dp)

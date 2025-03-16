@@ -30,7 +30,15 @@ import org.koin.core.parameter.parametersOf
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Configure window to handle edge-to-edge display
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // Explicitly set the status bar appearance to ensure text is visible
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = false // Force white status bar icons
+        }
+
         enableEdgeToEdge()
 
         setContent {
@@ -76,7 +84,7 @@ class MainActivity : ComponentActivity() {
                         startDestination = WordListRoutes.WordLists.route,
                         route = MainRoutes.WordLists.name
                     ) {
-                        // Word Lists main screen
+
                         composable(route = WordListRoutes.WordLists.route) {
                             val wordListsViewModel = koinViewModel<WordListsViewModel>()
                             WordLists(
@@ -85,7 +93,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // Word List Detail screen
                         composable(
                             route = WordListRoutes.WordListDetail.route,
                             arguments = listOf(

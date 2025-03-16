@@ -22,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,29 +56,25 @@ fun WordListColumnItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-            .shadow(
-                elevation = 2.dp,
-                shape = RoundedCornerShape(12.dp)
-            )
+            .padding(horizontal = 16.dp, vertical = 6.dp) // Slightly more vertical spacing
             .clickable { wordList.id?.let { onClick(it) } },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF121212)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // Remove elevation for cleaner look
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp), // Increased padding for more space
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Main content
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 8.dp)
+                    .padding(end = 12.dp) // More space between content and delete button
             ) {
                 // Title
                 Text(
@@ -87,6 +82,7 @@ fun WordListColumnItem(
                     color = CustomColor.GREEN01.color,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
+                    letterSpacing = (-0.3).sp, // Tighter letter spacing for titles
                     lineHeight = 24.sp,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1
@@ -95,18 +91,20 @@ fun WordListColumnItem(
                 // Word count
                 Text(
                     text = "${wordList.numberOfWords} word${if (wordList.numberOfWords != 1.toLong()) "s" else ""}",
-                    color = Color.White.copy(alpha = 0.7f),
+                    color = Color.White.copy(alpha = 0.8f), // Slightly more visible
                     fontSize = 14.sp,
                     lineHeight = 16.sp,
+                    letterSpacing = 0.3.sp,
                 )
 
                 // Description (if available)
                 if (wordList.description.isNotEmpty()) {
                     Text(
                         text = wordList.description,
-                        color = Color.White.copy(alpha = 0.5f),
+                        color = Color.White.copy(alpha = 0.6f), // Slightly more visible
                         fontSize = 14.sp,
                         lineHeight = 18.sp,
+                        letterSpacing = 0.3.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -121,12 +119,14 @@ fun WordListColumnItem(
                     color = Color.White.copy(alpha = 0.4f),
                     fontSize = 12.sp,
                     lineHeight = 14.sp,
+                    letterSpacing = 0.3.sp
                 )
             }
 
             if (onDelete != null) {
                 IconButton(
-                    onClick = { showDeleteDialog = true }
+                    onClick = { showDeleteDialog = true },
+                    modifier = Modifier.size(44.dp) // Slightly larger touch target
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,

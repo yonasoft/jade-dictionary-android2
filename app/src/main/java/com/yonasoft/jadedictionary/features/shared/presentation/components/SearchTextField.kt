@@ -1,3 +1,4 @@
+// Improved SearchTextField
 package com.yonasoft.jadedictionary.features.shared.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
@@ -25,7 +26,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -63,8 +63,9 @@ fun SearchTextField(
             placeholder = {
                 Text(
                     placeholder,
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 18.sp
+                    color = Color.White.copy(alpha = 0.5f), // Slightly more transparent for subtlety
+                    fontSize = 16.sp, // Slightly smaller for cleaner look
+                    letterSpacing = 0.3.sp // Slightly increased letter spacing
                 )
             },
             leadingIcon = {
@@ -72,7 +73,7 @@ fun SearchTextField(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Search Icon",
                     tint = CustomColor.GREEN01.color,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(22.dp) // Slightly smaller icon
                 )
             },
             trailingIcon = {
@@ -85,22 +86,22 @@ fun SearchTextField(
                         onClick = onCancel,
                         modifier = Modifier
                             .padding(end = 4.dp)
-                            .size(36.dp)
+                            .size(32.dp) // Slightly smaller for cleaner look
                             .clip(CircleShape)
-                            .background(Color(0xFF333333))
+                            .background(Color(0xFF252525)) // Slightly darker for better contrast
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Clear search",
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
+                            tint = Color.White.copy(alpha = 0.8f), // Slightly transparent for subtlety
+                            modifier = Modifier.size(18.dp) // Slightly smaller icon
                         )
                     }
                 }
             },
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFF1A1A1A),
-                unfocusedContainerColor = Color(0xFF1A1A1A),
+                focusedContainerColor = Color(0xFF121212), // Darker background for better contrast
+                unfocusedContainerColor = Color(0xFF121212),
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
                 focusedIndicatorColor = Color.Transparent,
@@ -109,7 +110,8 @@ fun SearchTextField(
                 cursorColor = CustomColor.GREEN01.color,
             ),
             textStyle = TextStyle.Default.copy(
-                fontSize = 18.sp
+                fontSize = 16.sp, // Slightly smaller for cleaner look
+                letterSpacing = 0.3.sp // Slightly increased letter spacing
             ),
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Search,
@@ -125,9 +127,8 @@ fun SearchTextField(
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp)
-                .shadow(4.dp, RoundedCornerShape(26.dp))
-                .clip(RoundedCornerShape(26.dp))
+                .height(56.dp) // Slightly shorter for cleaner look
+                .clip(RoundedCornerShape(28.dp)) // Half of height for perfect pill shape
                 .let { base ->
                     focusRequester?.let { base.focusRequester(it) } ?: base
                 },

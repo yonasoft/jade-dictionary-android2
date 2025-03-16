@@ -1,4 +1,3 @@
-@file:OptIn(ExperimentalLayoutApi::class)
 
 package com.yonasoft.jadedictionary.features.handwriting.presentation.components
 
@@ -124,8 +123,8 @@ fun HandwritingInputBottomSheet(
         ModalBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,
-            containerColor = Color.Black,
-            dragHandle = { BottomSheetDefaults.DragHandle(color = Color.White) }
+            containerColor = Color(0xFF050505), // Darker background for better contrast
+            dragHandle = { BottomSheetDefaults.DragHandle(color = Color.White.copy(alpha = 0.6f)) }
         ) {
             Column(
                 modifier = Modifier
@@ -144,11 +143,12 @@ fun HandwritingInputBottomSheet(
                         text = "Handwriting Input",
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
-                        color = Color.White
+                        color = Color.White,
+                        letterSpacing = 0.3.sp
                     )
 
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         // Undo button
                         IconButton(
@@ -158,12 +158,19 @@ fun HandwritingInputBottomSheet(
                                     triggerRecognition()
                                 }
                             },
-                            enabled = strokes.isNotEmpty()
+                            enabled = strokes.isNotEmpty(),
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(
+                                    if (strokes.isNotEmpty()) Color(0xFF1A1A1A) else Color.Transparent
+                                )
+                                .size(40.dp)
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.baseline_undo_24),
                                 contentDescription = "Undo",
-                                tint = if (strokes.isNotEmpty()) CustomColor.GREEN01.color else Color.Gray
+                                tint = if (strokes.isNotEmpty()) CustomColor.GREEN01.color else Color.Gray.copy(alpha = 0.5f),
+                                modifier = Modifier.size(22.dp)
                             )
                         }
 
@@ -174,21 +181,35 @@ fun HandwritingInputBottomSheet(
                                 onCharacterDrawn(emptyList()) // Signal to clear recognition data
                                 recognitionJob?.cancel()
                             },
-                            enabled = strokes.isNotEmpty()
+                            enabled = strokes.isNotEmpty(),
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(
+                                    if (strokes.isNotEmpty()) Color(0xFF1A1A1A) else Color.Transparent
+                                )
+                                .size(40.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
                                 contentDescription = "Clear",
-                                tint = if (strokes.isNotEmpty()) CustomColor.GREEN01.color else Color.Gray
+                                tint = if (strokes.isNotEmpty()) CustomColor.GREEN01.color else Color.Gray.copy(alpha = 0.5f),
+                                modifier = Modifier.size(22.dp)
                             )
                         }
 
                         // Close button
-                        IconButton(onClick = onDismiss) {
+                        IconButton(
+                            onClick = onDismiss,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(Color(0xFF1A1A1A))
+                                .size(40.dp)
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Close",
-                                tint = Color.White
+                                tint = Color.White,
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                     }
@@ -232,7 +253,9 @@ fun HandwritingInputBottomSheet(
                             modifier = Modifier
                                 .weight(0.4f)
                                 .height(300.dp)
-                                .padding(start = 8.dp),
+                                .padding(start = 8.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color(0xFF121212)),
                             contentAlignment = Alignment.Center
                         ) {
                             SuggestionsPanel(
@@ -280,7 +303,9 @@ fun HandwritingInputBottomSheet(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(120.dp)
-                                .padding(top = 16.dp),
+                                .padding(top = 16.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color(0xFF121212)),
                             contentAlignment = Alignment.Center
                         ) {
                             SuggestionsPanel(
@@ -310,7 +335,7 @@ private fun DrawingCanvas(
     Canvas(
         modifier = Modifier
             .fillMaxSize()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
             .pointerInput(Unit) {
                 detectDragGestures(
@@ -372,6 +397,7 @@ private fun DrawingCanvas(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SuggestionsPanel(
     isRecognizing: Boolean,
@@ -386,31 +412,37 @@ private fun SuggestionsPanel(
             ) {
                 CircularProgressIndicator(
                     color = CustomColor.GREEN01.color,
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier
+                        .size(36.dp)
+                        .padding(4.dp),
+                    strokeWidth = 3.dp
                 )
                 Text(
                     text = "Recognizing handwriting...",
-                    color = Color.Gray,
-                    fontSize = 14.sp
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 14.sp,
+                    letterSpacing = 0.3.sp
                 )
             }
         }
         suggestedWords.isNotEmpty() -> {
             Column(
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(16.dp)
             ) {
                 Text(
                     text = "Character Suggestions",
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
                     color = Color.White,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    letterSpacing = 0.3.sp,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
 
                 // Grid layout for characters
                 FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                     maxItemsInEachRow = 5
                 ) {
                     suggestedWords.forEach { character ->
@@ -425,9 +457,11 @@ private fun SuggestionsPanel(
         else -> {
             Text(
                 text = "Draw to see character suggestions",
-                color = Color.Gray,
+                color = Color.White.copy(alpha = 0.5f),
                 fontSize = 14.sp,
-                textAlign = TextAlign.Center
+                letterSpacing = 0.3.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(16.dp)
             )
         }
     }
@@ -445,7 +479,7 @@ private fun CharacterButton(
             .background(CustomColor.GREEN01.color.copy(alpha = 0.1f))
             .border(
                 width = 1.dp,
-                color = CustomColor.GREEN01.color.copy(alpha = 0.5f),
+                color = CustomColor.GREEN01.color.copy(alpha = 0.3f),
                 shape = CircleShape
             )
             .clickable(onClick = onClick)
@@ -457,7 +491,8 @@ private fun CharacterButton(
             fontSize = 24.sp,
             textAlign = TextAlign.Center,
             color = Color.White,
-            fontWeight = FontWeight.Normal
+            fontWeight = FontWeight.Normal,
+            letterSpacing = (-0.5).sp // Tighter letter spacing for Chinese characters
         )
     }
 }

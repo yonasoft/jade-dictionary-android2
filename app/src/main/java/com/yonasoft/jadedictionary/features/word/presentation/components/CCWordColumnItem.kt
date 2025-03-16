@@ -24,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,22 +56,18 @@ fun CCWordColumn(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 4.dp) // Reduced vertical padding
-            .shadow(
-                elevation = 2.dp,
-                shape = RoundedCornerShape(12.dp)
-            ) // Smaller elevation and corners
+            .padding(horizontal = 16.dp, vertical = 4.dp) // Increased horizontal padding
             .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF121212)
+            containerColor = Color(0xFF1A1A1A) // Slightly lighter for contrast
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Reduced elevation
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // Remove elevation for cleaner look
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp), // Reduced padding
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
@@ -83,23 +78,24 @@ fun CCWordColumn(
                 Column(
                     modifier = Modifier
                         .weight(0.3f)
-                        .padding(end = 8.dp)
+                        .padding(end = 12.dp) // Slightly more padding
                 ) {
                     // Chinese character
                     Text(
                         text = fullDisplayText,
                         color = CustomColor.GREEN01.color,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp, // Smaller font size
+                        fontSize = 22.sp, // Slightly larger for emphasis
                         lineHeight = 24.sp,
-                        overflow = TextOverflow.Visible
+                        overflow = TextOverflow.Visible,
+                        letterSpacing = (-0.5).sp // Tighter spacing for characters
                     )
 
                     // Pinyin
                     Text(
                         text = word.displayPinyin,
                         color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 14.sp, // Smaller font size
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         lineHeight = 16.sp,
                         overflow = TextOverflow.Visible
@@ -110,7 +106,7 @@ fun CCWordColumn(
                 Text(
                     text = word.definition ?: "",
                     color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 14.sp, // Smaller font size
+                    fontSize = 14.sp,
                     lineHeight = 18.sp,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -152,9 +148,7 @@ fun CCWordColumn(
                         )
                     }
                 }
-            },
-
-            )
-
+            }
+        )
     }
 }

@@ -20,12 +20,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -51,7 +49,6 @@ fun WordDetailAppbar(
 ) {
     var showCreateDialog by remember { mutableStateOf(false) }
     var showWordListSelectionDialog by remember { mutableStateOf(false) }
-    var showSnackbarTrigger by rememberSaveable { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
     // Show create dialog if state is true
@@ -86,6 +83,9 @@ fun WordDetailAppbar(
         )
     }
 
+    // Darker app bar color for better contrast
+    val appBarColor = Color(0xFF050505)
+
     TopAppBar(
         title = {
             Row(
@@ -96,63 +96,64 @@ fun WordDetailAppbar(
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(start = 4.dp),
-                    fontSize = 22.sp,
+                    fontSize = 20.sp, // Slightly smaller for cleaner look
+                    letterSpacing = (-0.5).sp, // Tighter letter spacing for modern feel
                 )
             }
         },
         navigationIcon = {
-            IconButton(onClick = navigateUp) {
+            IconButton(
+                onClick = navigateUp,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF1A1A1A))
+                    .size(40.dp)
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Navigate back",
-                    tint = Color.White
+                    tint = Color.White,
+                    modifier = Modifier.size(22.dp)
                 )
             }
         },
         actions = {
             // Add to list button
             IconButton(
-                onClick = { showWordListSelectionDialog = true }
+                onClick = { showWordListSelectionDialog = true },
+                modifier = Modifier
+                    .padding(end = 4.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF1A1A1A))
+                    .size(40.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add to word list",
-                    tint = CustomColor.GREEN01.color
+                    tint = CustomColor.GREEN01.color,
+                    modifier = Modifier.size(22.dp)
                 )
             }
+
             IconButton(
                 onClick = { showCreateDialog = true },
                 modifier = Modifier
                     .padding(end = 8.dp)
-                    .shadow(4.dp, CircleShape)
                     .clip(CircleShape)
-                    .background(Color(0xFF1A1A1A)).size(40.dp)
-
+                    .background(Color(0xFF1A1A1A))
+                    .size(40.dp)
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.outline_playlist_add_24),
                     contentDescription = "Create new list",
-                    tint = Color.LightGray,
-                    modifier = Modifier.size(24.dp)
+                    tint = Color.White.copy(alpha = 0.8f),
+                    modifier = Modifier.size(22.dp)
                 )
             }
-
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFF121212)
+            containerColor = appBarColor
         )
     )
-
-    if (showCreateDialog) {
-        CreateWordListDialog(
-            onDismiss = { showCreateDialog = false },
-            onConfirm = { title, description ->
-                createNewWordList(title, description)
-                showCreateDialog = false
-
-                // Trigger the snackbar
-                showSnackbarTrigger = title
-            }
-        )
-    }
 }

@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -28,10 +27,11 @@ import com.yonasoft.jadedictionary.R
 fun JadeBanner(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
-            .shadow(8.dp),
+            .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)) // Larger corner radius
+            .background(Color.Black), // Black background to ensure no transparency
         contentAlignment = Alignment.Center
     ) {
+        // Background image
         Image(
             painter = painterResource(R.drawable.jade_background),
             contentDescription = "Jade Background",
@@ -39,34 +39,37 @@ fun JadeBanner(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxSize(),
         )
 
-        // Gradient overlay for better text visibility
+        // Enhanced gradient overlay for better text visibility and aesthetic appeal
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color.Black.copy(alpha = 0.5f),
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.7f)
+                            Color.Black.copy(alpha = 0.7f),  // Darker at top
+                            Color.Black.copy(alpha = 0.2f),  // More transparent in middle
+                            Color.Black.copy(alpha = 0.8f)   // Darker at bottom
                         )
                     )
                 )
         )
 
+        // Text content
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
         ) {
             Text(
                 text = "Jade Dictionary",
-                fontSize = 32.sp,
+                fontSize = 36.sp, // Larger title
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center,
                 color = Color.White,
-                modifier = Modifier
-                    .padding(16.dp)
+                letterSpacing = (-0.5).sp, // Tighter letter spacing for modern look
+                modifier = Modifier.padding(16.dp)
             )
 
             Text(
@@ -74,6 +77,7 @@ fun JadeBanner(modifier: Modifier = Modifier) {
                 fontSize = 16.sp,
                 color = Color.White.copy(alpha = 0.9f),
                 textAlign = TextAlign.Center,
+                letterSpacing = 0.4.sp, // Slightly looser for subtitle
                 modifier = Modifier.padding(bottom = 24.dp)
             )
         }

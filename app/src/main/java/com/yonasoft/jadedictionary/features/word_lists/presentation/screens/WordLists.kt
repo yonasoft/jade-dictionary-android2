@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -28,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
@@ -43,7 +45,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -76,6 +77,8 @@ fun WordLists(
     val isLoading = wordListsState.isLoading
     val errorMessage = uiState.errorMessage
 
+    // Background color matching the app theme
+    val backgroundColor = Color(0xFF0A0A0A)
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -97,16 +100,33 @@ fun WordLists(
     }
 
     Scaffold(
-        containerColor = Color.Black,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = backgroundColor,
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    containerColor = Color(0xFF1A1A1A),
+                    contentColor = Color.White,
+                    actionColor = CustomColor.GREEN01.color,
+                    snackbarData = data,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(
+                        onClick = { navController.navigateUp() },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clip(CircleShape)
+                            .size(40.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Navigate back",
-                            tint = Color.White
+                            tint = Color.White,
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                 },
@@ -116,11 +136,9 @@ fun WordLists(
                         onValueChange = { wordListsViewModel.updateSearchQuery(it) },
                     )
                 },
-                actions = {
-
-                },
+                actions = { },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF121212)
+                    containerColor = Color(0xFF050505) // Darker app bar background
                 ),
             )
         }
@@ -130,11 +148,15 @@ fun WordLists(
                 .fillMaxWidth()
                 .padding(paddingValue)
         ) {
-            JadeTabRowAlternative(selectedIndex = selectedTab, modifier = Modifier.fillMaxWidth()) {
+            JadeTabRowAlternative(
+                selectedIndex = selectedTab,
+                tabs = tabs.size,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 tabs.forEachIndexed { index, text ->
                     Tab(
                         selectedContentColor = CustomColor.GREEN01.color,
-                        unselectedContentColor = Color.White.copy(alpha = 0.7f),
+                        unselectedContentColor = Color.White.copy(alpha = 0.6f), // Slightly more subtle
                         content = {
                             Box(
                                 contentAlignment = Alignment.Center,
@@ -146,7 +168,7 @@ fun WordLists(
                                     Box(
                                         modifier = Modifier
                                             .height(36.dp)
-                                            .width(120.dp)
+                                            .width(100.dp) // Slightly narrower for cleaner look
                                             .clip(RoundedCornerShape(18.dp))
                                             .background(CustomColor.GREEN01.color.copy(alpha = 0.15f))
                                     )
@@ -155,9 +177,10 @@ fun WordLists(
                                 Text(
                                     text = text,
                                     fontSize = 16.sp,
+                                    letterSpacing = 0.3.sp,
                                     fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
                                     color = if (selectedTab == index) CustomColor.GREEN01.color else Color.White.copy(
-                                        alpha = 0.7f
+                                        alpha = 0.6f
                                     ),
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                                 )
@@ -170,7 +193,7 @@ fun WordLists(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp)) // Increased spacing
 
             HorizontalPager(
                 state = pagerState,
@@ -185,9 +208,11 @@ fun WordLists(
                 ) {
                     when (page) {
                         0 -> { /* HSK 2 content */
+                            EmptyTabContent("HSK 2 content coming soon")
                         }
 
                         1 -> { /* HSK 3.0 content */
+                            EmptyTabContent("HSK 3 content coming soon")
                         }
 
                         2 -> {
@@ -213,6 +238,22 @@ fun WordLists(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun EmptyTabContent(message: String) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = message,
+            color = Color.White.copy(alpha = 0.6f),
+            fontSize = 16.sp,
+            letterSpacing = 0.3.sp,
+            modifier = Modifier.padding(24.dp)
+        )
     }
 }
 
@@ -250,6 +291,11 @@ fun MyLists(
                     onDelete = { onDelete(it) }
                 )
             }
+
+            // Add bottom padding for better UX
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
     }
 }
@@ -264,12 +310,12 @@ fun AddNewListButton(onClick: () -> Unit) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
                 .clickable { onClick() },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color(0xFF121212)
-            )
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // Remove elevation for cleaner look
         ) {
             Row(
                 modifier = Modifier
@@ -284,11 +330,13 @@ fun AddNewListButton(onClick: () -> Unit) {
                     tint = CustomColor.GREEN01.color,
                     modifier = Modifier.size(24.dp)
                 )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Create New Word List",
                     color = CustomColor.GREEN01.color,
                     fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    letterSpacing = 0.3.sp
                 )
             }
         }

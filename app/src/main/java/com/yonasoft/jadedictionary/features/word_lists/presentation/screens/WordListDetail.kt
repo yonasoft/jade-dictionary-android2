@@ -3,6 +3,8 @@
 package com.yonasoft.jadedictionary.features.word_lists.presentation.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -24,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -38,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,9 +53,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
+import com.yonasoft.jadedictionary.features.shared.presentation.components.SearchTextField
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordColumn
-import com.yonasoft.jadedictionary.features.shared.presentation.components.SearchTextField
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListDetailViewModel
 import kotlinx.coroutines.launch
 
@@ -62,6 +67,9 @@ fun WordListDetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    // Background color matching the app theme
+    val backgroundColor = Color(0xFF0A0A0A)
 
     // Show error messages in snackbar
     LaunchedEffect(uiState.errorMessage) {
@@ -89,46 +97,80 @@ fun WordListDetailScreen(
     }
 
     Scaffold(
-        containerColor = Color.Black,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = backgroundColor,
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    containerColor = Color(0xFF1A1A1A),
+                    contentColor = Color.White,
+                    actionColor = CustomColor.GREEN01.color,
+                    snackbarData = data,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = if (uiState.isEditing) "Edit Word List" else uiState.wordList?.title ?: "Word List",
-                        color = Color.White
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (-0.3).sp // Tighter letter spacing for titles
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(
+                        onClick = { navController.navigateUp() },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clip(CircleShape)
+                            .size(40.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = Color.White,
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                 },
                 actions = {
                     if (uiState.isEditing) {
-                        IconButton(onClick = { viewModel.saveEdits() }) {
+                        IconButton(
+                            onClick = { viewModel.saveEdits() },
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clip(CircleShape)
+                                .size(40.dp)
+                        ) {
                             Icon(
                                 painter = painterResource(R.drawable.outline_save_24),
                                 contentDescription = "Save changes",
-                                tint = CustomColor.GREEN01.color
+                                tint = CustomColor.GREEN01.color,
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                     } else {
-                        IconButton(onClick = { viewModel.startEditing() }) {
+                        IconButton(
+                            onClick = { viewModel.startEditing() },
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clip(CircleShape)
+                                .size(40.dp)
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "Edit list details",
-                                tint = CustomColor.GREEN01.color
+                                tint = CustomColor.GREEN01.color,
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF121212)
+                    containerColor = Color(0xFF050505) // Darker app bar background
                 )
             )
         }
@@ -139,7 +181,11 @@ fun WordListDetailScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = CustomColor.GREEN01.color)
+                    CircularProgressIndicator(
+                        color = CustomColor.GREEN01.color,
+                        strokeWidth = 3.dp,
+                        modifier = Modifier.size(48.dp)
+                    )
                 }
             }
 
@@ -150,8 +196,9 @@ fun WordListDetailScreen(
                 ) {
                     Text(
                         text = "Word list not found",
-                        color = Color.White,
-                        fontSize = 18.sp
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = 18.sp,
+                        letterSpacing = 0.3.sp
                     )
                 }
             }
@@ -163,7 +210,11 @@ fun WordListDetailScreen(
                         .padding(paddingValues)
                 ) {
                     // Editing section for title and description
-                    AnimatedVisibility(visible = uiState.isEditing) {
+                    AnimatedVisibility(
+                        visible = uiState.isEditing,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -173,7 +224,13 @@ fun WordListDetailScreen(
                             OutlinedTextField(
                                 value = uiState.editTitle,
                                 onValueChange = { viewModel.updateEditTitle(it) },
-                                label = { Text("Title", color = Color.White.copy(alpha = 0.7f)) },
+                                label = {
+                                    Text(
+                                        "Title",
+                                        color = Color.White.copy(alpha = 0.7f),
+                                        letterSpacing = 0.3.sp
+                                    )
+                                },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = CustomColor.GREEN01.color,
@@ -190,8 +247,15 @@ fun WordListDetailScreen(
                             OutlinedTextField(
                                 value = uiState.editDescription,
                                 onValueChange = { viewModel.updateEditDescription(it) },
-                                label = { Text("Description", color = Color.White.copy(alpha = 0.7f)) },
+                                label = {
+                                    Text(
+                                        "Description",
+                                        color = Color.White.copy(alpha = 0.7f),
+                                        letterSpacing = 0.3.sp
+                                    )
+                                },
                                 modifier = Modifier.fillMaxWidth(),
+                                minLines = 3,
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = CustomColor.GREEN01.color,
                                     unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
@@ -206,7 +270,11 @@ fun WordListDetailScreen(
                     }
 
                     // Display section for title and description when not editing
-                    AnimatedVisibility(visible = !uiState.isEditing) {
+                    AnimatedVisibility(
+                        visible = !uiState.isEditing,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -218,6 +286,8 @@ fun WordListDetailScreen(
                                     text = uiState.wordList?.description ?: "",
                                     color = Color.White.copy(alpha = 0.7f),
                                     fontSize = 16.sp,
+                                    letterSpacing = 0.3.sp,
+                                    lineHeight = 24.sp,
                                     modifier = Modifier.padding(vertical = 8.dp)
                                 )
                             }
@@ -226,7 +296,8 @@ fun WordListDetailScreen(
                                 text = "${uiState.wordList?.numberOfWords ?: 0} words",
                                 color = CustomColor.GREEN01.color,
                                 fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
+                                letterSpacing = 0.3.sp
                             )
                         }
                     }
@@ -253,8 +324,10 @@ fun WordListDetailScreen(
                                     "No matching words found",
                                 color = Color.White.copy(alpha = 0.6f),
                                 fontSize = 16.sp,
+                                letterSpacing = 0.3.sp,
+                                lineHeight = 24.sp,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(16.dp)
+                                modifier = Modifier.padding(24.dp)
                             )
                         }
                     } else {
@@ -271,7 +344,7 @@ fun WordListDetailScreen(
                                     word = word,
                                     onRemove = { viewModel.removeWord(word) },
                                     onWordClick = {
-                                        // Navigate to word detail - you'll need to set up the route
+                                        // Navigate to word detail
                                         navController.navigate("word_detail/${word.id}")
                                     }
                                 )
@@ -301,7 +374,7 @@ fun WordListItemWithRemove(
         actions = {
             IconButton(
                 onClick = onRemove,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(44.dp) // Slightly larger for better touch target
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,

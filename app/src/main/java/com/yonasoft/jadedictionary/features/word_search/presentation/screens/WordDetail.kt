@@ -37,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -50,13 +49,13 @@ import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
+import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRowAlternative
+import com.yonasoft.jadedictionary.features.shared.presentation.components.openTTS
+import com.yonasoft.jadedictionary.features.shared.presentation.components.rememberTextToSpeech
 import com.yonasoft.jadedictionary.features.word.data.local.sentences.Sentence
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordColumn
 import com.yonasoft.jadedictionary.features.word.presentation.components.SentenceColumn
-import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRowAlternative
-import com.yonasoft.jadedictionary.features.shared.presentation.components.openTTS
-import com.yonasoft.jadedictionary.features.shared.presentation.components.rememberTextToSpeech
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordDetailAppbar
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
 import java.util.Locale
@@ -92,6 +91,9 @@ fun WordDetail(
         wordDetailViewModel.updateSelectedTab(pagerState.currentPage)
     }
 
+    // Update background color to be darker for better contrast
+    val backgroundColor = Color(0xFF0A0A0A)
+
     Scaffold(
         topBar = {
             WordDetailAppbar(
@@ -117,13 +119,11 @@ fun WordDetail(
             ) { snackbarData ->
                 // Custom snackbar appearance
                 Snackbar(
-                    modifier = Modifier
-                        .shadow(8.dp, RoundedCornerShape(8.dp)),
                     containerColor = Color(0xFF303030),
                     contentColor = Color.White,
                     actionContentColor = CustomColor.GREEN01.color,
                     dismissActionContentColor = CustomColor.GREEN01.color,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = snackbarData.visuals.message,
@@ -133,24 +133,23 @@ fun WordDetail(
                 }
             }
         },
-        containerColor = Color(0xFF121212)
+        containerColor = backgroundColor
     ) { paddingValue ->
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(paddingValue)
         ) {
-            // Word Detail Card
+            // Word Detail Card - Enhanced with gradient
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .shadow(8.dp, RoundedCornerShape(16.dp)),
-                shape = RoundedCornerShape(16.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF1A237E).copy(alpha = 0.5f)
+                    containerColor = Color.Transparent // Transparent for gradient
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp) // Remove elevation for cleaner look
             ) {
                 Box(
                     modifier = Modifier
@@ -158,8 +157,8 @@ fun WordDetail(
                         .background(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
-                                    Color(0xFF1A237E).copy(alpha = 0.6f),
-                                    Color(0xFF121212)
+                                    Color(0xFF0D47A1), // Deeper blue start
+                                    Color(0xFF1565C0)  // Lighter blue end
                                 )
                             )
                         )
@@ -168,7 +167,7 @@ fun WordDetail(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 120.dp, max = 240.dp)
-                            .padding(16.dp),
+                            .padding(20.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -179,23 +178,24 @@ fun WordDetail(
                         ) {
                             Text(
                                 text = wordDetails?.displayText ?: "",
-                                color = CustomColor.GREEN01.color,
+                                color = Color.White,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 36.sp,
-                                modifier = Modifier.padding(bottom = 4.dp)
+                                letterSpacing = (-0.5).sp, // Tighter letter spacing for characters
+                                modifier = Modifier.padding(bottom = 8.dp)
                             )
 
                             Text(
                                 text = wordDetails?.displayPinyin ?: "",
-                                color = Color.White,
+                                color = Color.White.copy(alpha = 0.9f),
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 20.sp,
-                                modifier = Modifier.padding(bottom = 12.dp)
+                                modifier = Modifier.padding(bottom = 16.dp)
                             )
 
                             Text(
                                 text = wordDetails?.definition ?: "",
-                                color = Color.White.copy(alpha = 0.9f),
+                                color = Color.White.copy(alpha = 0.85f),
                                 fontSize = 18.sp,
                                 lineHeight = 24.sp
                             )
@@ -212,7 +212,6 @@ fun WordDetail(
                                 }
                             },
                             modifier = Modifier
-                                .shadow(8.dp, CircleShape)
                                 .clip(CircleShape)
                                 .background(Color.White.copy(alpha = 0.15f))
                                 .size(56.dp)
@@ -221,14 +220,14 @@ fun WordDetail(
                                 painter = painterResource(R.drawable.baseline_volume_up_24),
                                 contentDescription = "Listen to sound icon",
                                 Modifier.size(32.dp),
-                                tint = CustomColor.GREEN01.color
+                                tint = Color.White
                             )
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Improved Tab Row
             JadeTabRowAlternative(
@@ -252,7 +251,7 @@ fun WordDetail(
                                     Box(
                                         modifier = Modifier
                                             .height(36.dp)
-                                            .width(120.dp)
+                                            .width(100.dp) // Slightly narrower for cleaner look
                                             .clip(RoundedCornerShape(18.dp))
                                             .background(CustomColor.GREEN01.color.copy(alpha = 0.15f))
                                     )
@@ -284,12 +283,12 @@ fun WordDetail(
                     .fillMaxWidth()
                     .weight(1f),
                 verticalAlignment = Alignment.Top
-            ) { _ ->
+            ) { page ->
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.TopStart
                 ) {
-                    when (selectedTab) {
+                    when (page) {
                         0 -> CharactersOfWord(characters, navController)
                         1 -> WordsOfWord(wordsOfWord, navController)
                         2 -> SentencesOfWord(sentences, onClick = { sentence ->
@@ -317,21 +316,11 @@ fun WordDetail(
     }
 }
 
+
 @Composable
 fun CharactersOfWord(characters: List<CCWord>, navController: NavHostController) {
     if (characters.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                "No Characters Found",
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-            )
-        }
+        EmptyStateMessage("No Characters Found")
         return
     }
 
@@ -354,18 +343,7 @@ fun CharactersOfWord(characters: List<CCWord>, navController: NavHostController)
 @Composable
 fun WordsOfWord(words: List<CCWord>, navController: NavHostController) {
     if (words.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                "No Words Found",
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-            )
-        }
+        EmptyStateMessage("No Words Found")
         return
     }
 
@@ -388,18 +366,7 @@ fun WordsOfWord(words: List<CCWord>, navController: NavHostController) {
 @Composable
 fun SentencesOfWord(sentences: List<Sentence>, onClick: (String) -> Unit) {
     if (sentences.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                "No Sentences Found",
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-            )
-        }
+        EmptyStateMessage("No Sentences Found")
         return
     }
 
@@ -413,6 +380,30 @@ fun SentencesOfWord(sentences: List<Sentence>, onClick: (String) -> Unit) {
             key = { _, sentence -> sentence.id },
         ) { _, sentence ->
             SentenceColumn(sentence, onClick = { onClick(it) })
+        }
+    }
+}
+
+// Reusable empty state component with improved styling
+@Composable
+private fun EmptyStateMessage(message: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Empty icon - you could add one here if desired
+
+            Text(
+                text = message,
+                color = Color.White.copy(alpha = 0.5f),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center,
+                letterSpacing = 0.3.sp
+            )
         }
     }
 }
