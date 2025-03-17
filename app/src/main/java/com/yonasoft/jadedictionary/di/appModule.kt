@@ -4,14 +4,16 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.yonasoft.jadedictionary.features.word.data.local.cc.CCWordDatabase
 import com.yonasoft.jadedictionary.features.word.data.local.cc.CCWordRepositoryImpl
+import com.yonasoft.jadedictionary.features.word.data.local.hsk.HSKWordRepositoryImpl
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWordRepository
+import com.yonasoft.jadedictionary.features.word.domain.hsk.HSKWordRepository
 import com.yonasoft.jadedictionary.features.word.domain.utils.PinyinUtils
 import com.yonasoft.jadedictionary.features.word_lists.data.cc.CCWordListDatabase
 import com.yonasoft.jadedictionary.features.word_lists.data.cc.CCWordListRepositoryImpl
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordListRepository
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListDetailViewModel
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListsViewModel
-import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
+import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.WordDetailViewModel
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -44,14 +46,19 @@ val appModule = module {
     // Repositories
     single<CCWordRepository> { CCWordRepositoryImpl(get(), androidContext()) }
     single<CCWordListRepository> { CCWordListRepositoryImpl(get(), androidContext()) }
+    single<HSKWordRepository> {
+        HSKWordRepositoryImpl(androidContext()).also {
+            Log.i("HSK", "HSK repository initialized")
+        }
+    }
 
     // ViewModels
     viewModel { WordSearchViewModel(application = get(), get(), get()) }
-    viewModel { WordListsViewModel(get()) }
+    viewModel { WordListsViewModel(get(), get()) }
     viewModel { (savedStateHandle: SavedStateHandle) ->
         WordDetailViewModel(get(), get(), savedStateHandle) // Pass both repositories
     }
     viewModel { (savedStateHandle: SavedStateHandle) ->
-        WordListDetailViewModel(get(), get(), savedStateHandle)
+        WordListDetailViewModel(get(), get(), get(), (savedStateHandle))
     }
 }

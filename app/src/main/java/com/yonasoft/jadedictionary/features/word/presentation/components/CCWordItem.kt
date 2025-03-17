@@ -36,7 +36,7 @@ import com.yonasoft.jadedictionary.features.word_lists.presentation.components.W
 import kotlinx.coroutines.launch
 
 @Composable
-fun CCWordColumn(
+fun CCWordItem(
     word: CCWord,
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier,

@@ -142,7 +142,7 @@ fun WordListSelectionDialog(
                             .height(300.dp)
                     ) {
                         items(filteredLists) { wordList ->
-                            WordListColumnItem(
+                            CCWordListItem(
                                 wordList = wordList,
                                 onClick = {
                                     onWordListSelected(wordList)

@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.yonasoft.jadedictionary.features.word_lists.presentation.screens
 
 import androidx.compose.animation.AnimatedVisibility
@@ -55,12 +53,16 @@ import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.features.shared.presentation.components.SearchTextField
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
-import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordColumn
+import com.yonasoft.jadedictionary.features.word.domain.hsk.HSKWord
+import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordItem
+import com.yonasoft.jadedictionary.features.word.presentation.components.HSKWordItem
+import com.yonasoft.jadedictionary.features.word_lists.domain.hsk.HSKWordList
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListDetailViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WordListDetailScreen(
+fun CCWordListDetailScreen(
     navController: NavController,
     viewModel: WordListDetailViewModel
 ) {
@@ -80,10 +82,15 @@ fun WordListDetailScreen(
         }
     }
 
-    // Show undo option when a word is removed
+    // Show undo option when a word is removed (only for custom lists)
     LaunchedEffect(uiState.isUndoAvailable, uiState.lastRemovedWord) {
         if (uiState.isUndoAvailable && uiState.lastRemovedWord != null) {
-            val wordName = uiState.lastRemovedWord!!.displayText
+            val wordName = when (val word = uiState.lastRemovedWord) {
+                is CCWord -> word.displayText
+                is HSKWord -> word.displayText
+                else -> "word"
+            }
+
             val result = snackbarHostState.showSnackbar(
                 message = "Removed \"$wordName\" from list",
                 actionLabel = "UNDO",
@@ -137,35 +144,38 @@ fun WordListDetailScreen(
                     }
                 },
                 actions = {
-                    if (uiState.isEditing) {
-                        IconButton(
-                            onClick = { viewModel.saveEdits() },
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .clip(CircleShape)
-                                .size(40.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.outline_save_24),
-                                contentDescription = "Save changes",
-                                tint = CustomColor.GREEN01.color,
-                                modifier = Modifier.size(22.dp)
-                            )
-                        }
-                    } else {
-                        IconButton(
-                            onClick = { viewModel.startEditing() },
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .clip(CircleShape)
-                                .size(40.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit list details",
-                                tint = CustomColor.GREEN01.color,
-                                modifier = Modifier.size(22.dp)
-                            )
+                    // Only show edit actions for editable lists
+                    if (!uiState.isHSKList) {
+                        if (uiState.isEditing) {
+                            IconButton(
+                                onClick = { viewModel.saveEdits() },
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .clip(CircleShape)
+                                    .size(40.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.outline_save_24),
+                                    contentDescription = "Save changes",
+                                    tint = CustomColor.GREEN01.color,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                        } else {
+                            IconButton(
+                                onClick = { viewModel.startEditing() },
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .clip(CircleShape)
+                                    .size(40.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit list details",
+                                    tint = CustomColor.GREEN01.color,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
                         }
                     }
                 },
@@ -209,9 +219,9 @@ fun WordListDetailScreen(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    // Editing section for title and description
+                    // Editing section for title and description (custom lists only)
                     AnimatedVisibility(
-                        visible = uiState.isEditing,
+                        visible = uiState.isEditing && !uiState.isHSKList,
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
@@ -299,6 +309,25 @@ fun WordListDetailScreen(
                                 fontWeight = FontWeight.Medium,
                                 letterSpacing = 0.3.sp
                             )
+
+                            // HSK info if applicable
+                            if (uiState.isHSKList && uiState.wordList is HSKWordList) {
+                                val hskList = uiState.wordList as HSKWordList
+                                val versionName = if (hskList.version == com.yonasoft.jadedictionary.features.word.domain.hsk.HSKVersion.OLD) {
+                                    "HSK 2.0"
+                                } else {
+                                    "HSK 3.0"
+                                }
+
+                                Text(
+                                    text = "This is an official $versionName vocabulary list",
+                                    color = Color.White.copy(alpha = 0.6f),
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    letterSpacing = 0.3.sp,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                            }
                         }
                     }
 
@@ -319,7 +348,8 @@ fun WordListDetailScreen(
                         ) {
                             Text(
                                 text = if (uiState.words.isEmpty())
-                                    "This list is empty. Add words from the search screen."
+                                    if (uiState.isHSKList) "No words found for this HSK level."
+                                    else "This list is empty. Add words from the search screen."
                                 else
                                     "No matching words found",
                                 color = Color.White.copy(alpha = 0.6f),
@@ -338,16 +368,41 @@ fun WordListDetailScreen(
                         ) {
                             items(
                                 items = uiState.filteredWords,
-                                key = { it.id!! }
-                            ) { word ->
-                                WordListItemWithRemove(
-                                    word = word,
-                                    onRemove = { viewModel.removeWord(word) },
-                                    onWordClick = {
-                                        // Navigate to word detail
-                                        navController.navigate("word_detail/${word.id}")
+                                key = {
+                                    when (it) {
+                                        is CCWord -> it.id ?: 0
+                                        is HSKWord -> it.id
+                                        else -> 0
                                     }
-                                )
+                                }
+                            ) { word ->
+                                when (word) {
+                                    is CCWord -> {
+                                        WordListItemWithRemove(
+                                            word = word,
+                                            onRemove = {
+                                                if (!uiState.isHSKList) viewModel.removeWord(word)
+                                            },
+                                            onWordClick = {
+                                                // Navigate to word detail
+                                                navController.navigate("word_detail/${word.id}")
+                                            },
+                                            showRemoveButton = !uiState.isHSKList
+                                        )
+                                    }
+                                    is HSKWord -> {
+                                        HSKWordItem(
+                                            word = word,
+                                            onClick = {
+                                                // Navigate to HSK word detail (if implemented)
+                                                // For now, we could show a message that HSK word details are coming soon
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar("HSK word details coming soon")
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
                             }
 
                             item {
@@ -365,23 +420,26 @@ fun WordListDetailScreen(
 fun WordListItemWithRemove(
     word: CCWord,
     onRemove: () -> Unit,
-    onWordClick: () -> Unit
+    onWordClick: () -> Unit,
+    showRemoveButton: Boolean = true
 ) {
-    CCWordColumn(
+    CCWordItem(
         word = word,
         onClick = onWordClick,
         modifier = Modifier.fillMaxWidth(),
         actions = {
-            IconButton(
-                onClick = onRemove,
-                modifier = Modifier.size(44.dp) // Slightly larger for better touch target
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Remove from list",
-                    tint = Color.Red.copy(alpha = 0.7f),
-                    modifier = Modifier.size(20.dp)
-                )
+            if (showRemoveButton) {
+                IconButton(
+                    onClick = onRemove,
+                    modifier = Modifier.size(44.dp) // Slightly larger for better touch target
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Remove from list",
+                        tint = Color.Red.copy(alpha = 0.7f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
     )

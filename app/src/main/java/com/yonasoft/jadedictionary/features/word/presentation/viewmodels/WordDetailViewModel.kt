@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels
+package com.yonasoft.jadedictionary.features.word.presentation.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle

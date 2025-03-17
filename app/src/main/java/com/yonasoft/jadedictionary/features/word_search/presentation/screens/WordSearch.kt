@@ -52,7 +52,7 @@ import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.features.handwriting.presentation.components.HandwritingInputBottomSheet
 import com.yonasoft.jadedictionary.features.ocr.presentation.components.OCRBottomSheet
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRowAlternative
-import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordColumn
+import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordItem
 import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordSearchAppBar
 import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordSearchViewModel
 
@@ -370,7 +370,7 @@ fun WordSearch(
                         searchResults,
                         key = { _, word -> word.id!! },
                     ) { _, word ->
-                        CCWordColumn(
+                        CCWordItem(
                             word = word,
                             onClick = {
                                 navController.navigate(WordRoutes.WordDetail.createRoute(word.id!!))

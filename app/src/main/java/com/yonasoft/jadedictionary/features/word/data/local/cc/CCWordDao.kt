@@ -143,7 +143,7 @@ ORDER BY
     length_priority DESC,
     length(simplified) ASC,
     simplified ASC
-LIMIT 50
+LIMIT 100
 """
     )
     suspend fun searchWords(query: String): List<CCWord>
@@ -167,7 +167,7 @@ WHERE simplified IN (
     WHERE char <> ''
 )
 ORDER BY length(simplified) ASC
-LIMIT 50
+LIMIT 10
 """
     )
     suspend fun getCharsFromWord(word: String): List<CCWord>

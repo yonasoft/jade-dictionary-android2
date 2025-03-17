@@ -83,16 +83,16 @@ fun Home(navController: NavHostController) {
                 },
             )
 
-            LinkDirector(
-                modifier = Modifier.fillMaxWidth(),
-                icon = ImageVector.vectorResource(R.drawable.outline_cards_star_24),
-                contentDescription = "Flash Cards",
-                label = "Cards",
-                description = "Practice vocabulary with interactive flashcards",
-                onClick = {},
-            )
-
-            Spacer(modifier = Modifier.height(8.dp)) // Additional spacing between groups
+//            LinkDirector(
+//                modifier = Modifier.fillMaxWidth(),
+//                icon = ImageVector.vectorResource(R.drawable.outline_cards_star_24),
+//                contentDescription = "Flash Cards",
+//                label = "Cards",
+//                description = "Practice vocabulary with interactive flashcards",
+//                onClick = {},
+//            )
+//
+//            Spacer(modifier = Modifier.height(8.dp)) // Additional spacing between groups
 
             LinkDirector(
                 modifier = Modifier.fillMaxWidth(),

@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.features.word_search.presentation.screens
+package com.yonasoft.jadedictionary.features.word.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -54,10 +54,10 @@ import com.yonasoft.jadedictionary.features.shared.presentation.components.openT
 import com.yonasoft.jadedictionary.features.shared.presentation.components.rememberTextToSpeech
 import com.yonasoft.jadedictionary.features.word.data.local.sentences.Sentence
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
-import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordColumn
+import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordItem
 import com.yonasoft.jadedictionary.features.word.presentation.components.SentenceColumn
-import com.yonasoft.jadedictionary.features.word_search.presentation.components.WordDetailAppbar
-import com.yonasoft.jadedictionary.features.word_search.presentation.viewmodels.WordDetailViewModel
+import com.yonasoft.jadedictionary.features.word.presentation.components.WordDetailAppbar
+import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.WordDetailViewModel
 import java.util.Locale
 
 @Composable
@@ -333,7 +333,7 @@ fun CharactersOfWord(characters: List<CCWord>, navController: NavHostController)
             characters,
             key = { _, word -> word.id!! },
         ) { _, word ->
-            CCWordColumn(word = word, onClick = {
+            CCWordItem(word = word, onClick = {
                 navController.navigate(WordRoutes.WordDetail.createRoute(word.id!!))
             })
         }
@@ -356,7 +356,7 @@ fun WordsOfWord(words: List<CCWord>, navController: NavHostController) {
             words,
             key = { i, _ -> i },
         ) { _, word ->
-            CCWordColumn(word = word, onClick = {
+            CCWordItem( word = word, onClick = {
                 navController.navigate(WordRoutes.WordDetail.createRoute(word.id!!))
             })
         }

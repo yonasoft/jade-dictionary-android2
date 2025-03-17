@@ -11,7 +11,7 @@ import com.yonasoft.jadedictionary.features.word_lists.domain.utils.Converters
 
 @Database(
     entities = [CCWordList::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

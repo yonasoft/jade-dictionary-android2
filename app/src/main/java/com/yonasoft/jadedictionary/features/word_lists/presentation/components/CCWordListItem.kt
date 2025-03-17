@@ -34,7 +34,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun WordListColumnItem(
+fun CCWordListItem(
     wordList: CCWordList,
     onClick: (Long) -> Unit,
     onDelete: ((CCWordList) -> Unit)? = null,

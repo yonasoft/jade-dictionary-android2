@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.yonasoft.jadedictionary.features.word_lists.presentation.screens
 
 import androidx.compose.foundation.background
@@ -15,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -25,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,11 +55,15 @@ import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRowAlternative
 import com.yonasoft.jadedictionary.features.shared.presentation.components.SearchTextField
+import com.yonasoft.jadedictionary.features.word_lists.domain.WordList
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
+import com.yonasoft.jadedictionary.features.word_lists.domain.hsk.HSKWordList
 import com.yonasoft.jadedictionary.features.word_lists.presentation.components.CreateWordListDialog
-import com.yonasoft.jadedictionary.features.word_lists.presentation.components.WordListColumnItem
+import com.yonasoft.jadedictionary.features.word_lists.presentation.components.HSKWordListItem
+import com.yonasoft.jadedictionary.features.word_lists.presentation.components.CCWordListItem
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListsViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordLists(
     navController: NavHostController,
@@ -72,6 +76,8 @@ fun WordLists(
 
     // Extract individual values from the states
     val myWordLists = wordListsState.myWordLists
+    val hskOldWordLists = wordListsState.hskOldWordLists
+    val hskNewWordLists = wordListsState.hskNewWordLists
     val searchQuery = wordListsState.searchQuery
     val selectedTab = uiState.selectedTab
     val isLoading = wordListsState.isLoading
@@ -98,6 +104,13 @@ fun WordLists(
     }
     LaunchedEffect(pagerState.currentPage) {
         wordListsViewModel.updateInputTab(pagerState.currentPage)
+    }
+
+    // Show error in snackbar if present
+    LaunchedEffect(errorMessage) {
+        if (errorMessage != null) {
+            snackbarHostState.showSnackbar(errorMessage)
+        }
     }
 
     Scaffold(
@@ -203,45 +216,102 @@ fun WordLists(
                     .weight(1f),
                 verticalAlignment = Alignment.Top
             ) { page ->
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.TopStart
-                ) {
-                    when (page) {
-                        0 -> { /* HSK 2 content */
-                            EmptyTabContent("HSK 2.0 content coming soon")
-                        }
-
-                        1 -> { /* HSK 3.0 content */
-                            EmptyTabContent("HSK 3.0 content coming soon")
-                        }
-
-                        2 -> { /* HSK 3.0 content */
-                            EmptyTabContent("Preset lists content coming soon")
-                        }
-
-                        3 -> {
-                            MyLists(
-                                wordList = myWordLists,
-                                onClick = { wordListId ->
-                                    // Navigate to word list detail
-                                    navController.navigate(
-                                        WordListRoutes.WordListDetail.createRoute(
-                                            wordListId
+                if (isLoading && (page == 0 || page == 1)) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = CustomColor.GREEN01.color,
+                            strokeWidth = 3.dp,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.TopStart
+                    ) {
+                        when (page) {
+                            0 -> { /* HSK 2.0 content */
+                                HSKWordListsTab(
+                                    wordLists = hskOldWordLists,
+                                    onClick = { wordListId ->
+                                        // Navigate to word list detail
+                                        navController.navigate(
+                                            WordListRoutes.WordListDetail.createRoute(wordListId)
                                         )
-                                    )
-                                },
-                                onCreateNewList = { title, description ->
-                                    wordListsViewModel.createNewWordList(title, description)
-                                },
-                                onDelete = {
-                                    wordListsViewModel.deleteWordList(it)
-                                }
-                            )
+                                    }
+                                )
+                            }
+
+                            1 -> { /* HSK 3.0 content */
+                                HSKWordListsTab(
+                                    wordLists = hskNewWordLists,
+                                    onClick = { wordListId ->
+                                        // Navigate to word list detail
+                                        navController.navigate(
+                                            WordListRoutes.WordListDetail.createRoute(wordListId)
+                                        )
+                                    }
+                                )
+                            }
+
+                            2 -> { /* Preset content */
+                                EmptyTabContent("Preset lists content coming soon")
+                            }
+
+                            3 -> {
+                                MyLists(
+                                    wordList = myWordLists,
+                                    onClick = { wordListId ->
+                                        // Navigate to word list detail
+                                        navController.navigate(
+                                            WordListRoutes.WordListDetail.createRoute(wordListId)
+                                        )
+                                    },
+                                    onCreateNewList = { title, description ->
+                                        wordListsViewModel.createNewWordList(title, description)
+                                    },
+                                    onDelete = {
+                                        wordListsViewModel.deleteWordList(it)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun HSKWordListsTab(
+    wordLists: List<HSKWordList>,
+    onClick: (Long) -> Unit
+) {
+    if (wordLists.isEmpty()) {
+        EmptyTabContent("No HSK word lists available")
+        return
+    }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Sort HSK lists by level
+        val sortedLists = wordLists.sortedBy { it.level.value }
+
+        items(sortedLists, key = { it.id }) { wordList ->
+            HSKWordListItem(
+                wordList = wordList,
+                onClick = onClick
+            )
+        }
+
+        // Add bottom padding for better UX
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -267,7 +337,7 @@ fun MyLists(
     wordList: List<CCWordList>,
     onClick: (Long) -> Unit,
     onCreateNewList: (title: String, description: String?) -> Unit,
-    onDelete: (CCWordList) -> Unit
+    onDelete: (WordList) -> Unit
 ) {
     val showDialog = rememberSaveable { mutableStateOf(false) }
 
@@ -290,7 +360,7 @@ fun MyLists(
         ) {
             // Existing word lists
             itemsIndexed(wordList, key = { _, wordList -> wordList.id ?: 0 }) { _, wordList ->
-                WordListColumnItem(
+                CCWordListItem(
                     wordList = wordList,
                     onClick = { id -> onClick(id) },
                     onDelete = { onDelete(it) }

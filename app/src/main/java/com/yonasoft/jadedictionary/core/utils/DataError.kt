@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.features.word.domain.utils
+package com.yonasoft.jadedictionary.core.utils
 
 sealed interface DataError: Error {
     enum class Network: DataError {

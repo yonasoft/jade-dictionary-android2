@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.features.word_search.presentation.components
+package com.yonasoft.jadedictionary.features.word.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row

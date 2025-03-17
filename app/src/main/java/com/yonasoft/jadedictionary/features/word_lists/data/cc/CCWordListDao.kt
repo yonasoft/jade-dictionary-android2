@@ -10,14 +10,14 @@ import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
 
 @Dao
 interface CCWordListDao {
-    @Query("SELECT * FROM cc_wordlist")
+    @Query("SELECT * FROM word_lists")
     fun getAllWordLists(): List<CCWordList>
 
-    @Query("SELECT * FROM cc_wordlist WHERE _id = :id")
+    @Query("SELECT * FROM word_lists WHERE _id = :id")
     suspend fun getWordListById(id: Long): CCWordList?
 
 
-    @Query("SELECT * FROM cc_wordlist WHERE title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' ORDER BY CASE WHEN title LIKE :query || '%' THEN 0 WHEN title LIKE '%' || :query || '%' THEN 1 WHEN description LIKE :query || '%' THEN 2 ELSE 3 END")
+    @Query("SELECT * FROM word_lists WHERE title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' ORDER BY CASE WHEN title LIKE :query || '%' THEN 0 WHEN title LIKE '%' || :query || '%' THEN 1 WHEN description LIKE :query || '%' THEN 2 ELSE 3 END")
     fun searchWordLists(query: String): List<CCWordList>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -29,6 +29,6 @@ interface CCWordListDao {
     @Delete
     suspend fun deleteWordList(wordList: CCWordList)
 
-    @Query("DELETE FROM cc_wordlist WHERE _id = :id")
+    @Query("DELETE FROM word_lists WHERE _id = :id")
     suspend fun deleteWordListById(id: Long)
 }
