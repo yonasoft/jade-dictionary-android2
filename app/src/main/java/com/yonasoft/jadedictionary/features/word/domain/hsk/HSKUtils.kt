@@ -40,7 +40,7 @@ object HSKUtils {
 
         word.hskNewLevel?.let {
             val levelText = if (it >= 7) {
-                "HSK 3.0: Level $it (7-9)"
+                "HSK 3.0: Level 7-9"
             } else {
                 "HSK 3.0: Level $it"
             }
@@ -96,7 +96,7 @@ object HSKUtils {
     fun formatHSKLevelForDisplay(level: Int, isNew: Boolean): String {
         return if (isNew) {
             if (level >= 7) {
-                "HSK3: $level (7-9)"
+                "HSK3: 7-9"
             } else {
                 "HSK3: $level"
             }

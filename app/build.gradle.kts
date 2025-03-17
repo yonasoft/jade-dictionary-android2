@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.compose.material)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.compose.ui.google.fonts)

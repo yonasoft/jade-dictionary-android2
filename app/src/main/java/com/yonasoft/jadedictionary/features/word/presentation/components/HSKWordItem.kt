@@ -125,7 +125,7 @@ fun HSKWordItem(
                         val level = it.toString()
                         // Check if it's a higher level (7-9)
                         val displayText = if (it >= 7) {
-                            "HSK3: $level (7-9)"
+                            "HSK3: 7-9"
                         } else {
                             "HSK3: $level"
                         }
