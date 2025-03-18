@@ -91,6 +91,8 @@ fun WordSearch(
     val ocrResults = ocrState.results
     val isRecognizing = recognitionState.isLoading
 
+    val listState =rememberLazyListState()
+
     // Create a SnackbarHostState that will be used by both the Scaffold and the AppBar
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -105,6 +107,10 @@ fun WordSearch(
                 wordSearchViewModel.updateSearchQuery(result?.get(0) ?: "")
             }
         }
+
+    LaunchedEffect(searchResults) {
+        listState.scrollToItem(0)
+    }
 
     LaunchedEffect(selectedTab) {
         kotlinx.coroutines.delay(100)
@@ -364,7 +370,7 @@ fun WordSearch(
             if (searchResults.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    state = rememberLazyListState()
+                    state = listState
                 ) {
                     itemsIndexed(
                         searchResults,
