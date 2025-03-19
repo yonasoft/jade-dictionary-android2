@@ -62,7 +62,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CCWordListDetailScreen(
+fun WordListDetailScreen(
     navController: NavController,
     viewModel: WordListDetailViewModel
 ) {
@@ -385,7 +385,7 @@ fun CCWordListDetailScreen(
                                             },
                                             onWordClick = {
                                                 // Navigate to word detail
-                                                navController.navigate("word_detail/${word.id}")
+                                                navController.navigate("cc_word_detail/${word.id}")
                                             },
                                             showRemoveButton = !uiState.isHSKList
                                         )
@@ -394,11 +394,7 @@ fun CCWordListDetailScreen(
                                         HSKWordItem(
                                             word = word,
                                             onClick = {
-                                                // Navigate to HSK word detail (if implemented)
-                                                // For now, we could show a message that HSK word details are coming soon
-                                                scope.launch {
-                                                    snackbarHostState.showSnackbar("HSK word details coming soon")
-                                                }
+                                                navController.navigate("hsk_word_detail/${word.id}")
                                             }
                                         )
                                     }

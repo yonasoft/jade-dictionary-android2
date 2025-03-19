@@ -8,8 +8,11 @@ enum class MainRoutes {
 
 sealed class WordRoutes(val route: String) {
     data object WordSearch : WordRoutes("word_search")
-    data object WordDetail : WordRoutes("word_detail/{wordId}") {
-        fun createRoute(wordId: Long) = "word_detail/$wordId"
+    data object CCWordDetail : WordRoutes("cc_word_detail/{wordId}") {
+        fun createRoute(wordId: Long) = "cc_word_detail/$wordId"
+    }
+    data object HSKWordDetail : WordRoutes("hsk_word_detail/{wordId}") {
+        fun createRoute(wordId: Long) = "hsk_word_detail/$wordId"
     }
 }
 

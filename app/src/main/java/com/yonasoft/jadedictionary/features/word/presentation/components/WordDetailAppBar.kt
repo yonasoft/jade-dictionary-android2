@@ -44,7 +44,7 @@ fun WordDetailAppbar(
     navigateUp: () -> Unit,
     createNewWordList: ((title: String, description: String?) -> Unit)? = null,
     addWordToList: ((CCWordList) -> Unit)? = null,
-    wordLists: List<CCWordList>,
+    wordLists: List<CCWordList>? = null,
     snackbarHostState: SnackbarHostState
 ) {
     var showCreateDialog by remember { mutableStateOf(false) }
@@ -68,12 +68,12 @@ fun WordDetailAppbar(
     }
 
     // Show word list selection dialog
-    if (showWordListSelectionDialog) {
+    if (showWordListSelectionDialog && addWordToList != null && wordLists != null) {
         WordListSelectionDialog(
             wordLists = wordLists,
             onDismiss = { showWordListSelectionDialog = false },
             onWordListSelected = { selectedList ->
-                addWordToList?.let { it(selectedList) }
+                addWordToList(selectedList)
 
                 // Show confirmation
                 scope.launch {

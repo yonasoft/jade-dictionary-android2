@@ -16,8 +16,10 @@ import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
 import com.yonasoft.jadedictionary.features.word.presentation.screens.CCWordDetail
+import com.yonasoft.jadedictionary.features.word.presentation.screens.HSKWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.CCWordDetailViewModel
-import com.yonasoft.jadedictionary.features.word_lists.presentation.screens.CCWordListDetailScreen
+import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.HSKWordDetailViewModel
+import com.yonasoft.jadedictionary.features.word_lists.presentation.screens.WordListDetailScreen
 import com.yonasoft.jadedictionary.features.word_lists.presentation.screens.WordLists
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListDetailViewModel
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListsViewModel
@@ -65,7 +67,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(
-                            route = WordRoutes.WordDetail.route,
+                            route = WordRoutes.CCWordDetail.route,
                             arguments = listOf(
                                 navArgument("wordId") { type = NavType.LongType }
                             )
@@ -76,6 +78,21 @@ class MainActivity : ComponentActivity() {
                             CCWordDetail(
                                 navController = navController,
                                 ccWordDetailViewModel = ccWordDetailViewModel
+                            )
+                        }
+
+                        composable(
+                            route = WordRoutes.HSKWordDetail.route,
+                            arguments = listOf(
+                                navArgument("wordId") { type = NavType.LongType }
+                            )
+                        ) {
+                            val hskWordDetailViewModel = koinViewModel<HSKWordDetailViewModel> {
+                                parametersOf(it.savedStateHandle)
+                            }
+                            HSKWordDetail(
+                                navController = navController,
+                                hskWordDetailViewModel = hskWordDetailViewModel
                             )
                         }
                     }
@@ -102,7 +119,7 @@ class MainActivity : ComponentActivity() {
                             val wordListDetailViewModel = koinViewModel<WordListDetailViewModel> {
                                 parametersOf(it.savedStateHandle)
                             }
-                            CCWordListDetailScreen(
+                            WordListDetailScreen(
                                 navController = navController,
                                 viewModel = wordListDetailViewModel
                             )

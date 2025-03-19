@@ -379,7 +379,7 @@ fun WordSearch(
                         CCWordItem(
                             word = word,
                             onClick = {
-                                navController.navigate(WordRoutes.WordDetail.createRoute(word.id!!))
+                                navController.navigate(WordRoutes.CCWordDetail.createRoute(word.id!!))
                             },
                             wordLists = wordLists,
                             onAddToWordList = { selectedWord, selectedList ->

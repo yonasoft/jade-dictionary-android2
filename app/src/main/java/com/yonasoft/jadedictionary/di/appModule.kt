@@ -11,6 +11,7 @@ import com.yonasoft.jadedictionary.features.word.domain.hsk.HSKWordRepository
 import com.yonasoft.jadedictionary.features.word.domain.sentences.SentenceRespository
 import com.yonasoft.jadedictionary.features.word.domain.utils.PinyinUtils
 import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.CCWordDetailViewModel
+import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.HSKWordDetailViewModel
 import com.yonasoft.jadedictionary.features.word_lists.data.cc.CCWordListDatabase
 import com.yonasoft.jadedictionary.features.word_lists.data.cc.CCWordListRepositoryImpl
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordListRepository
@@ -60,6 +61,9 @@ val appModule = module {
     viewModel { WordListsViewModel(get(), get()) }
     viewModel { (savedStateHandle: SavedStateHandle) ->
         CCWordDetailViewModel(get(), get(), get(), savedStateHandle) // Pass both repositories
+    }
+    viewModel { (savedStateHandle: SavedStateHandle) ->
+        HSKWordDetailViewModel(get(), get(), get(), savedStateHandle)
     }
     viewModel { (savedStateHandle: SavedStateHandle) ->
         WordListDetailViewModel(get(), get(), get(), (savedStateHandle))
