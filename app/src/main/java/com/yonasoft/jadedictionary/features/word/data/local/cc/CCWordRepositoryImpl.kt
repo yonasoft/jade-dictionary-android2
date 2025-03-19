@@ -2,11 +2,9 @@ package com.yonasoft.jadedictionary.features.word.data.local.cc
 
 import android.content.Context
 import android.util.Log
-import com.yonasoft.jadedictionary.features.word.data.local.sentences.Sentence
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWordRepository
 import com.yonasoft.jadedictionary.features.word.domain.utils.PinyinUtils
-import com.yonasoft.jadedictionary.features.word.domain.utils.SentenceUtil
 
 class CCWordRepositoryImpl(private val dao: CCWordDao, private val context: Context) :
     CCWordRepository {
@@ -33,7 +31,4 @@ class CCWordRepositoryImpl(private val dao: CCWordDao, private val context: Cont
         return dao.getWordsFromWord(word)
     }
 
-    override suspend fun getSentencesFromWord(word: String): List<Sentence> {
-        return SentenceUtil.searchDefaultSentences(context = context, searchString = word)
-    }
 }

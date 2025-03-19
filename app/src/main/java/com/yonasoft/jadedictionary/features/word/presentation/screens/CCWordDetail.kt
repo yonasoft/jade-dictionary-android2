@@ -60,30 +60,30 @@ import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.features.shared.presentation.components.JadeTabRowAlternative
 import com.yonasoft.jadedictionary.features.shared.presentation.components.openTTS
 import com.yonasoft.jadedictionary.features.shared.presentation.components.rememberTextToSpeech
-import com.yonasoft.jadedictionary.features.word.data.local.sentences.Sentence
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
+import com.yonasoft.jadedictionary.features.word.domain.sentences.Sentence
 import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordItem
 import com.yonasoft.jadedictionary.features.word.presentation.components.SentenceColumn
 import com.yonasoft.jadedictionary.features.word.presentation.components.WordDetailAppbar
-import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.WordDetailViewModel
+import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.CCWordDetailViewModel
 import java.util.Locale
 
 @Composable
-fun WordDetail(
+fun CCWordDetail(
     navController: NavHostController,
-    wordDetailViewModel: WordDetailViewModel
+   ccWordDetailViewModel: CCWordDetailViewModel
 ) {
     val tabs = listOf(
         "Chars",
         "Words",
         "Examples"
     )
-    val selectedTab by wordDetailViewModel.tabIndex.collectAsStateWithLifecycle()
-    val wordDetails by wordDetailViewModel.wordDetails.collectAsStateWithLifecycle()
-    val characters by wordDetailViewModel.characters.collectAsStateWithLifecycle()
-    val wordsOfWord by wordDetailViewModel.wordsOfWord.collectAsStateWithLifecycle()
-    val sentences by wordDetailViewModel.sentences.collectAsStateWithLifecycle()
-    val wordLists by wordDetailViewModel.wordLists.collectAsStateWithLifecycle()
+    val selectedTab by ccWordDetailViewModel.tabIndex.collectAsStateWithLifecycle()
+    val wordDetails by ccWordDetailViewModel.wordDetails.collectAsStateWithLifecycle()
+    val characters by ccWordDetailViewModel.characters.collectAsStateWithLifecycle()
+    val wordsOfWord by ccWordDetailViewModel.wordsOfWord.collectAsStateWithLifecycle()
+    val sentences by ccWordDetailViewModel.sentences.collectAsStateWithLifecycle()
+    val wordLists by ccWordDetailViewModel.wordLists.collectAsStateWithLifecycle()
 
     // Create a SnackbarHostState for snackbar display
     val snackbarHostState = remember { SnackbarHostState() }
@@ -96,7 +96,7 @@ fun WordDetail(
         pagerState.scrollToPage(selectedTab)
     }
     LaunchedEffect(pagerState.currentPage) {
-        wordDetailViewModel.updateSelectedTab(pagerState.currentPage)
+        ccWordDetailViewModel.updateSelectedTab(pagerState.currentPage)
     }
 
     // Update background color to be darker for better contrast
@@ -110,10 +110,10 @@ fun WordDetail(
                     navController.navigateUp()
                 },
                 createNewWordList = { title, description ->
-                    wordDetailViewModel.createNewWordList(title, description)
+                    ccWordDetailViewModel.createNewWordList(title, description)
                 },
                 addWordToList = { selectedList ->
-                    wordDetailViewModel.addWordToList(selectedList)
+                    ccWordDetailViewModel.addWordToList(selectedList)
                 },
                 wordLists = wordLists,
                 snackbarHostState = snackbarHostState
@@ -156,7 +156,7 @@ fun WordDetail(
                 pagerState = pagerState,
                 navController = navController,
                 tts = tts,
-                wordDetailViewModel = wordDetailViewModel,
+                CCWordDetailViewModel = ccWordDetailViewModel,
                 characters = characters,
                 wordsOfWord = wordsOfWord,
                 sentences = sentences
@@ -173,7 +173,7 @@ fun ScrollableLazyColumn(
     pagerState: androidx.compose.foundation.pager.PagerState,
     navController: NavHostController,
     tts: androidx.compose.runtime.State<android.speech.tts.TextToSpeech?>,
-    wordDetailViewModel: WordDetailViewModel,
+    CCWordDetailViewModel: CCWordDetailViewModel,
     characters: List<CCWord>,
     wordsOfWord: List<CCWord>,
     sentences: List<Sentence>
@@ -267,7 +267,7 @@ fun ScrollableLazyColumn(
                                     openTTS(
                                         tts = tts.value!!,
                                         text = simplifiedText,
-                                        setSpeaking = { wordDetailViewModel.setIsSpeaking(it) }
+                                        setSpeaking = { CCWordDetailViewModel.setIsSpeaking(it) }
                                     )
                                 }
                             },
@@ -331,7 +331,7 @@ fun ScrollableLazyColumn(
                         },
                         selected = selectedTab == index,
                         onClick = {
-                            wordDetailViewModel.updateSelectedTab(index)
+                            CCWordDetailViewModel.updateSelectedTab(index)
                         }
                     )
                 }
@@ -343,14 +343,14 @@ fun ScrollableLazyColumn(
         when (selectedTab) {
             0 -> characterItems(characters, navController)
             1 -> wordItems(wordsOfWord, navController)
-            2 -> sentenceItems(sentences, tts.value!!, wordDetailViewModel)
+            2 -> sentenceItems(sentences, tts.value!!, CCWordDetailViewModel)
         }
     }
 
     // Update ViewModel when swipe state changes
     LaunchedEffect(swipeableState.currentValue) {
         if (swipeableState.currentValue != selectedTab) {
-            wordDetailViewModel.updateSelectedTab(swipeableState.currentValue)
+            CCWordDetailViewModel.updateSelectedTab(swipeableState.currentValue)
         }
     }
 }
@@ -403,7 +403,7 @@ private fun LazyListScope.wordItems(
 private fun LazyListScope.sentenceItems(
     sentences: List<Sentence>,
     tts: android.speech.tts.TextToSpeech,
-    wordDetailViewModel: WordDetailViewModel
+    CCWordDetailViewModel: CCWordDetailViewModel
 ) {
     if (sentences.isEmpty()) {
         item {
@@ -420,7 +420,7 @@ private fun LazyListScope.sentenceItems(
             openTTS(
                 tts = tts,
                 text = sentenceText,
-                setSpeaking = { wordDetailViewModel.setIsSpeaking(it) }
+                setSpeaking = { CCWordDetailViewModel.setIsSpeaking(it) }
             )
         })
     }

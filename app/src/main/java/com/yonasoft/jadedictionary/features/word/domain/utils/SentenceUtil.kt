@@ -1,7 +1,7 @@
 package com.yonasoft.jadedictionary.features.word.domain.utils
 
 import android.content.Context
-import com.yonasoft.jadedictionary.features.word.data.local.sentences.Sentence
+import com.yonasoft.jadedictionary.features.word.domain.sentences.Sentence
 import java.io.BufferedReader
 import java.io.InputStreamReader
 

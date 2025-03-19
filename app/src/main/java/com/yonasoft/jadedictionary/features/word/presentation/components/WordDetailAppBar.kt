@@ -42,8 +42,8 @@ import kotlinx.coroutines.launch
 fun WordDetailAppbar(
     title: String,
     navigateUp: () -> Unit,
-    createNewWordList: (title: String, description: String?) -> Unit,
-    addWordToList: (CCWordList) -> Unit,
+    createNewWordList: ((title: String, description: String?) -> Unit)? = null,
+    addWordToList: ((CCWordList) -> Unit)? = null,
     wordLists: List<CCWordList>,
     snackbarHostState: SnackbarHostState
 ) {
@@ -56,7 +56,7 @@ fun WordDetailAppbar(
         CreateWordListDialog(
             onDismiss = { showCreateDialog = false },
             onConfirm = { newTitle, description ->
-                createNewWordList(newTitle, description)
+                createNewWordList?.let { it(newTitle, description) }
                 showCreateDialog = false
 
                 // Show confirmation
@@ -73,7 +73,7 @@ fun WordDetailAppbar(
             wordLists = wordLists,
             onDismiss = { showWordListSelectionDialog = false },
             onWordListSelected = { selectedList ->
-                addWordToList(selectedList)
+                addWordToList?.let { it(selectedList) }
 
                 // Show confirmation
                 scope.launch {
@@ -120,36 +120,40 @@ fun WordDetailAppbar(
         },
         actions = {
             // Add to list button
-            IconButton(
-                onClick = { showWordListSelectionDialog = true },
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1A1A1A))
-                    .size(40.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add to word list",
-                    tint = CustomColor.GREEN01.color,
-                    modifier = Modifier.size(22.dp)
-                )
+            addWordToList?.let {
+                IconButton(
+                    onClick = { showWordListSelectionDialog = true },
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF1A1A1A))
+                        .size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add to word list",
+                        tint = CustomColor.GREEN01.color,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
             }
 
-            IconButton(
-                onClick = { showCreateDialog = true },
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1A1A1A))
-                    .size(40.dp)
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.outline_playlist_add_24),
-                    contentDescription = "Create new list",
-                    tint = Color.White.copy(alpha = 0.8f),
-                    modifier = Modifier.size(22.dp)
-                )
+            createNewWordList?.let {
+                IconButton(
+                    onClick = { showCreateDialog = true },
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF1A1A1A))
+                        .size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.outline_playlist_add_24),
+                        contentDescription = "Create new list",
+                        tint = Color.White.copy(alpha = 0.8f),
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(

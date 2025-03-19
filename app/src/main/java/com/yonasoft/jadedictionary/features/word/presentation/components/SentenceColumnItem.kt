@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
-import com.yonasoft.jadedictionary.features.word.data.local.sentences.Sentence
+import com.yonasoft.jadedictionary.features.word.domain.sentences.Sentence
 import com.yonasoft.jadedictionary.features.word.domain.utils.PinyinUtils
 
 @Composable

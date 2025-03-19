@@ -15,8 +15,8 @@ import com.yonasoft.jadedictionary.core.navigation.MainRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
-import com.yonasoft.jadedictionary.features.word.presentation.screens.WordDetail
-import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.WordDetailViewModel
+import com.yonasoft.jadedictionary.features.word.presentation.screens.CCWordDetail
+import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.CCWordDetailViewModel
 import com.yonasoft.jadedictionary.features.word_lists.presentation.screens.CCWordListDetailScreen
 import com.yonasoft.jadedictionary.features.word_lists.presentation.screens.WordLists
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListDetailViewModel
@@ -70,12 +70,12 @@ class MainActivity : ComponentActivity() {
                                 navArgument("wordId") { type = NavType.LongType }
                             )
                         ) {
-                            val wordDetailViewModel = koinViewModel<WordDetailViewModel> {
+                            val ccWordDetailViewModel = koinViewModel<CCWordDetailViewModel> {
                                 parametersOf(it.savedStateHandle)
                             }
-                            WordDetail(
+                            CCWordDetail(
                                 navController = navController,
-                                wordDetailViewModel = wordDetailViewModel
+                                ccWordDetailViewModel = ccWordDetailViewModel
                             )
                         }
                     }

@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.features.word.data.local.sentences
+package com.yonasoft.jadedictionary.features.word.domain.sentences
 
 
 data class Sentence(

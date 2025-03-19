@@ -4,9 +4,10 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yonasoft.jadedictionary.features.word.data.local.sentences.Sentence
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWordRepository
+import com.yonasoft.jadedictionary.features.word.domain.sentences.Sentence
+import com.yonasoft.jadedictionary.features.word.domain.sentences.SentenceRespository
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordList
 import com.yonasoft.jadedictionary.features.word_lists.domain.cc.CCWordListRepository
 import kotlinx.coroutines.Dispatchers
@@ -18,9 +19,10 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class WordDetailViewModel(
-    private val repository: CCWordRepository,
+class CCWordDetailViewModel(
+    private val ccWordRepository: CCWordRepository,
     private val wordListRepository: CCWordListRepository,
+    private val sentenceRespository: SentenceRespository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _wordId = MutableStateFlow<Long?>(null)
@@ -157,7 +159,7 @@ class WordDetailViewModel(
     private suspend fun fetchWordDetails(wordId: Long) {
         withContext(Dispatchers.IO) {
             try {
-                val wordDetails = repository.getWordById(wordId)
+                val wordDetails = ccWordRepository.getWordById(wordId)
                 withContext(Dispatchers.Main) {
                     _wordDetails.value = wordDetails
                 }
@@ -170,7 +172,7 @@ class WordDetailViewModel(
     private suspend fun fetchCharacters(characters: String) {
         withContext(Dispatchers.IO) {
             try {
-                val fetchedCharacters = repository.getCharsFromWord(characters)
+                val fetchedCharacters = ccWordRepository.getCharsFromWord(characters)
                 withContext(Dispatchers.Main) {
                     _characters.value = fetchedCharacters
                 }
@@ -183,7 +185,7 @@ class WordDetailViewModel(
     private suspend fun fetchWordsOfWord(word: String) {
         withContext(Dispatchers.IO) {
             try {
-                val fetchedWord = repository.getWordsFromWord(word)
+                val fetchedWord = ccWordRepository.getWordsFromWord(word)
                 withContext(Dispatchers.Main) {
                     _wordsOfWord.value = fetchedWord
                 }
@@ -196,7 +198,7 @@ class WordDetailViewModel(
     private suspend fun fetchSentencesOfWord(word: String) {
         withContext(Dispatchers.IO) {
             try {
-                val fetchedSentences = repository.getSentencesFromWord(word)
+                val fetchedSentences = sentenceRespository.getSentencesFromWord(word)
                 Log.i("WordDetailViewModel", fetchedSentences.toString())
                 withContext(Dispatchers.Main) {
                     _sentences.value = fetchedSentences
