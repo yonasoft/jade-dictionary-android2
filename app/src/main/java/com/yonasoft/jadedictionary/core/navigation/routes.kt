@@ -1,9 +1,12 @@
 package com.yonasoft.jadedictionary.core.navigation
 
+import com.yonasoft.jadedictionary.features.practice.domain.models.shared.PracticeType
+
 enum class MainRoutes {
     Home,
     Words,
     WordLists,
+    Practice,
 }
 
 sealed class WordRoutes(val route: String) {
@@ -21,4 +24,20 @@ sealed class WordListRoutes(val route: String) {
     data object WordListDetail : WordListRoutes("word_list_detail/{wordListId}") {
         fun createRoute(wordListId: Long) = "word_list_detail/$wordListId"
     }
+}
+
+sealed class PracticeRoutes(val route: String) {
+    // Selection screen where user chooses a practice type
+    data object PracticeSelection : PracticeRoutes("practice_selection")
+
+    // Setup screen for any practice type
+    data object CCPracticeSetup : PracticeRoutes("practice_setup/{practiceType}") {
+        fun createRoute(practiceType: PracticeType) = "practice_setup/${practiceType.routeKey}"
+    }
+
+    data object HSKPracticeSetup : PracticeRoutes("practice_setup/{practiceType}") {
+        fun createRoute(practiceType: PracticeType) = "practice_setup/${practiceType.routeKey}"
+    }
+
+
 }
