@@ -22,8 +22,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,8 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.yonasoft.jadedictionary.R
+import com.yonasoft.jadedictionary.core.navigation.PracticeRoutes
 import com.yonasoft.jadedictionary.features.practice.domain.models.shared.PracticeType
+import com.yonasoft.jadedictionary.features.practice.domain.models.shared.WordSource
 import com.yonasoft.jadedictionary.features.practice.presentation.components.PracticeOptionCard
+import com.yonasoft.jadedictionary.features.practice.presentation.components.main.WordSourceSelector
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,9 +52,12 @@ fun PracticeSelection(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
+
+    var wordSource: WordSource by rememberSaveable { mutableStateOf(WordSource.CUSTOM) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val backgroundColor = Color(0xFF0A0A0A)
+
 
     // Define practice options
     val practiceOptions = listOf(
@@ -111,6 +121,8 @@ fun PracticeSelection(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            WordSourceSelector(selectedSource = wordSource, onSourceSelected = { wordSource = it })
+
             Spacer(modifier = Modifier.height(16.dp))
 
             // Description text
@@ -132,7 +144,17 @@ fun PracticeSelection(
                     icon = icon,
                     isLocked = false, // Example: Listening is locked
                     onClick = {
+                        val route =
+                            when (wordSource) {
+                                WordSource.CUSTOM -> PracticeRoutes.CCPracticeSetup.createRoute(
+                                    practiceType
+                                )
 
+                                WordSource.HSK -> PracticeRoutes.HSKPracticeSetup.createRoute(
+                                    practiceType
+                                )
+                            }
+                        navController.navigate(route)
                     },
                     modifier = Modifier.fillMaxWidth()
                 )

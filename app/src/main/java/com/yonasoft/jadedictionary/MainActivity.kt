@@ -16,7 +16,9 @@ import com.yonasoft.jadedictionary.core.navigation.PracticeRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
+import com.yonasoft.jadedictionary.features.practice.presentation.screens.cc_setup.CCPracticeSetup
 import com.yonasoft.jadedictionary.features.practice.presentation.screens.main.PracticeSelection
+import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.CCPracticeSetupViewModel
 import com.yonasoft.jadedictionary.features.word.presentation.screens.CCWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.screens.HSKWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.CCWordDetailViewModel
@@ -126,8 +128,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-
-                    // Add Practice navigation
                     navigation(
                         startDestination = PracticeRoutes.PracticeSelection.route,
                         route = MainRoutes.Practice.name
@@ -135,6 +135,20 @@ class MainActivity : ComponentActivity() {
                         composable(route = PracticeRoutes.PracticeSelection.route) {
                             PracticeSelection(
                                 navController = navController
+                            )
+                        }
+
+                        composable(route = PracticeRoutes.CCPracticeSetup.route,
+                            arguments = listOf(
+                                navArgument("practiceType") { type = NavType.StringType }
+                            )
+                        ) {
+                            val ccPracticeSetupViewModel = koinViewModel<CCPracticeSetupViewModel> {
+                                parametersOf(it.savedStateHandle)
+                            }
+                            CCPracticeSetup(
+                                navController = navController,
+                                viewModel = ccPracticeSetupViewModel,
                             )
                         }
                     }

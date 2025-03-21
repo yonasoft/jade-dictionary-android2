@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -151,4 +152,33 @@ fun CCWordItem(
             }
         )
     }
+}
+
+@Composable
+fun CCWordItemWithRemove(
+    word: CCWord,
+    onRemove: () -> Unit,
+    onWordClick: () -> Unit,
+    showRemoveButton: Boolean = true
+) {
+    CCWordItem(
+        word = word,
+        onClick = onWordClick,
+        modifier = Modifier.fillMaxWidth(),
+        actions = {
+            if (showRemoveButton) {
+                IconButton(
+                    onClick = onRemove,
+                    modifier = Modifier.size(44.dp) // Slightly larger for better touch target
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Remove from list",
+                        tint = Color.Red.copy(alpha = 0.7f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        }
+    )
 }

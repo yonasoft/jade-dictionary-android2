@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,7 +53,7 @@ import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.features.shared.presentation.components.SearchTextField
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 import com.yonasoft.jadedictionary.features.word.domain.hsk.HSKWord
-import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordItem
+import com.yonasoft.jadedictionary.features.word.presentation.components.CCWordItemWithRemove
 import com.yonasoft.jadedictionary.features.word.presentation.components.HSKWordItem
 import com.yonasoft.jadedictionary.features.word_lists.domain.hsk.HSKWordList
 import com.yonasoft.jadedictionary.features.word_lists.presentation.viewmodels.WordListDetailViewModel
@@ -378,7 +377,7 @@ fun WordListDetailScreen(
                             ) { word ->
                                 when (word) {
                                     is CCWord -> {
-                                        WordListItemWithRemove(
+                                        CCWordItemWithRemove(
                                             word = word,
                                             onRemove = {
                                                 if (!uiState.isHSKList) viewModel.removeWord(word)
@@ -412,31 +411,3 @@ fun WordListDetailScreen(
     }
 }
 
-@Composable
-fun WordListItemWithRemove(
-    word: CCWord,
-    onRemove: () -> Unit,
-    onWordClick: () -> Unit,
-    showRemoveButton: Boolean = true
-) {
-    CCWordItem(
-        word = word,
-        onClick = onWordClick,
-        modifier = Modifier.fillMaxWidth(),
-        actions = {
-            if (showRemoveButton) {
-                IconButton(
-                    onClick = onRemove,
-                    modifier = Modifier.size(44.dp) // Slightly larger for better touch target
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Remove from list",
-                        tint = Color.Red.copy(alpha = 0.7f),
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-        }
-    )
-}

@@ -31,13 +31,11 @@ sealed class PracticeRoutes(val route: String) {
     data object PracticeSelection : PracticeRoutes("practice_selection")
 
     // Setup screen for any practice type
-    data object CCPracticeSetup : PracticeRoutes("practice_setup/{practiceType}") {
-        fun createRoute(practiceType: PracticeType) = "practice_setup/${practiceType.routeKey}"
+    data object CCPracticeSetup : PracticeRoutes("cc_practice_setup/{practiceType}") {
+        fun createRoute(practiceType: PracticeType) = "cc_practice_setup/${practiceType.routeKey}"
     }
 
-    data object HSKPracticeSetup : PracticeRoutes("practice_setup/{practiceType}") {
-        fun createRoute(practiceType: PracticeType) = "practice_setup/${practiceType.routeKey}"
+    data object HSKPracticeSetup : PracticeRoutes("hsk_practice_setup/{practiceType}") {
+        fun createRoute(practiceType: PracticeType) = "hsk_practice_setup/${practiceType.routeKey}"
     }
-
-
 }
