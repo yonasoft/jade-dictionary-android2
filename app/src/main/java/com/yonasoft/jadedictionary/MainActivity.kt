@@ -17,8 +17,10 @@ import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
 import com.yonasoft.jadedictionary.features.practice.presentation.screens.cc_setup.CCPracticeSetup
+import com.yonasoft.jadedictionary.features.practice.presentation.screens.hsk_setup.HSKPracticeSetup
 import com.yonasoft.jadedictionary.features.practice.presentation.screens.main.PracticeSelection
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.CCPracticeSetupViewModel
+import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.HSKPracticeSetupViewModel
 import com.yonasoft.jadedictionary.features.word.presentation.screens.CCWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.screens.HSKWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.CCWordDetailViewModel
@@ -149,6 +151,20 @@ class MainActivity : ComponentActivity() {
                             CCPracticeSetup(
                                 navController = navController,
                                 viewModel = ccPracticeSetupViewModel,
+                            )
+                        }
+
+                        composable(route = PracticeRoutes.HSKPracticeSetup.route,
+                            arguments = listOf(
+                                navArgument("practiceType") { type = NavType.StringType }
+                            )
+                        ) {
+                            val hskPracticeSetupViewModel = koinViewModel<HSKPracticeSetupViewModel> {
+                                parametersOf(it.savedStateHandle)
+                            }
+                            HSKPracticeSetup(
+                                navController = navController,
+                                viewModel = hskPracticeSetupViewModel,
                             )
                         }
                     }

@@ -3,6 +3,7 @@ package com.yonasoft.jadedictionary.di
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.CCPracticeSetupViewModel
+import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.HSKPracticeSetupViewModel
 import com.yonasoft.jadedictionary.features.word.data.local.cc.CCWordDatabase
 import com.yonasoft.jadedictionary.features.word.data.local.cc.CCWordRepositoryImpl
 import com.yonasoft.jadedictionary.features.word.data.local.hsk.HSKWordRepositoryImpl
@@ -71,5 +72,8 @@ val appModule = module {
     }
     viewModel { (savedStateHandle: SavedStateHandle) ->
         CCPracticeSetupViewModel(get(), get(), (savedStateHandle))
+    }
+    viewModel { (savedStateHandle: SavedStateHandle) ->
+        HSKPracticeSetupViewModel(get(), (savedStateHandle))
     }
 }
