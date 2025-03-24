@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.features.practice.presentation.screens.hsk_setup
+package com.yonasoft.jadedictionary.features.practice.presentation.screens.setup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -65,6 +65,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
+import com.yonasoft.jadedictionary.core.navigation.PracticeRoutes
 import com.yonasoft.jadedictionary.features.practice.domain.models.shared.PracticeType
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.HSKPracticeSetupViewModel
 import com.yonasoft.jadedictionary.features.word.domain.hsk.HSKVersion
@@ -190,6 +191,22 @@ fun HSKPracticeSetup(
                                 "Starting practice with ${uiState.selectedWords.size} words"
                             )
                         }
+
+                        val wordIds = uiState.selectedWords.map { it.id }
+                        val route = when (uiState.practiceType) {
+                            PracticeType.FLASH_CARDS -> PracticeRoutes.FlashCardPractice.createRoute("HSK", wordIds)
+                            PracticeType.MULTIPLE_CHOICE -> PracticeRoutes.MultipleChoicePractice.createRoute("HSK", wordIds)
+                            PracticeType.LISTENING -> PracticeRoutes.ListeningPractice.createRoute("HSK", wordIds)
+                            else -> PracticeRoutes.FlashCardPractice.createRoute("HSK", wordIds) // Default fallback
+                        }
+
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                "Starting practice with ${uiState.selectedWords.size} words"
+                            )
+                        }
+
+                        navController.navigate(route)
                     },
                     containerColor = CustomColor.GREEN01.color,
                     contentColor = Color.Black
@@ -479,7 +496,9 @@ fun HSKLevelSelectionDialog(
                                 text = version,
                                 fontSize = 14.sp,
                                 fontWeight = if (currentVersion == version) FontWeight.Bold else FontWeight.Normal,
-                                color = if (currentVersion == version) CustomColor.GREEN01.color else Color.White.copy(alpha = 0.7f)
+                                color = if (currentVersion == version) CustomColor.GREEN01.color else Color.White.copy(
+                                    alpha = 0.7f
+                                )
                             )
 
                             // Indicator for selected version
@@ -649,7 +668,8 @@ fun HSKLevelSelectionDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val version = if (currentVersion == "HSK 3.0") HSKVersion.NEW else HSKVersion.OLD
+                    val version =
+                        if (currentVersion == "HSK 3.0") HSKVersion.NEW else HSKVersion.OLD
                     viewModel.setHSKVersion(version)
                     onLevelsSelected(tempSelectedLevels.toList())
                     onDismiss()

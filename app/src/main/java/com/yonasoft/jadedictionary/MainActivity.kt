@@ -16,10 +16,14 @@ import com.yonasoft.jadedictionary.core.navigation.PracticeRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
-import com.yonasoft.jadedictionary.features.practice.presentation.screens.cc_setup.CCPracticeSetup
-import com.yonasoft.jadedictionary.features.practice.presentation.screens.hsk_setup.HSKPracticeSetup
 import com.yonasoft.jadedictionary.features.practice.presentation.screens.main.PracticeSelection
+import com.yonasoft.jadedictionary.features.practice.presentation.screens.practice_modes.FlashCardPractice
+import com.yonasoft.jadedictionary.features.practice.presentation.screens.practice_modes.ListeningPractice
+import com.yonasoft.jadedictionary.features.practice.presentation.screens.practice_modes.MultipleChoicePractice
+import com.yonasoft.jadedictionary.features.practice.presentation.screens.setup.CCPracticeSetup
+import com.yonasoft.jadedictionary.features.practice.presentation.screens.setup.HSKPracticeSetup
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.CCPracticeSetupViewModel
+import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.FlashCardPracticeViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.HSKPracticeSetupViewModel
 import com.yonasoft.jadedictionary.features.word.presentation.screens.CCWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.screens.HSKWordDetail
@@ -165,6 +169,83 @@ class MainActivity : ComponentActivity() {
                             HSKPracticeSetup(
                                 navController = navController,
                                 viewModel = hskPracticeSetupViewModel,
+                            )
+                        }
+
+                        composable(
+                            route = PracticeRoutes.FlashCardPractice.route,
+                            arguments = listOf(
+                                navArgument("wordSource") { type = NavType.StringType },
+                                navArgument("wordIds") { type = NavType.StringType }
+                            )
+                        ) {
+                            val wordSource = it.arguments?.getString("wordSource") ?: "CC"
+                            val wordIdsString = it.arguments?.getString("wordIds") ?: ""
+                            val wordIds = if (wordIdsString.isNotEmpty()) {
+                                wordIdsString.split(",").map { id -> id.toLong() }
+                            } else {
+                                emptyList()
+                            }
+
+                            val flashCardViewModel = koinViewModel<FlashCardPracticeViewModel> {
+                                parametersOf(it.savedStateHandle)
+                            }
+
+                            FlashCardPractice(
+                                navController = navController,
+                                viewModel = flashCardViewModel
+                            )
+                        }
+
+                        // Multiple Choice Practice
+                        composable(
+                            route = PracticeRoutes.MultipleChoicePractice.route,
+                            arguments = listOf(
+                                navArgument("wordSource") { type = NavType.StringType },
+                                navArgument("wordIds") { type = NavType.StringType }
+                            )
+                        ) {
+                            val wordSource = it.arguments?.getString("wordSource") ?: "CC"
+                            val wordIdsString = it.arguments?.getString("wordIds") ?: ""
+                            val wordIds = if (wordIdsString.isNotEmpty()) {
+                                wordIdsString.split(",").map { id -> id.toLong() }
+                            } else {
+                                emptyList()
+                            }
+
+//                            val multipleChoiceViewModel = koinViewModel<MultipleChoiceViewModel> {
+//                                parametersOf(it.savedStateHandle)
+//                            }
+
+                            MultipleChoicePractice(
+                                navController = navController,
+//                                viewModel = multipleChoiceViewModel
+                            )
+                        }
+
+                        // Listening Practice
+                        composable(
+                            route = PracticeRoutes.ListeningPractice.route,
+                            arguments = listOf(
+                                navArgument("wordSource") { type = NavType.StringType },
+                                navArgument("wordIds") { type = NavType.StringType }
+                            )
+                        ) {
+                            val wordSource = it.arguments?.getString("wordSource") ?: "CC"
+                            val wordIdsString = it.arguments?.getString("wordIds") ?: ""
+                            val wordIds = if (wordIdsString.isNotEmpty()) {
+                                wordIdsString.split(",").map { id -> id.toLong() }
+                            } else {
+                                emptyList()
+                            }
+
+//                            val listeningViewModel = koinViewModel<ListeningViewModel> {
+//                                parametersOf(it.savedStateHandle)
+//                            }
+
+                            ListeningPractice(
+                                navController = navController,
+//                                viewModel = listeningViewModel
                             )
                         }
                     }

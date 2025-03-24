@@ -14,6 +14,7 @@ sealed class WordRoutes(val route: String) {
     data object CCWordDetail : WordRoutes("cc_word_detail/{wordId}") {
         fun createRoute(wordId: Long) = "cc_word_detail/$wordId"
     }
+
     data object HSKWordDetail : WordRoutes("hsk_word_detail/{wordId}") {
         fun createRoute(wordId: Long) = "hsk_word_detail/$wordId"
     }
@@ -37,5 +38,27 @@ sealed class PracticeRoutes(val route: String) {
 
     data object HSKPracticeSetup : PracticeRoutes("hsk_practice_setup/{practiceType}") {
         fun createRoute(practiceType: PracticeType) = "hsk_practice_setup/${practiceType.routeKey}"
+    }
+
+    // Practice screens
+    data object FlashCardPractice : PracticeRoutes("flash_card_practice/{wordSource}/{wordIds}") {
+        fun createRoute(wordSource: String, wordIds: List<Long>): String {
+            val idsString = wordIds.joinToString(",")
+            return "flash_card_practice/$wordSource/$idsString"
+        }
+    }
+
+    data object MultipleChoicePractice : PracticeRoutes("multiple_choice_practice/{wordSource}/{wordIds}") {
+        fun createRoute(wordSource: String, wordIds: List<Long>): String {
+            val idsString = wordIds.joinToString(",")
+            return "multiple_choice_practice/$wordSource/$idsString"
+        }
+    }
+
+    data object ListeningPractice : PracticeRoutes("listening_practice/{wordSource}/{wordIds}") {
+        fun createRoute(wordSource: String, wordIds: List<Long>): String {
+            val idsString = wordIds.joinToString(",")
+            return "listening_practice/$wordSource/$idsString"
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.yonasoft.jadedictionary.features.practice.presentation.screens.cc_setup
+package com.yonasoft.jadedictionary.features.practice.presentation.screens.setup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,6 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
+import com.yonasoft.jadedictionary.core.navigation.PracticeRoutes
 import com.yonasoft.jadedictionary.features.practice.domain.models.shared.PracticeType
 import com.yonasoft.jadedictionary.features.practice.presentation.components.WordSearchModal
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.CCPracticeSetupViewModel
@@ -181,6 +182,22 @@ fun CCPracticeSetup(
                                 "Starting practice with ${uiState.selectedWords.size} words"
                             )
                         }
+
+                        val wordIds = uiState.selectedWords.mapNotNull { it.id }
+                        val route = when (uiState.practiceType) {
+                            PracticeType.FLASH_CARDS -> PracticeRoutes.FlashCardPractice.createRoute("CC", wordIds)
+                            PracticeType.MULTIPLE_CHOICE -> PracticeRoutes.MultipleChoicePractice.createRoute("CC", wordIds)
+                            PracticeType.LISTENING -> PracticeRoutes.ListeningPractice.createRoute("CC", wordIds)
+                            else -> PracticeRoutes.FlashCardPractice.createRoute("CC", wordIds) // Default fallback
+                        }
+
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                "Starting practice with ${uiState.selectedWords.size} words"
+                            )
+                        }
+
+                        navController.navigate(route)
                     },
                     containerColor = CustomColor.GREEN01.color,
                     contentColor = Color.Black
