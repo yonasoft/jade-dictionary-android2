@@ -5,6 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.CCPracticeSetupViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.FlashCardPracticeViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.HSKPracticeSetupViewModel
+import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.ListeningPracticeViewModel
+import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.MultipleChoicePracticeViewModel
 import com.yonasoft.jadedictionary.features.word.data.local.cc.CCWordDatabase
 import com.yonasoft.jadedictionary.features.word.data.local.cc.CCWordRepositoryImpl
 import com.yonasoft.jadedictionary.features.word.data.local.hsk.HSKWordRepositoryImpl
@@ -79,5 +81,20 @@ val appModule = module {
     }
     viewModel { (savedStateHandle: SavedStateHandle) ->
         FlashCardPracticeViewModel(get(), get(), (savedStateHandle))
+    }
+    viewModel { parameters ->
+        MultipleChoicePracticeViewModel(
+            ccWordRepository = get(),
+            hskWordRepository = get(),
+            savedStateHandle = parameters.get()
+        )
+    }
+
+    viewModel { parameters ->
+        ListeningPracticeViewModel(
+            ccWordRepository = get(),
+            hskWordRepository = get(),
+            savedStateHandle = parameters.get()
+        )
     }
 }

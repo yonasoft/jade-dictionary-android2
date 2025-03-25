@@ -1,5 +1,7 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 
+package com.yonasoft.jadedictionary.features.practice.presentation.screens.practice_modes
+
 import android.speech.tts.TextToSpeech
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -29,7 +31,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -50,23 +51,18 @@ import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,60 +70,30 @@ import androidx.navigation.NavHostController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.PracticeRoutes
-import com.yonasoft.jadedictionary.features.practice.presentation.state.ListeningMode
-import com.yonasoft.jadedictionary.features.practice.presentation.state.ListeningQuestion
-import com.yonasoft.jadedictionary.features.practice.presentation.state.ListeningState
-import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.ListeningPracticeViewModel
+import com.yonasoft.jadedictionary.features.practice.presentation.state.MultipleChoiceState
+import com.yonasoft.jadedictionary.features.practice.presentation.state.QuestionMode
+import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.MultipleChoicePracticeViewModel
 import com.yonasoft.jadedictionary.features.shared.presentation.components.openTTS
 import com.yonasoft.jadedictionary.features.shared.presentation.components.rememberTextToSpeech
+import com.yonasoft.jadedictionary.features.word.domain.Word
 import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 import com.yonasoft.jadedictionary.features.word.domain.hsk.HSKWord
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.util.Locale
 
-/**
- * If not already defined in the project, we need this utility function
- */
-@Composable
-fun rememberWindowSizeClass(): WindowSizeClass {
-    val configuration = LocalConfiguration.current
-    val density = LocalDensity.current
-
-    val widthDp = configuration.screenWidthDp.dp
-    val heightDp = configuration.screenHeightDp.dp
-
-    return WindowSizeClass.calculateFromSize(DpSize(widthDp, heightDp))
-}
 
 @Composable
-fun ListeningPractice(
+fun MultipleChoicePractice(
     navController: NavHostController,
-    viewModel: ListeningPracticeViewModel
+    viewModel: MultipleChoicePracticeViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val backgroundColor = Color(0xFF0A0A0A)
     val windowSizeClass = rememberWindowSizeClass()
-    val scope = rememberCoroutineScope()
 
     // Handle TTS for Chinese pronunciation
     val tts = rememberTextToSpeech(Locale.CHINESE)
     var isSpeaking by remember { mutableStateOf(false) }
-    var useSlow by remember { mutableStateOf(false) }
-
-    // Auto-play the audio when a new question appears
-    LaunchedEffect(uiState.currentQuestionIndex, useSlow) {
-        if (!uiState.isLoading && !uiState.isPracticeComplete) {
-            uiState.getCurrentQuestion()?.let { question ->
-                playQuestionAudio(question, tts.value,
-                    isPlaying = { viewModel.setAudioPlaying(it) },
-                    setSpeaking = { isSpeaking = it },
-                    useSlow = useSlow
-                )
-            }
-        }
-    }
 
     Scaffold(
         containerColor = backgroundColor,
@@ -136,7 +102,7 @@ fun ListeningPractice(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Listening Practice",
+                        text = "Multiple Choice",
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
@@ -206,14 +172,14 @@ fun ListeningPractice(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Loading listening exercises...",
+                        text = "Loading questions...",
                         color = Color.White,
                         fontSize = 16.sp
                     )
                 }
             } else if (uiState.isPracticeComplete) {
                 // Results page
-                ListeningResults(
+                MultipleChoiceResults(
                     uiState = uiState,
                     tts = tts.value,
                     setSpeaking = { isSpeaking = it },
@@ -222,26 +188,13 @@ fun ListeningPractice(
                     onFinish = { navController.popBackStack(PracticeRoutes.PracticeSelection.route, false) }
                 )
             } else {
-                // Listening question practice
-                ListeningContent(
+                // Multiple choice question practice
+                MultipleChoiceContent(
                     uiState = uiState,
                     onOptionSelected = { viewModel.selectOption(it) },
                     onNextQuestion = { viewModel.moveToNextQuestion() },
-                    onPlayAudio = {
-                        uiState.getCurrentQuestion()?.let { question ->
-                            scope.launch {
-                                playQuestionAudio(question, tts.value,
-                                    isPlaying = { viewModel.setAudioPlaying(it) },
-                                    setSpeaking = { isSpeaking = it },
-                                    useSlow = useSlow
-                                )
-                            }
-                        }
-                    },
-                    onToggleSpeed = { useSlow = !useSlow },
-                    useSlow = useSlow,
                     tts = tts.value,
-                    isAudioPlaying = uiState.isAudioPlaying,
+                    setSpeaking = { isSpeaking = it },
                     modifier = Modifier.weight(1f),
                     windowSizeClass = windowSizeClass
                 )
@@ -250,60 +203,13 @@ fun ListeningPractice(
     }
 }
 
-suspend fun playQuestionAudio(
-    question: ListeningQuestion,
-    tts: TextToSpeech?,
-    isPlaying: (Boolean) -> Unit,
-    setSpeaking: (Boolean) -> Unit,
-    useSlow: Boolean = false
-) {
-    if (tts == null) return
-
-    isPlaying(true)
-    setSpeaking(true)
-
-    when (val word = question.word) {
-        is CCWord -> {
-            word.simplified?.let {
-                val speechRate = if (useSlow) 0.5f else 1.0f
-                tts.setSpeechRate(speechRate)
-                openTTS(tts, it, setSpeaking)
-                delay(100)  // Give a little time for TTS to start
-
-                // Wait until TTS is done
-                while (tts.isSpeaking) {
-                    delay(100)
-                }
-            }
-        }
-        is HSKWord -> {
-            val speechRate = if (useSlow) 0.5f else 1.0f
-            tts.setSpeechRate(speechRate)
-            openTTS(tts, word.simplified, setSpeaking)
-            delay(100)  // Give a little time for TTS to start
-
-            // Wait until TTS is done
-            while (tts.isSpeaking) {
-                delay(100)
-            }
-        }
-    }
-
-    // Reset speech rate to normal
-    tts.setSpeechRate(1.0f)
-    isPlaying(false)
-}
-
 @Composable
-fun ListeningContent(
-    uiState: ListeningState,
+fun MultipleChoiceContent(
+    uiState: MultipleChoiceState,
     onOptionSelected: (Int) -> Unit,
     onNextQuestion: () -> Unit,
-    onPlayAudio: () -> Unit,
-    onToggleSpeed: () -> Unit,
-    useSlow: Boolean,
     tts: TextToSpeech?,
-    isAudioPlaying: Boolean,
+    setSpeaking: (Boolean) -> Unit,
     windowSizeClass: WindowSizeClass,
     modifier: Modifier = Modifier
 ) {
@@ -312,6 +218,7 @@ fun ListeningContent(
             windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
 
     val currentQuestion = uiState.getCurrentQuestion()
+    val questionWord = currentQuestion?.word
 
     val scrollState = rememberScrollState()
 
@@ -330,8 +237,8 @@ fun ListeningContent(
                 .padding(bottom = if (uiState.isAnswerRevealed) 160.dp else 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Question card with audio controls
-            if (currentQuestion != null) {
+            // Question card with content based on mode
+            if (questionWord != null) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -360,96 +267,108 @@ fun ListeningContent(
                         // Question title based on mode
                         Text(
                             text = when (currentQuestion.mode) {
-                                ListeningMode.AUDIO_TO_CHARACTER -> "Listen and select the correct character"
-                                ListeningMode.AUDIO_TO_PINYIN -> "Listen and select the correct pinyin"
-                                ListeningMode.AUDIO_TO_DEFINITION -> "Listen and select the correct meaning"
+                                QuestionMode.PINYIN_TO_CHARACTER -> "What character matches this pinyin?"
+                                QuestionMode.CHARACTER_TO_PINYIN -> "What's the pinyin for this character?"
+                                QuestionMode.CHARACTER_TO_DEFINITION -> "What's the meaning of this character?"
+                                QuestionMode.DEFINITION_TO_CHARACTER -> "Which character has this meaning?"
                             },
                             fontSize = 16.sp,
                             color = Color.White.copy(alpha = 0.8f),
                             textAlign = TextAlign.Center
                         )
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                        // Audio control buttons
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
+                        // Question content
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(vertical = 16.dp)
                         ) {
-                            // Play button
-                            IconButton(
-                                onClick = onPlayAudio,
-                                enabled = !isAudioPlaying,
-                                modifier = Modifier
-                                    .background(
-                                        color = CustomColor.GREEN01.color.copy(alpha = 0.2f),
-                                        shape = CircleShape
+                            when (currentQuestion.mode) {
+                                QuestionMode.CHARACTER_TO_PINYIN, QuestionMode.CHARACTER_TO_DEFINITION -> {
+                                    // Show character
+                                    Text(
+                                        text = getDisplayText(questionWord),
+                                        fontSize = 48.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = CustomColor.GREEN01.color
                                     )
-                                    .size(80.dp)
-                            ) {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_volume_up_24),
-                                    contentDescription = "Play audio",
-                                    tint = if (isAudioPlaying)
-                                        CustomColor.GREEN01.color.copy(alpha = 0.5f)
-                                    else
-                                        CustomColor.GREEN01.color,
-                                    modifier = Modifier.size(40.dp)
-                                )
-                            }
 
-                            Spacer(modifier = Modifier.width(16.dp))
+                                    Spacer(modifier = Modifier.height(8.dp))
 
-                            // Speed control button
-                            IconButton(
-                                onClick = onToggleSpeed,
-                                modifier = Modifier
-                                    .background(
-                                        color = if (useSlow)
-                                            CustomColor.GREEN01.color.copy(alpha = 0.2f)
-                                        else
-                                            Color.Gray.copy(alpha = 0.2f),
-                                        shape = CircleShape
+                                    // Sound button
+                                    IconButton(
+                                        onClick = {
+                                            when (questionWord) {
+                                                is CCWord -> questionWord.simplified?.let {
+                                                    openTTS(tts ?: return@IconButton, it, setSpeaking)
+                                                }
+                                                is HSKWord -> openTTS(tts ?: return@IconButton, questionWord.simplified, setSpeaking)
+                                            }
+                                        },
+                                        modifier = Modifier
+                                            .background(
+                                                color = CustomColor.GREEN01.color.copy(alpha = 0.2f),
+                                                shape = CircleShape
+                                            )
+                                            .size(48.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = ImageVector.vectorResource(R.drawable.baseline_volume_up_24),
+                                            contentDescription = "Pronounce word",
+                                            tint = CustomColor.GREEN01.color
+                                        )
+                                    }
+                                }
+
+                                QuestionMode.PINYIN_TO_CHARACTER -> {
+                                    // Show pinyin
+                                    Text(
+                                        text = getDisplayPinyin(questionWord),
+                                        fontSize = 36.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = CustomColor.GREEN01.color,
+                                        textAlign = TextAlign.Center
                                     )
-                                    .size(48.dp)
-                            ) {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_fast_forward_24),
-                                    contentDescription = if (useSlow) "Normal speed" else "Slow speed",
-                                    tint = if (useSlow)
-                                        CustomColor.GREEN01.color
-                                    else
-                                        Color.Gray,
-                                    modifier = Modifier.size(24.dp)
-                                )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    // Sound button
+                                    IconButton(
+                                        onClick = {
+                                            when (questionWord) {
+                                                is CCWord -> questionWord.simplified?.let {
+                                                    openTTS(tts ?: return@IconButton, it, setSpeaking)
+                                                }
+                                                is HSKWord -> openTTS(tts ?: return@IconButton, questionWord.simplified, setSpeaking)
+                                            }
+                                        },
+                                        modifier = Modifier
+                                            .background(
+                                                color = CustomColor.GREEN01.color.copy(alpha = 0.2f),
+                                                shape = CircleShape
+                                            )
+                                            .size(48.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = ImageVector.vectorResource(R.drawable.baseline_volume_up_24),
+                                            contentDescription = "Pronounce word",
+                                            tint = CustomColor.GREEN01.color
+                                        )
+                                    }
+                                }
+
+                                QuestionMode.DEFINITION_TO_CHARACTER -> {
+                                    // Show definition
+                                    Text(
+                                        text = getDisplayDefinition(questionWord),
+                                        fontSize = 24.sp,
+                                        color = CustomColor.GREEN01.color,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Speed indicator text
-                        Text(
-                            text = if (useSlow) "Slow speed" else "Normal speed",
-                            fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.6f)
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Audio playing indicator
-                        if (isAudioPlaying) {
-                            Text(
-                                text = "Playing audio...",
-                                fontSize = 14.sp,
-                                color = CustomColor.GREEN01.color
-                            )
-                        } else {
-                            Text(
-                                text = "Tap to listen",
-                                fontSize = 14.sp,
-                                color = Color.White.copy(alpha = 0.6f)
-                            )
                         }
                     }
                 }
@@ -475,7 +394,7 @@ fun ListeningContent(
                         val isCorrect = uiState.isAnswerRevealed && index == currentQuestion.correctOptionIndex
                         val isIncorrect = uiState.isAnswerRevealed && isSelected && !isCorrect
 
-                        ListeningOption(
+                        AnswerOption(
                             option = option,
                             questionMode = currentQuestion.mode,
                             isSelected = isSelected,
@@ -507,7 +426,7 @@ fun ListeningContent(
                     .fillMaxWidth()
             ) {
                 // Feedback message
-                val isCorrect = uiState.selectedOptionIndex == currentQuestion?.correctOptionIndex
+                val isCorrect = uiState.selectedOptionIndex == currentQuestion!!.correctOptionIndex
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -530,38 +449,6 @@ fun ListeningContent(
                         fontWeight = FontWeight.Bold
                     )
                 }
-
-                // Show correct answer if wrong
-                if (!isCorrect) {
-                    Text(
-                        text = "The correct answer is:",
-                        color = Color.White.copy(alpha = 0.7f),
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-
-                    Card(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(0.8f),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF1A1A1A),
-                            contentColor = Color(0xFF1A5928)
-                        )
-                    ) {
-                        Text(
-                            text = currentQuestion?.options?.get(currentQuestion.correctOptionIndex) ?: "",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
 
                 // Next button
                 Button(
@@ -597,9 +484,9 @@ fun ListeningContent(
 }
 
 @Composable
-fun ListeningOption(
+fun AnswerOption(
     option: String,
-    questionMode: ListeningMode,
+    questionMode: QuestionMode,
     isSelected: Boolean,
     isCorrect: Boolean,
     isIncorrect: Boolean,
@@ -647,10 +534,8 @@ fun ListeningOption(
             Text(
                 text = option,
                 fontSize = when (questionMode) {
-                    ListeningMode.AUDIO_TO_PINYIN -> 18.sp
-                    ListeningMode.AUDIO_TO_CHARACTER ->
-                        if (option.length < 4) 20.sp else 18.sp
-                    ListeningMode.AUDIO_TO_DEFINITION ->
+                    QuestionMode.CHARACTER_TO_PINYIN, QuestionMode.PINYIN_TO_CHARACTER -> 18.sp
+                    QuestionMode.CHARACTER_TO_DEFINITION, QuestionMode.DEFINITION_TO_CHARACTER ->
                         if (option.length > 20) 14.sp else 16.sp
                 },
                 modifier = Modifier.weight(1f),
@@ -671,8 +556,8 @@ fun ListeningOption(
 }
 
 @Composable
-fun ListeningResults(
-    uiState: ListeningState,
+fun MultipleChoiceResults(
+    uiState: MultipleChoiceState,
     tts: TextToSpeech?,
     setSpeaking: (Boolean) -> Unit,
     windowSizeClass: WindowSizeClass,
@@ -803,14 +688,6 @@ fun ListeningResults(
                         )
                     }
                 }
-
-                Text(
-                    text = "Keep practicing to improve your listening skills!",
-                    fontSize = 16.sp,
-                    color = Color.White.copy(alpha = 0.8f),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 16.dp)
-                )
             }
         }
 
@@ -840,7 +717,7 @@ fun ListeningResults(
                         )
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Refresh,
+                        imageVector = ImageVector.vectorResource(R.drawable.outline_replay_24),
                         contentDescription = "Retry missed questions",
                         tint = CustomColor.GREEN01.color,
                         modifier = Modifier.size(20.dp)
@@ -882,5 +759,30 @@ fun ListeningResults(
                 )
             }
         }
+    }
+}
+
+// Helper functions to get display text from different word types
+private fun getDisplayText(word: Word): String {
+    return when (word) {
+        is CCWord -> word.displayText
+        is HSKWord -> word.displayText
+        else -> ""
+    }
+}
+
+private fun getDisplayPinyin(word: Word): String {
+    return when (word) {
+        is CCWord -> word.displayPinyin
+        is HSKWord -> word.pinyin!!
+        else -> ""
+    }
+}
+
+private fun getDisplayDefinition(word: Word): String {
+    return when (word) {
+        is CCWord -> word.definition ?: ""
+        is HSKWord -> word.displayDefinition
+        else -> ""
     }
 }
