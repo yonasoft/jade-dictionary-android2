@@ -334,6 +334,7 @@ fun WordListDetailScreen(
                     SearchTextField(
                         searchQuery = uiState.searchQuery,
                         onValueChange = { viewModel.searchWords(it) },
+                        onCancel = {viewModel.resetQuery()},
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
 

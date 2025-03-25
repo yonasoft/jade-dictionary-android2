@@ -17,13 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.navigation.MainRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.components.HomeAppBar
 import com.yonasoft.jadedictionary.features.home.presentation.components.JadeBanner
@@ -83,16 +80,16 @@ fun Home(navController: NavHostController) {
                 },
             )
 
-            LinkDirector(
-                modifier = Modifier.fillMaxWidth(),
-                icon = ImageVector.vectorResource(id = R.drawable.baseline_videogame_asset_24),
-                contentDescription = "Practice",
-                label = "Practice",
-                description = "Test your knowledge with exercises and flash cards",
-                onClick = {
-                    navController.navigate(MainRoutes.Practice.name)
-                },
-            )
+//            LinkDirector(
+//                modifier = Modifier.fillMaxWidth(),
+//                icon = ImageVector.vectorResource(id = R.drawable.baseline_videogame_asset_24),
+//                contentDescription = "Practice",
+//                label = "Practice",
+//                description = "Test your knowledge with exercises and flash cards",
+//                onClick = {
+//                    navController.navigate(MainRoutes.Practice.name)
+//                },
+//            )
 
             LinkDirector(
                 modifier = Modifier.fillMaxWidth(),
@@ -103,8 +100,6 @@ fun Home(navController: NavHostController) {
                 onClick = {},
                 isComingSoon = true, // Mark the store as coming soon
             )
-
-            // Add some bottom padding for scrolling comfort
             Spacer(modifier = Modifier.height(16.dp))
         }
     }

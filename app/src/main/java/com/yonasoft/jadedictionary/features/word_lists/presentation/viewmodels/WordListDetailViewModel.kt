@@ -119,7 +119,8 @@ class WordListDetailViewModel(
                     com.yonasoft.jadedictionary.features.word.domain.hsk.HSKVersion.NEW
                 }
 
-                val level = com.yonasoft.jadedictionary.features.word.domain.hsk.HSKLevel.fromInt(levelValue)
+                val level =
+                    com.yonasoft.jadedictionary.features.word.domain.hsk.HSKLevel.fromInt(levelValue)
 
                 if (level == null) {
                     withContext(Dispatchers.Main) {
@@ -189,11 +190,13 @@ class WordListDetailViewModel(
                                 word.pinyin?.contains(query, ignoreCase = true) == true ||
                                 word.definition?.contains(query, ignoreCase = true) == true
                     }
+
                     is com.yonasoft.jadedictionary.features.word.domain.hsk.HSKWord -> {
                         word.displayText.contains(query, ignoreCase = true) ||
                                 word.pinyin?.contains(query, ignoreCase = true) == true ||
                                 word.definitions.any { it.contains(query, ignoreCase = true) }
                     }
+
                     else -> false
                 }
             }
@@ -301,15 +304,37 @@ class WordListDetailViewModel(
                                     updatedWords.filter { filterWord ->
                                         when (filterWord) {
                                             is CCWord -> {
-                                                filterWord.displayText.contains(it.searchQuery, ignoreCase = true) ||
-                                                        filterWord.pinyin?.contains(it.searchQuery, ignoreCase = true) == true ||
-                                                        filterWord.definition?.contains(it.searchQuery, ignoreCase = true) == true
+                                                filterWord.displayText.contains(
+                                                    it.searchQuery,
+                                                    ignoreCase = true
+                                                ) ||
+                                                        filterWord.pinyin?.contains(
+                                                            it.searchQuery,
+                                                            ignoreCase = true
+                                                        ) == true ||
+                                                        filterWord.definition?.contains(
+                                                            it.searchQuery,
+                                                            ignoreCase = true
+                                                        ) == true
                                             }
+
                                             is com.yonasoft.jadedictionary.features.word.domain.hsk.HSKWord -> {
-                                                filterWord.displayText.contains(it.searchQuery, ignoreCase = true) ||
-                                                        filterWord.pinyin?.contains(it.searchQuery, ignoreCase = true) == true ||
-                                                        filterWord.definitions.any { def -> def.contains(it.searchQuery, ignoreCase = true) }
+                                                filterWord.displayText.contains(
+                                                    it.searchQuery,
+                                                    ignoreCase = true
+                                                ) ||
+                                                        filterWord.pinyin?.contains(
+                                                            it.searchQuery,
+                                                            ignoreCase = true
+                                                        ) == true ||
+                                                        filterWord.definitions.any { def ->
+                                                            def.contains(
+                                                                it.searchQuery,
+                                                                ignoreCase = true
+                                                            )
+                                                        }
                                             }
+
                                             else -> false
                                         }
                                     },
@@ -372,15 +397,37 @@ class WordListDetailViewModel(
                         updatedWords.filter { word ->
                             when (word) {
                                 is CCWord -> {
-                                    word.displayText.contains(_uiState.value.searchQuery, ignoreCase = true) ||
-                                            word.pinyin?.contains(_uiState.value.searchQuery, ignoreCase = true) == true ||
-                                            word.definition?.contains(_uiState.value.searchQuery, ignoreCase = true) == true
+                                    word.displayText.contains(
+                                        _uiState.value.searchQuery,
+                                        ignoreCase = true
+                                    ) ||
+                                            word.pinyin?.contains(
+                                                _uiState.value.searchQuery,
+                                                ignoreCase = true
+                                            ) == true ||
+                                            word.definition?.contains(
+                                                _uiState.value.searchQuery,
+                                                ignoreCase = true
+                                            ) == true
                                 }
+
                                 is com.yonasoft.jadedictionary.features.word.domain.hsk.HSKWord -> {
-                                    word.displayText.contains(_uiState.value.searchQuery, ignoreCase = true) ||
-                                            word.pinyin?.contains(_uiState.value.searchQuery, ignoreCase = true) == true ||
-                                            word.definitions.any { it.contains(_uiState.value.searchQuery, ignoreCase = true) }
+                                    word.displayText.contains(
+                                        _uiState.value.searchQuery,
+                                        ignoreCase = true
+                                    ) ||
+                                            word.pinyin?.contains(
+                                                _uiState.value.searchQuery,
+                                                ignoreCase = true
+                                            ) == true ||
+                                            word.definitions.any {
+                                                it.contains(
+                                                    _uiState.value.searchQuery,
+                                                    ignoreCase = true
+                                                )
+                                            }
                                 }
+
                                 else -> false
                             }
                         }
@@ -427,6 +474,14 @@ class WordListDetailViewModel(
             } catch (e: Exception) {
                 // Job was likely canceled, no action needed
             }
+        }
+    }
+
+    fun resetQuery() {
+        _uiState.update {
+            it.copy(
+                searchQuery = ""
+            )
         }
     }
 }
