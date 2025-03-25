@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 
 package com.yonasoft.jadedictionary.features.practice.presentation.screens.practice_modes
 
@@ -17,16 +17,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -44,6 +49,10 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,10 +65,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -79,6 +91,23 @@ import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 import com.yonasoft.jadedictionary.features.word.domain.hsk.HSKWord
 import java.util.Locale
 
+/**
+ * Utility function to remember the current window size class
+ */
+/**
+ * Utility function to remember the current window size class
+ */
+@Composable
+fun rememberWindowSizeClass(): WindowSizeClass {
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
+
+    val widthDp = configuration.screenWidthDp.dp
+    val heightDp = configuration.screenHeightDp.dp
+
+    return WindowSizeClass.calculateFromSize(DpSize(widthDp, heightDp))
+}
+
 @Composable
 fun FlashCardPractice(
     navController: NavHostController,
@@ -86,6 +115,7 @@ fun FlashCardPractice(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val backgroundColor = Color(0xFF0A0A0A)
+    val windowSizeClass = rememberWindowSizeClass()
 
     // Handle TTS for Chinese pronunciation
     val tts = rememberTextToSpeech(Locale.CHINESE)
@@ -178,7 +208,8 @@ fun FlashCardPractice(
                     uiState = uiState,
                     onTabSelected = { viewModel.setResultsTabIndex(it) },
                     tts = tts.value!!,
-                    setSpeaking = { isSpeaking = it }
+                    setSpeaking = { isSpeaking = it },
+                    windowSizeClass = windowSizeClass
                 )
             } else {
                 // Flash card practice
@@ -190,7 +221,8 @@ fun FlashCardPractice(
                     onHard = { viewModel.markCurrentWord(WordDifficulty.HARD) },
                     tts = tts.value,
                     setSpeaking = { isSpeaking = it },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    windowSizeClass = windowSizeClass
                 )
             }
         }
@@ -206,40 +238,112 @@ fun FlashCardContent(
     onHard: () -> Unit,
     tts: TextToSpeech?,
     setSpeaking: (Boolean) -> Unit,
+    windowSizeClass: WindowSizeClass,
     modifier: Modifier = Modifier
 ) {
     val currentWord = uiState.getCurrentWord()
+    val isLandscape = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact &&
+            windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Flash card
-        if (currentWord != null) {
-            FlashCard(
-                word = currentWord,
-                isFlipped = uiState.isCardFlipped,
-                onFlip = onCardFlip,
-                displayMode = uiState.currentCardMode,
-                tts = tts,
-                setSpeaking = setSpeaking,
-                modifier = Modifier.weight(1f)
-            )
+    if (isLandscape) {
+        // Landscape layout
+        Row(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Flash card
+            if (currentWord != null) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                ) {
+                    FlashCard(
+                        word = currentWord,
+                        isFlipped = uiState.isCardFlipped,
+                        onFlip = onCardFlip,
+                        displayMode = uiState.currentCardMode,
+                        tts = tts,
+                        setSpeaking = setSpeaking,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
 
-            // Difficulty buttons (only show when card is flipped)
-            AnimatedVisibility(
-                visible = uiState.isCardFlipped,
-                enter = fadeIn(animationSpec = tween(300)),
-                exit = fadeOut(animationSpec = tween(300))
-            ) {
-                DifficultyButtons(
-                    onEasy = onEasy,
-                    onMedium = onMedium,
-                    onHard = onHard
-                )
+                // Difficulty buttons (vertical layout for landscape)
+                AnimatedVisibility(
+                    visible = uiState.isCardFlipped,
+                    enter = fadeIn(animationSpec = tween(300)),
+                    exit = fadeOut(animationSpec = tween(300)),
+                    modifier = Modifier.width(120.dp)
+                ) {
+                    DifficultyButtonsVertical(
+                        onEasy = onEasy,
+                        onMedium = onMedium,
+                        onHard = onHard
+                    )
+                }
+            }
+        }
+    } else {
+        // Portrait layout
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded) 32.dp else 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Flash card
+            if (currentWord != null) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .then(
+                            if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded) {
+                                Modifier.widthIn(max = 600.dp).align(Alignment.CenterHorizontally)
+                            } else {
+                                Modifier
+                            }
+                        )
+                ) {
+                    FlashCard(
+                        word = currentWord,
+                        isFlipped = uiState.isCardFlipped,
+                        onFlip = onCardFlip,
+                        displayMode = uiState.currentCardMode,
+                        tts = tts,
+                        setSpeaking = setSpeaking,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                // Difficulty buttons (horizontal layout for portrait)
+                AnimatedVisibility(
+                    visible = uiState.isCardFlipped,
+                    enter = fadeIn(animationSpec = tween(300)),
+                    exit = fadeOut(animationSpec = tween(300)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Center the buttons in wider screens
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        DifficultyButtons(
+                            onEasy = onEasy,
+                            onMedium = onMedium,
+                            onHard = onHard,
+                            modifier = if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded) {
+                                Modifier.widthIn(max = 600.dp)
+                            } else {
+                                Modifier.fillMaxWidth()
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -266,12 +370,12 @@ fun FlashCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
         // Front of card
         Card(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .graphicsLayer {
                     rotationY = rotation
                     cameraDistance = 12f * density
@@ -289,7 +393,8 @@ fun FlashCard(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
+                    .padding(24.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -377,7 +482,7 @@ fun FlashCard(
         // Back of card
         Card(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .graphicsLayer {
                     rotationY = rotation - 180f
                     cameraDistance = 12f * density
@@ -395,7 +500,8 @@ fun FlashCard(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
+                    .padding(24.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
             ) {
@@ -532,7 +638,6 @@ fun FlashCard(
     }
 }
 
-
 @Composable
 fun DifficultyButtons(
     onEasy: () -> Unit,
@@ -542,7 +647,6 @@ fun DifficultyButtons(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
@@ -637,121 +741,384 @@ fun DifficultyButtons(
 }
 
 @Composable
+fun DifficultyButtonsVertical(
+    onEasy: () -> Unit,
+    onMedium: () -> Unit,
+    onHard: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .padding(vertical = 16.dp, horizontal = 8.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Easy button
+        ElevatedCard(
+            onClick = onEasy,
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = Color(0xFF1A5928),
+                contentColor = Color.White
+            )
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Easy",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Easy",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+
+        // Medium button
+        ElevatedCard(
+            onClick = onMedium,
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = Color(0xFF73520D),
+                contentColor = Color.White
+            )
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp)
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.outline_radio_button_unchecked_24),
+                    contentDescription = "Medium",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Medium",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+
+        // Hard button
+        ElevatedCard(
+            onClick = onHard,
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = Color(0xFF891919),
+                contentColor = Color.White
+            )
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Hard",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Hard",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun FlashCardResults(
     uiState: FlashCardState,
     onTabSelected: (Int) -> Unit,
     tts: TextToSpeech?,
     setSpeaking: (Boolean) -> Unit,
+    windowSizeClass: WindowSizeClass,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        // Header
-        Text(
-            text = "Practice Complete!",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            modifier = Modifier.padding(vertical = 16.dp)
-        )
+    val isLandscape = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact &&
+            windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
+    val isWideScreen = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
 
-        // Results summary
+    if (isLandscape) {
+        // Landscape layout for results
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            ResultSummaryItem(
-                count = uiState.easyWords.size,
-                label = "Easy",
-                color = Color(0xFF1A5928)
-            )
+            // Left panel with summary
+            Column(
+                modifier = Modifier
+                    .weight(0.35f)
+                    .fillMaxHeight()
+                    .padding(end = 16.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                // Header
+                Text(
+                    text = "Practice Complete!",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
 
-            ResultSummaryItem(
-                count = uiState.mediumWords.size,
-                label = "Medium",
-                color = Color(0xFF73520D)
-            )
+                // Results summary
+                ResultSummaryItem(
+                    count = uiState.easyWords.size,
+                    label = "Easy",
+                    color = Color(0xFF1A5928),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
 
-            ResultSummaryItem(
-                count = uiState.hardWords.size,
-                label = "Hard",
-                color = Color(0xFF891919)
-            )
-        }
+                ResultSummaryItem(
+                    count = uiState.mediumWords.size,
+                    label = "Medium",
+                    color = Color(0xFF73520D),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
 
-        Spacer(modifier = Modifier.height(16.dp))
+                ResultSummaryItem(
+                    count = uiState.hardWords.size,
+                    label = "Hard",
+                    color = Color(0xFF891919),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
 
-        // Tab row for result categories
-        TabRow(
-            selectedTabIndex = uiState.resultsTabIndex,
-            containerColor = Color(0xFF1A1A1A),
-            contentColor = CustomColor.GREEN01.color
-        ) {
-            ResultTab(
-                title = "Easy (${uiState.easyWords.size})",
-                selected = uiState.resultsTabIndex == 0,
-                onClick = { onTabSelected(0) }
-            )
+            // Right panel with tabs and content
+            Column(
+                modifier = Modifier
+                    .weight(0.65f)
+                    .fillMaxHeight()
+            ) {
+                // Tab row for result categories
+                TabRow(
+                    selectedTabIndex = uiState.resultsTabIndex,
+                    containerColor = Color(0xFF1A1A1A),
+                    contentColor = CustomColor.GREEN01.color
+                ) {
+                    ResultTab(
+                        title = "Easy (${uiState.easyWords.size})",
+                        selected = uiState.resultsTabIndex == 0,
+                        onClick = { onTabSelected(0) }
+                    )
 
-            ResultTab(
-                title = "Medium (${uiState.mediumWords.size})",
-                selected = uiState.resultsTabIndex == 1,
-                onClick = { onTabSelected(1) }
-            )
+                    ResultTab(
+                        title = "Medium (${uiState.mediumWords.size})",
+                        selected = uiState.resultsTabIndex == 1,
+                        onClick = { onTabSelected(1) }
+                    )
 
-            ResultTab(
-                title = "Hard (${uiState.hardWords.size})",
-                selected = uiState.resultsTabIndex == 2,
-                onClick = { onTabSelected(2) }
-            )
-        }
+                    ResultTab(
+                        title = "Hard (${uiState.hardWords.size})",
+                        selected = uiState.resultsTabIndex == 2,
+                        onClick = { onTabSelected(2) }
+                    )
+                }
 
-        // Pager with result lists
-        val pagerState = rememberPagerState(
-            initialPage = uiState.resultsTabIndex,
-            pageCount = { 3 }
-        )
+                // Pager with result lists
+                val pagerState = rememberPagerState(
+                    initialPage = uiState.resultsTabIndex,
+                    pageCount = { 3 }
+                )
 
-        // Sync tab selection with pager
-        LaunchedEffect(uiState.resultsTabIndex) {
-            pagerState.animateScrollToPage(uiState.resultsTabIndex)
-        }
+                // Sync tab selection with pager
+                LaunchedEffect(uiState.resultsTabIndex) {
+                    pagerState.animateScrollToPage(uiState.resultsTabIndex)
+                }
 
-        LaunchedEffect(pagerState.currentPage) {
-            if (pagerState.currentPage != uiState.resultsTabIndex) {
-                onTabSelected(pagerState.currentPage)
+                LaunchedEffect(pagerState.currentPage) {
+                    if (pagerState.currentPage != uiState.resultsTabIndex) {
+                        onTabSelected(pagerState.currentPage)
+                    }
+                }
+
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) { page ->
+                    when (page) {
+                        0 -> ResultsList(
+                            results = uiState.easyWords,
+                            tts = tts,
+                            setSpeaking = setSpeaking
+                        )
+
+                        1 -> ResultsList(
+                            results = uiState.mediumWords,
+                            tts = tts,
+                            setSpeaking = setSpeaking
+                        )
+
+                        2 -> ResultsList(
+                            results = uiState.hardWords,
+                            tts = tts,
+                            setSpeaking = setSpeaking
+                        )
+                    }
+                }
             }
         }
+    } else {
+        // Portrait layout
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(if (isWideScreen) 32.dp else 16.dp)
+        ) {
+            // Header
+            Text(
+                text = "Practice Complete!",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
 
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) { page ->
-            when (page) {
-                0 -> ResultsList(
-                    results = uiState.easyWords,
-                    tts = tts,
-                    setSpeaking = setSpeaking
-                )
+            // Results summary
+            if (isWideScreen) {
+                // For wide screens, use a row for summary
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    ResultSummaryItem(
+                        count = uiState.easyWords.size,
+                        label = "Easy",
+                        color = Color(0xFF1A5928)
+                    )
 
-                1 -> ResultsList(
-                    results = uiState.mediumWords,
-                    tts = tts,
-                    setSpeaking = setSpeaking
-                )
+                    ResultSummaryItem(
+                        count = uiState.mediumWords.size,
+                        label = "Medium",
+                        color = Color(0xFF73520D)
+                    )
 
-                2 -> ResultsList(
-                    results = uiState.hardWords,
-                    tts = tts,
-                    setSpeaking = setSpeaking
-                )
+                    ResultSummaryItem(
+                        count = uiState.hardWords.size,
+                        label = "Hard",
+                        color = Color(0xFF891919)
+                    )
+                }
+            } else {
+                // For narrow screens, use the original row layout
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    ResultSummaryItem(
+                        count = uiState.easyWords.size,
+                        label = "Easy",
+                        color = Color(0xFF1A5928)
+                    )
+
+                    ResultSummaryItem(
+                        count = uiState.mediumWords.size,
+                        label = "Medium",
+                        color = Color(0xFF73520D)
+                    )
+
+                    ResultSummaryItem(
+                        count = uiState.hardWords.size,
+                        label = "Hard",
+                        color = Color(0xFF891919)
+                    )
+                }
+            }
+
+            // Apply max width constraint for wide screens
+            Box(
+                modifier = if (isWideScreen) Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally) else Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = if (isWideScreen) Modifier.widthIn(max = 800.dp) else Modifier.fillMaxWidth()
+                ) {
+                    // Tab row for result categories
+                    TabRow(
+                        selectedTabIndex = uiState.resultsTabIndex,
+                        containerColor = Color(0xFF1A1A1A),
+                        contentColor = CustomColor.GREEN01.color
+                    ) {
+                        ResultTab(
+                            title = "Easy (${uiState.easyWords.size})",
+                            selected = uiState.resultsTabIndex == 0,
+                            onClick = { onTabSelected(0) }
+                        )
+
+                        ResultTab(
+                            title = "Medium (${uiState.mediumWords.size})",
+                            selected = uiState.resultsTabIndex == 1,
+                            onClick = { onTabSelected(1) }
+                        )
+
+                        ResultTab(
+                            title = "Hard (${uiState.hardWords.size})",
+                            selected = uiState.resultsTabIndex == 2,
+                            onClick = { onTabSelected(2) }
+                        )
+                    }
+
+                    // Pager with result lists
+                    val pagerState = rememberPagerState(
+                        initialPage = uiState.resultsTabIndex,
+                        pageCount = { 3 }
+                    )
+
+                    // Sync tab selection with pager
+                    LaunchedEffect(uiState.resultsTabIndex) {
+                        pagerState.animateScrollToPage(uiState.resultsTabIndex)
+                    }
+
+                    LaunchedEffect(pagerState.currentPage) {
+                        if (pagerState.currentPage != uiState.resultsTabIndex) {
+                            onTabSelected(pagerState.currentPage)
+                        }
+                    }
+
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) { page ->
+                        when (page) {
+                            0 -> ResultsList(
+                                results = uiState.easyWords,
+                                tts = tts,
+                                setSpeaking = setSpeaking
+                            )
+
+                            1 -> ResultsList(
+                                results = uiState.mediumWords,
+                                tts = tts,
+                                setSpeaking = setSpeaking
+                            )
+
+                            2 -> ResultsList(
+                                results = uiState.hardWords,
+                                tts = tts,
+                                setSpeaking = setSpeaking
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -838,7 +1205,6 @@ fun ResultsList(
         }
     }
 }
-
 
 @Composable
 fun ResultWordItem(

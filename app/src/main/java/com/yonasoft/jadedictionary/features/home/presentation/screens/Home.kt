@@ -101,6 +101,7 @@ fun Home(navController: NavHostController) {
                 label = "Store",
                 description = "Get premium word lists, practice modules and learning tools",
                 onClick = {},
+                isComingSoon = true, // Mark the store as coming soon
             )
 
             // Add some bottom padding for scrolling comfort

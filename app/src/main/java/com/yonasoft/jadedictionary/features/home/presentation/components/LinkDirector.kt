@@ -39,11 +39,12 @@ fun LinkDirector(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     description: String = "",
+    isComingSoon: Boolean = false,
 ) {
     Card(
         modifier = modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { onClick() },
+            .clickable(enabled = !isComingSoon) { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent, // Transparent background for gradient
@@ -55,8 +56,9 @@ fun LinkDirector(
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
-                            Color(0xFF0D47A1), // Deeper blue start
-                            Color(0xFF1565C0)  // Lighter blue end
+                            // If coming soon, use a slightly muted color
+                            if (isComingSoon) Color(0xFF0D47A1).copy(alpha = 0.7f) else Color(0xFF0D47A1),
+                            if (isComingSoon) Color(0xFF1565C0).copy(alpha = 0.7f) else Color(0xFF1565C0)
                         )
                     )
                 )
@@ -90,12 +92,26 @@ fun LinkDirector(
                     Column(
                         modifier = Modifier.padding(start = 16.dp)
                     ) {
-                        Text(
-                            text = label,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 17.sp // Slightly smaller for cleaner look
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = label,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 17.sp // Slightly smaller for cleaner look
+                            )
+
+                            if (isComingSoon) {
+                                Text(
+                                    text = " • COMING SOON",
+                                    color = Color(0xFFFFD54F), // Amber color for visibility
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(start = 4.dp)
+                                )
+                            }
+                        }
 
                         AnimatedVisibility(
                             visible = description.isNotEmpty(),
@@ -115,7 +131,7 @@ fun LinkDirector(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "Right Arrow",
-                    tint = Color.White.copy(alpha = 0.7f), // Slightly transparent for subtlety
+                    tint = Color.White.copy(alpha = if (isComingSoon) 0.4f else 0.7f), // More transparent if coming soon
                     modifier = Modifier.size(32.dp),
                 )
             }
