@@ -5,6 +5,7 @@ package com.yonasoft.jadedictionary.features.ocr.presentation.components
 import android.Manifest
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -67,8 +68,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.exifinterface.media.ExifInterface
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
+import java.io.ByteArrayInputStream
 import java.util.concurrent.Executor
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,7 +101,6 @@ fun OCRBottomSheet(
         cameraPermissionGranted = isGranted
     }
 
-    // Gallery launcher
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -109,8 +111,11 @@ fun OCRBottomSheet(
                 val bitmap = BitmapFactory.decodeStream(inputStream)
                 inputStream?.close()
 
-                capturedImage = bitmap
-                bitmap?.let { onOCRCompleted(it) }
+                // Handle rotation for gallery images
+                val rotatedBitmap = getCorrectlyOrientedBitmap(context, imageUri, bitmap)
+
+                capturedImage = rotatedBitmap
+                onOCRCompleted(rotatedBitmap)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -473,7 +478,8 @@ fun CameraPreview(
     )
 }
 
-// Helper function to capture an image
+
+// Replace your current captureImage function with this one
 private fun captureImage(
     imageCapture: ImageCapture,
     executor: Executor,
@@ -487,8 +493,14 @@ private fun captureImage(
                 val buffer = image.planes[0].buffer
                 val bytes = ByteArray(buffer.remaining())
                 buffer.get(bytes)
+
+                // Decode the image
                 val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                onImageCaptured(bitmap)
+
+                // Get the image rotation from EXIF data
+                val rotatedBitmap = getRotatedBitmap(bitmap, bytes)
+
+                onImageCaptured(rotatedBitmap)
                 image.close()
             }
 
@@ -496,5 +508,98 @@ private fun captureImage(
                 onError(exception)
             }
         }
+    )
+}
+
+// Add this new function to correctly rotate the bitmap
+private fun getRotatedBitmap(bitmap: Bitmap, imageBytes: ByteArray): Bitmap {
+    // Read EXIF orientation from the image data
+    val inputStream = ByteArrayInputStream(imageBytes)
+    val exif = try {
+        ExifInterface(inputStream)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return bitmap
+    }
+
+    // Get the orientation from EXIF data
+    val orientation = exif.getAttributeInt(
+        ExifInterface.TAG_ORIENTATION,
+        ExifInterface.ORIENTATION_NORMAL
+    )
+
+    // Calculate rotation angle based on EXIF orientation
+    val rotationAngle = when (orientation) {
+        ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+        ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+        ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+        else -> 0f
+    }
+
+    // If no rotation needed, return the original bitmap
+    if (rotationAngle == 0f) {
+        return bitmap
+    }
+
+    // Create a matrix for the rotation
+    val matrix = Matrix()
+    matrix.postRotate(rotationAngle)
+
+    // Create a new bitmap with the correct orientation
+    return Bitmap.createBitmap(
+        bitmap,
+        0,
+        0,
+        bitmap.width,
+        bitmap.height,
+        matrix,
+        true
+    )
+}
+
+
+// Add this function to handle gallery image rotation
+private fun getCorrectlyOrientedBitmap(context: android.content.Context, uri: Uri, bitmap: Bitmap): Bitmap {
+    // Get input stream from URI
+    val inputStream = context.contentResolver.openInputStream(uri) ?: return bitmap
+
+    // Read EXIF data
+    val exif = try {
+        ExifInterface(inputStream)
+    } catch (e: Exception) {
+        inputStream.close()
+        return bitmap
+    }
+
+    inputStream.close()
+
+    // Get orientation and rotate if needed
+    val orientation = exif.getAttributeInt(
+        ExifInterface.TAG_ORIENTATION,
+        ExifInterface.ORIENTATION_NORMAL
+    )
+
+    val rotationAngle = when (orientation) {
+        ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+        ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+        ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+        else -> 0f
+    }
+
+    if (rotationAngle == 0f) {
+        return bitmap
+    }
+
+    val matrix = Matrix()
+    matrix.postRotate(rotationAngle)
+
+    return Bitmap.createBitmap(
+        bitmap,
+        0,
+        0,
+        bitmap.width,
+        bitmap.height,
+        matrix,
+        true
     )
 }

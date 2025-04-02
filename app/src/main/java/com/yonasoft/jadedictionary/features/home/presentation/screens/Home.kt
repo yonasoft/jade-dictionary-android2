@@ -10,17 +10,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.navigation.MainRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.components.HomeAppBar
 import com.yonasoft.jadedictionary.features.home.presentation.components.JadeBanner
@@ -80,26 +82,26 @@ fun Home(navController: NavHostController) {
                 },
             )
 
-//            LinkDirector(
-//                modifier = Modifier.fillMaxWidth(),
-//                icon = ImageVector.vectorResource(id = R.drawable.baseline_videogame_asset_24),
-//                contentDescription = "Practice",
-//                label = "Practice",
-//                description = "Test your knowledge with exercises and flash cards",
-//                onClick = {
-//                    navController.navigate(MainRoutes.Practice.name)
-//                },
-//            )
-
             LinkDirector(
                 modifier = Modifier.fillMaxWidth(),
-                icon = Icons.Default.ShoppingCart,
-                contentDescription = "Store",
-                label = "Store",
-                description = "Get premium word lists, practice modules and learning tools",
-                onClick = {},
-                isComingSoon = true, // Mark the store as coming soon
+                icon = ImageVector.vectorResource(id = R.drawable.baseline_videogame_asset_24),
+                contentDescription = "Practice",
+                label = "Practice",
+                description = "Test your knowledge with exercises and flash cards",
+                onClick = {
+                    navController.navigate(MainRoutes.Practice.name)
+                },
             )
+
+//            LinkDirector(
+//                modifier = Modifier.fillMaxWidth(),
+//                icon = Icons.Default.ShoppingCart,
+//                contentDescription = "Store",
+//                label = "Store",
+//                description = "Get premium word lists, practice modules and learning tools",
+//                onClick = {},
+//                isComingSoon = true, // Mark the store as coming soon
+//            )
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
