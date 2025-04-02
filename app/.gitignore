@@ -15,6 +15,7 @@ captures/
 .cxx/
 *.apk
 *.aab
+*.ap_
 output.json
 
 # IntelliJ
@@ -34,5 +35,17 @@ google-services.json
 # Android Profiling
 *.hprof
 
-# Release folder
+# Release folders and files
 app/release/
+app/release/**
+
+# Generated files
+bin/
+gen/
+out/
+
+# Proguard
+proguard/
+
+# Navigation component
+.navigation/
