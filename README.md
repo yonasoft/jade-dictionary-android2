@@ -49,7 +49,6 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
   <img src="/screenshots/fc.jpg" width="200" alt="Flash Cards Screenshot">
   <img src="/screenshots/multi.jpg" width="200" alt="Multiple Choice Screenshot">
   <img src="/screenshots/listening.jpg" width="200" alt="Listening Practice Screenshot">
-  <img src="/screenshots/multi.jpg" width="200" alt="Multiple Choice Screenshot">
   <img src="/screenshots/fc-complete.jpg" width="200" alt="Flash Card Complete Screenshot">
    <img src="/screenshots/practice-complete.jpg" width="200" alt="Practice Complete Screenshot">
 </div>
@@ -58,6 +57,7 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 - Multiple-choice quizzes to test recognition
 - Listening exercises to improve comprehension
 - Customizable learning sessions
+- More Coming soon!
 
 ### Personalized Learning
 <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
