@@ -86,9 +86,10 @@ class CCPracticeSetupViewModel(
             return
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 _uiState.update { it.copy(isLoading = true) }
+
                 val results = ccWordRepository.searchWords(query)
                 _uiState.update {
                     it.copy(
@@ -169,7 +170,7 @@ class CCPracticeSetupViewModel(
      * Add words from a word list
      */
     fun addWordsFromList(wordList: CCWordList) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 _uiState.update { it.copy(isLoading = true) }
 
