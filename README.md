@@ -82,7 +82,7 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 <details>
 <summary>From APK File</summary>
 
-1. Download the latest APK from the [Releases page](/app/releases)
+1. Download the latest APK from the [Releases page](/app/release)
 2. Enable installation from unknown sources in your device settings
 3. Open the downloaded APK file to install
 </details>
