@@ -13,10 +13,8 @@ local.properties
 captures/
 .externalNativeBuild/
 .cxx/
-*.apk
-*.aab
-*.ap_
-output.json
+output-metadata.json
+baselineprofiles/
 
 # IntelliJ
 *.iml
@@ -35,9 +33,10 @@ google-services.json
 # Android Profiling
 *.hprof
 
-# Release folders and files
-app/release/
-app/release/**
+# Release files - exclude everything except APK
+app/release/*
+!app/release/app-release.apk
+*.aab
 
 # Generated files
 bin/
