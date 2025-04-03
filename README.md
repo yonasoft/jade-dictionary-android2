@@ -4,6 +4,24 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 
 ![App Logo](/screenshots/graphic.png)
 
+## Installation
+
+<details>
+<summary>From Google Play Store</summary>
+
+1. Visit [Jade Chinese Dictionary on Google Play](https://play.google.com/store/apps/details?id=com.yonasoft.jadedictionary)
+2. Click "Install"
+3. Open the app after installation completes
+</details>
+
+<details>
+<summary>From APK File</summary>
+
+1. Download the latest APK from the [Releases page](https://github.com/yonasoft/jade-dictionary-android2/raw/master/app/release/app-release.apk)
+2. Enable installation from unknown sources in your device settings
+3. Open the downloaded APK file to install
+</details>
+
 ## Features
 ### Comprehensive Dictionary
 <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
@@ -68,24 +86,6 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 - Create and manage custom word lists
 - Focus on vocabulary relevant to your needs
 - Track your progress (coming soon)
-
-## Installation
-
-<details>
-<summary>From Google Play Store</summary>
-
-1. Visit [Jade Chinese Dictionary on Google Play](https://play.google.com/store/apps/details?id=com.yonasoft.jadedictionary)
-2. Click "Install"
-3. Open the app after installation completes
-</details>
-
-<details>
-<summary>From APK File</summary>
-
-1. Download the latest APK from the [Releases page](https://github.com/yonasoft/jade-dictionary-android2/raw/master/app/release/app-release.apk)
-2. Enable installation from unknown sources in your device settings
-3. Open the downloaded APK file to install
-</details>
 
 ## Contact
 
