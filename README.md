@@ -15,7 +15,10 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 - Similar word suggestions
 
 ### Multiple Input Methods
-<img src="/screenshots/handwriting.jpg" width="250" alt="Input Methods Screenshot">
+<img src="/screenshots/keyboard.jpg" width="250" alt="Speech Methods Screenshot">
+<img src="/screenshots/handwriting.jpg" width="250" alt="Handwriting Method Screenshot">
+<img src="/screenshots/speech.jpg" width="250" alt="Speech Method Screenshot">
+<img src="/screenshots/ocr.jpg" width="250" alt="OCR Method Screenshot">
 - Handwriting recognition (Google ML)
 - OCR camera input
 - Speech-to-text functionality
