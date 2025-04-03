@@ -15,7 +15,7 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 
 - 120,000+ Chinese-English entries
 - Both simplified and traditional characters
-- Detailed pronunciation guides
+- Pronunciation guides via TTS
 - Example sentences for context
 - Character breakdowns
 - Similar word suggestions
