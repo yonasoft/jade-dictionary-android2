@@ -21,6 +21,7 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
   <img src="/screenshots/speech.jpg" width="250" alt="Speech Method Screenshot">
   <img src="/screenshots/ocr.jpg" width="250" alt="OCR Method Screenshot">
 </div>
+
 - Handwriting recognition (Google ML)
 - OCR camera input
 - Speech-to-text functionality
