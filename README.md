@@ -6,7 +6,13 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 
 ## Features
 ### Comprehensive Dictionary
-<img src="/screenshots/home.jpg" width="250" alt="Dictionary Screenshot">
+<div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+  <img src="/screenshots/home.jpg" width="200" alt="Dictionary Screenshot">
+  <img src="/screenshots/search.jpg" width="200" alt="Dictionary Screenshot">
+  <img src="/screenshots/word-detail.jpg" width="200" alt="Dictionary Screenshot">
+  <img src="/screenshots/word-sentences.jpg" width="200" alt="Dictionary Screenshot">
+</div>
+
 - 120,000+ Chinese-English entries
 - Both simplified and traditional characters
 - Detailed pronunciation guides
@@ -16,10 +22,10 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 
 ### Multiple Input Methods
 <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-  <img src="/screenshots/keyboard.jpg" width="250" alt="Keyboard Input Screenshot">
-  <img src="/screenshots/handwriting.jpg" width="250" alt="Handwriting Method Screenshot">
-  <img src="/screenshots/speech.jpg" width="250" alt="Speech Method Screenshot">
-  <img src="/screenshots/ocr.jpg" width="250" alt="OCR Method Screenshot">
+  <img src="/screenshots/keyboard.jpg" width="200" alt="Keyboard Input Screenshot">
+  <img src="/screenshots/handwriting.jpg" width="200" alt="Handwriting Method Screenshot">
+  <img src="/screenshots/speech.jpg" width="200" alt="Speech Method Screenshot">
+  <img src="/screenshots/ocr.jpg" width="200" alt="OCR Method Screenshot">
 </div>
 
 - Handwriting recognition (Google ML)
@@ -28,13 +34,14 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 - Traditional keyboard entry
 
 ### Complete HSK Coverage
-<img src="/screenshots/hsk.jpg" width="250" alt="HSK Lists Screenshot">
+<img src="/screenshots/hsk.jpg" width="200" alt="HSK Lists Screenshot">
 - HSK 2.0 (levels 1-6) word lists
 - HSK 3.0 (levels 1-9) vocabulary sets
 - Perfect for exam preparation
 
 ### Effective Practice Methods
-<img src="/screenshots/multi.jpg" width="250" alt="Practice Screenshot">
+<img src="/screenshots/multi.jpg" width="200" alt="Practice Screenshot">
+<img src="/screenshots/practice-complete.jpg" width="200" alt="Practice Screenshot">
 - Flashcards for quick memorization
 - Multiple-choice quizzes to test recognition
 - Listening exercises to improve comprehension
