@@ -45,8 +45,12 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 
 ### Effective Practice Methods
 <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-  <img src="/screenshots/practice-complete.jpg" width="200" alt="Flash Card Complete Screenshot">
+  <img src="/screenshots/fc.jpg" width="200" alt="Flash Cards Screenshot">
   <img src="/screenshots/multi.jpg" width="200" alt="Multiple Choice Screenshot">
+  <img src="/screenshots/listening.jpg" width="200" alt="Listening Practice Screenshot">
+  <img src="/screenshots/multi.jpg" width="200" alt="Multiple Choice Screenshot">
+  <img src="/screenshots/fc-complete.jpg" width="200" alt="Flash Card Complete Screenshot">
+   <img src="/screenshots/practice-complete.jpg" width="200" alt="Practice Complete Screenshot">
 </div>
 
 - Flashcards for quick memorization
