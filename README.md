@@ -63,6 +63,7 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
   <img src="/screenshots/lists.jpg" width="200" alt="Custom Lists Screenshot">
   <img src="/screenshots/list-detail.jpg" width="200" alt="Custom Lists Detail Screenshot">
 </div>
+
 - Create and manage custom word lists
 - Focus on vocabulary relevant to your needs
 - Track your progress (coming soon)
