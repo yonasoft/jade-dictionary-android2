@@ -74,7 +74,7 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 <details>
 <summary>From Google Play Store</summary>
 
-1. Visit [Jade Chinese Dictionary on Google Play](https://play.google.com/store/apps/details?id=com.jadechinesedictionary)
+1. Visit [Jade Chinese Dictionary on Google Play](https://play.google.com/store/apps/details?id=com.yonasoft.jadedictionary)
 2. Click "Install"
 3. Open the app after installation completes
 </details>
@@ -86,12 +86,6 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 2. Enable installation from unknown sources in your device settings
 3. Open the downloaded APK file to install
 </details>
-
-1. Download the latest APK from the [Releases page](https://github.com/yourusername/jade-chinese-dictionary/releases)
-2. Enable installation from unknown sources in your device settings
-3. Open the downloaded APK file to install
-</details>
-
 
 ## Contact
 
