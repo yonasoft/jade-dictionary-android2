@@ -4,14 +4,9 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 
 ![App Logo](/screenshots/graphic.png)
 
-## Overview
-
-Jade Chinese Dictionary & HSK Practice is a comprehensive Chinese learning application that combines powerful dictionary features with effective practice tools. The app contains over 120,000 Chinese words and phrases, complete HSK vocabulary coverage, and multiple learning methods to help users remember what they learn.
-
 ## Features
-
 ### Comprehensive Dictionary
-![Dictionary Screenshot](/screenshots/home.jpg)
+<img src="/screenshots/home.jpg" width="250" alt="Dictionary Screenshot">
 - 120,000+ Chinese-English entries
 - Both simplified and traditional characters
 - Detailed pronunciation guides
@@ -20,27 +15,27 @@ Jade Chinese Dictionary & HSK Practice is a comprehensive Chinese learning appli
 - Similar word suggestions
 
 ### Multiple Input Methods
-![Input Methods Screenshot](/screenshots/handwriting.jpg)
+<img src="/screenshots/handwriting.jpg" width="250" alt="Input Methods Screenshot">
 - Handwriting recognition (Google ML)
 - OCR camera input
 - Speech-to-text functionality
 - Traditional keyboard entry
 
 ### Complete HSK Coverage
-![HSK Lists Screenshot](/screenshots/hsk.jpg)
+<img src="/screenshots/hsk.jpg" width="250" alt="HSK Lists Screenshot">
 - HSK 2.0 (levels 1-6) word lists
 - HSK 3.0 (levels 1-9) vocabulary sets
 - Perfect for exam preparation
 
 ### Effective Practice Methods
-![Practice Screenshot](/screenshots/multi.jpg)
+<img src="/screenshots/multi.jpg" width="250" alt="Practice Screenshot">
 - Flashcards for quick memorization
 - Multiple-choice quizzes to test recognition
 - Listening exercises to improve comprehension
 - Customizable learning sessions
 
 ### Personalized Learning
-![Custom Lists Screenshot](/screenshots/list.jpg)
+<img src="/screenshots/list.jpg" width="250" alt="Custom Lists Screenshot">
 - Create and manage custom word lists
 - Focus on vocabulary relevant to your needs
 - Track your progress (coming soon)
