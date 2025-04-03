@@ -16,10 +16,10 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 
 ### Multiple Input Methods
 <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-  <img src="/screenshots/keyboard.jpg" width="150" alt="Keyboard Input Screenshot">
-  <img src="/screenshots/handwriting.jpg" width="150" alt="Handwriting Method Screenshot">
-  <img src="/screenshots/speech.jpg" width="150" alt="Speech Method Screenshot">
-  <img src="/screenshots/ocr.jpg" width="150" alt="OCR Method Screenshot">
+  <img src="/screenshots/keyboard.jpg" width="250" alt="Keyboard Input Screenshot">
+  <img src="/screenshots/handwriting.jpg" width="250" alt="Handwriting Method Screenshot">
+  <img src="/screenshots/speech.jpg" width="250" alt="Speech Method Screenshot">
+  <img src="/screenshots/ocr.jpg" width="250" alt="OCR Method Screenshot">
 </div>
 - Handwriting recognition (Google ML)
 - OCR camera input
