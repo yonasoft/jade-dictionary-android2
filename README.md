@@ -39,6 +39,7 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
   <img src="/screenshots/hsk3.jpg" width="200" alt="HSK 3.0 Lists Screenshot">
   <img src="/screenshots/hsk-detail.jpg" width="200" alt="HSK Detail Screenshot">
 </div>
+
 - HSK 2.0 (levels 1-6) word lists
 - HSK 3.0 (levels 1-9) vocabulary sets
 - Perfect for exam preparation
