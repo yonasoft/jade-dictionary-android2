@@ -87,6 +87,16 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 - Focus on vocabulary relevant to your needs
 - Track your progress (coming soon)
 
+### Upcoming Features
+- Word stats from practice
+- Better tablet and ChromeOS support
+- Customizable settings
+- Sync data to Google Play account
+- Preset lists
+- Shop for premium content
+- Practice reminders
+- Light/Dark Mode
+
 ## Contact
 
 For support or inquiries, please [open an issue](https://github.com/yonasoft/jade-dictionary-android2/issues) or contact us at yonasoft7@gmail.com.
