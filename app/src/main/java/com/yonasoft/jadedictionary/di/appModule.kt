@@ -7,6 +7,7 @@ import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.Fla
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.HSKPracticeSetupViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.ListeningPracticeViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.MultipleChoicePracticeViewModel
+import com.yonasoft.jadedictionary.features.settings.presentation.viewmodels.SettingsViewModel
 import com.yonasoft.jadedictionary.features.word.data.local.cc.CCWordDatabase
 import com.yonasoft.jadedictionary.features.word.data.local.cc.CCWordRepositoryImpl
 import com.yonasoft.jadedictionary.features.word.data.local.hsk.HSKWordRepositoryImpl
@@ -96,5 +97,9 @@ val appModule = module {
             hskWordRepository = get(),
             savedStateHandle = parameters.get()
         )
+    }
+
+    viewModel {
+        SettingsViewModel()
     }
 }

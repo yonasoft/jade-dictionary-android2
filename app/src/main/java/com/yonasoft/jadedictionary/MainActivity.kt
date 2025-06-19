@@ -29,6 +29,7 @@ import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.HSK
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.ListeningPracticeViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.MultipleChoicePracticeViewModel
 import com.yonasoft.jadedictionary.features.settings.presentation.screens.main.SettingsScreen
+import com.yonasoft.jadedictionary.features.settings.presentation.viewmodels.SettingsViewModel
 import com.yonasoft.jadedictionary.features.word.presentation.screens.CCWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.screens.HSKWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.CCWordDetailViewModel
@@ -242,7 +243,11 @@ class MainActivity : ComponentActivity() {
                             route = MainRoutes.Settings.name
                         ) {
                             composable(route = SettingsRoutes.Settings.route) {
-                                SettingsScreen(navController = navController)
+                                val settingsViewModel = koinViewModel<SettingsViewModel>()
+                                SettingsScreen(
+                                    navController = navController,
+                                    settingsViewModel = settingsViewModel,
+                                )
                             }
                         }
                     }
