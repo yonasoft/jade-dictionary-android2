@@ -7,6 +7,7 @@ enum class MainRoutes {
     Words,
     WordLists,
     Practice,
+    Settings
 }
 
 sealed class WordRoutes(val route: String) {
@@ -61,4 +62,8 @@ sealed class PracticeRoutes(val route: String) {
             return "listening_practice/$wordSource/$idsString"
         }
     }
+}
+
+sealed class SettingsRoutes(val route: String) {
+    data object Settings : SettingsRoutes("settings")
 }

@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.yonasoft.jadedictionary.core.navigation.MainRoutes
 import com.yonasoft.jadedictionary.core.navigation.PracticeRoutes
+import com.yonasoft.jadedictionary.core.navigation.SettingsRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
@@ -27,6 +28,7 @@ import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.Fla
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.HSKPracticeSetupViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.ListeningPracticeViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.MultipleChoicePracticeViewModel
+import com.yonasoft.jadedictionary.features.settings.presentation.screens.main.SettingsScreen
 import com.yonasoft.jadedictionary.features.word.presentation.screens.CCWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.screens.HSKWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.CCWordDetailViewModel
@@ -233,6 +235,15 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 viewModel = listeningViewModel
                             )
+                        }
+
+                        navigation(
+                            startDestination = SettingsRoutes.Settings.route,
+                            route = MainRoutes.Settings.name
+                        ) {
+                            composable(route = SettingsRoutes.Settings.route) {
+                                SettingsScreen(navController = navController)
+                            }
                         }
                     }
                 }

@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.yonasoft.jadedictionary.R
+import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.navigation.PracticeRoutes
 import com.yonasoft.jadedictionary.features.practice.domain.models.shared.PracticeType
 import com.yonasoft.jadedictionary.features.practice.domain.models.shared.WordSource
@@ -56,7 +57,6 @@ fun PracticeSelection(
     var wordSource: WordSource by rememberSaveable { mutableStateOf(WordSource.CUSTOM) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val backgroundColor = Color(0xFF0A0A0A)
 
 
     // Define practice options
@@ -79,7 +79,7 @@ fun PracticeSelection(
     )
 
     Scaffold(
-        containerColor = backgroundColor,
+        containerColor = CustomColor.DARK01.color,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
@@ -109,7 +109,7 @@ fun PracticeSelection(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF050505)
+                    containerColor = CustomColor.DARK02.color
                 )
             )
         }

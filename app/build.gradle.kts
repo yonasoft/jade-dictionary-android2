@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.material3.window.size.android)
+    implementation(libs.androidx.navigation.runtime.android)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.compose.ui.google.fonts)
