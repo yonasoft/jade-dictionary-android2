@@ -5,6 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -17,6 +21,7 @@ import com.yonasoft.jadedictionary.core.navigation.PracticeRoutes
 import com.yonasoft.jadedictionary.core.navigation.SettingsRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
+import com.yonasoft.jadedictionary.core.stores.settings.ThemePreferences
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
 import com.yonasoft.jadedictionary.features.practice.presentation.screens.main.PracticeSelection
 import com.yonasoft.jadedictionary.features.practice.presentation.screens.practice_modes.FlashCardPractice
@@ -59,7 +64,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            JadeDictionaryTheme {
+
+            val context = LocalContext.current
+            val themePreferences = remember { ThemePreferences(context) }
+            val isDarkTheme by themePreferences.isDarkTheme.collectAsState(initial = false)
+
+            JadeDictionaryTheme(darkTheme = isDarkTheme) {
                 val navController = rememberNavController()
 
                 NavHost(

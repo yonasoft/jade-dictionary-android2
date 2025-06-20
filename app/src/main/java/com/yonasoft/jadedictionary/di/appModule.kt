@@ -2,6 +2,7 @@ package com.yonasoft.jadedictionary.di
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
+import com.yonasoft.jadedictionary.core.stores.settings.ThemePreferences
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.CCPracticeSetupViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.FlashCardPracticeViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.HSKPracticeSetupViewModel
@@ -62,6 +63,8 @@ val appModule = module {
         }
     }
 
+    single { ThemePreferences(androidContext()) }
+
     // ViewModels
     viewModel { WordSearchViewModel(application = get(), get(), get()) }
     viewModel { WordListsViewModel(get(), get()) }
@@ -100,6 +103,6 @@ val appModule = module {
     }
 
     viewModel {
-        SettingsViewModel()
+        SettingsViewModel(get())
     }
 }

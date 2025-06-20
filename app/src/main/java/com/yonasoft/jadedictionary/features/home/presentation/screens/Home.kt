@@ -31,8 +31,7 @@ import com.yonasoft.jadedictionary.features.home.presentation.components.LinkDir
 
 @Composable
 fun Home(navController: NavHostController) {
-    // Use a slightly darker background for better contrast with cards
-    val backgroundColor = Color(0xFF0A0A0A)
+
 
     Scaffold(
         topBar = {
@@ -40,7 +39,6 @@ fun Home(navController: NavHostController) {
                 navController.navigate(MainRoutes.Words.name)
             }
         },
-        containerColor = backgroundColor,
     ) { padding ->
         val scrollState = rememberScrollState()
 
