@@ -2,6 +2,8 @@ package com.yonasoft.jadedictionary.di
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
+import com.yonasoft.jadedictionary.core.notifications.reminder.ReminderScheduler
+import com.yonasoft.jadedictionary.core.stores.settings.ReminderPreferences
 import com.yonasoft.jadedictionary.core.stores.settings.ThemePreferences
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.CCPracticeSetupViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.FlashCardPracticeViewModel
@@ -63,7 +65,10 @@ val appModule = module {
         }
     }
 
+    //Settings
     single { ThemePreferences(androidContext()) }
+    single { ReminderPreferences(androidContext()) }
+    single { ReminderScheduler(androidContext()) }
 
     // ViewModels
     viewModel { WordSearchViewModel(application = get(), get(), get()) }
@@ -103,6 +108,10 @@ val appModule = module {
     }
 
     viewModel {
-        SettingsViewModel(get())
+        SettingsViewModel(
+            themePreferences = get(),
+            reminderPreferences = get(),
+            reminderScheduler = get()
+        )
     }
 }

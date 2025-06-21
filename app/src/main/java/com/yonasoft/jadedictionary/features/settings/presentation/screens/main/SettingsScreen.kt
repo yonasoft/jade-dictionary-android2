@@ -1,5 +1,9 @@
 package com.yonasoft.jadedictionary.features.settings.presentation.screens.main
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,7 +48,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
-import com.yonasoft.jadedictionary.features.settings.presentation.components.dialogs.NotificationSettingsDialog
+import com.yonasoft.jadedictionary.core.utils.PermissionHelper
+import com.yonasoft.jadedictionary.features.settings.presentation.components.dialogs.ReminderNotificationSettingsDialog
 import com.yonasoft.jadedictionary.features.settings.presentation.viewmodels.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,9 +58,23 @@ fun SettingsScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel,
 ) {
+    val context = LocalContext.current
     val uiState by settingsViewModel.uiState.collectAsState()
-    val notificationSettings by settingsViewModel.notificationSettings.collectAsState()
+    val notificationSettings by settingsViewModel.settingsReminderState.collectAsState()
     val showNotificationDialog by settingsViewModel.showNotificationDialog.collectAsState()
+
+    // Permission launcher for notification permission
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Permission granted, enable notifications
+            settingsViewModel.toggleNotifications(true)
+        } else {
+            // Permission denied, keep notifications disabled
+            settingsViewModel.toggleNotifications(false)
+        }
+    }
 
     Scaffold(
         containerColor = CustomColor.DARK01.color,
@@ -109,7 +129,7 @@ fun SettingsScreen(
 //                showChevron = false
 //            )
 
-            // Notification Settings
+            // Notification Settings with permission handling
             SettingsItem(
                 icon = Icons.Default.Notifications,
                 title = "Daily Practice Reminder",
@@ -120,7 +140,23 @@ fun SettingsScreen(
                 },
                 showSwitch = true,
                 switchChecked = notificationSettings.isEnabled,
-                onSwitchChange = { settingsViewModel.toggleNotifications(it) },
+                onSwitchChange = { enabled ->
+                    if (enabled) {
+                        // Check permission before enabling
+                        if (PermissionHelper.hasNotificationPermission(context)) {
+                            settingsViewModel.toggleNotifications(true)
+                        } else {
+                            // Request permission on Android 13+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                settingsViewModel.toggleNotifications(true)
+                            }
+                        }
+                    } else {
+                        settingsViewModel.toggleNotifications(false)
+                    }
+                },
                 showChevron = true,
                 onItemClick = { settingsViewModel.openNotificationDialog() }
             )
@@ -129,8 +165,8 @@ fun SettingsScreen(
 
     // Show notification dialog
     if (showNotificationDialog) {
-        NotificationSettingsDialog(
-            notificationSettings = notificationSettings,
+        ReminderNotificationSettingsDialog(
+            settingsReminderState = notificationSettings,
             onDismiss = { settingsViewModel.closeNotificationDialog() },
             onSave = { settingsViewModel.saveNotificationSettings() },
             onTimeChange = { settingsViewModel.updateNotificationTime(it) },

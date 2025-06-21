@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -71,6 +72,19 @@ class MainActivity : ComponentActivity() {
 
             JadeDictionaryTheme(darkTheme = isDarkTheme) {
                 val navController = rememberNavController()
+
+                LaunchedEffect(Unit) {
+                    val shouldNavigateToPractice = intent?.getBooleanExtra("navigate_to_practice", false) ?: false
+                    if (shouldNavigateToPractice) {
+                        // Navigate to practice screen
+                        navController.navigate(MainRoutes.Practice.name) {
+                            // Clear the back stack so user starts fresh
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = false
+                            }
+                        }
+                    }
+                }
 
                 NavHost(
                     navController = navController,

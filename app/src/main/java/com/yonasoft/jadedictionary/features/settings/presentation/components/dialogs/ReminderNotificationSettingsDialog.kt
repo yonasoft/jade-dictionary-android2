@@ -49,14 +49,14 @@ import androidx.compose.ui.window.DialogProperties
 import com.yonasoft.jadedictionary.R
 import com.yonasoft.jadedictionary.core.constants.CustomColor
 import com.yonasoft.jadedictionary.core.constants.DayOfWeek
-import com.yonasoft.jadedictionary.features.settings.presentation.state.NotificationSettings
+import com.yonasoft.jadedictionary.features.settings.presentation.state.SettingsReminderState
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun NotificationSettingsDialog(
-    notificationSettings: NotificationSettings,
+fun ReminderNotificationSettingsDialog(
+    settingsReminderState: SettingsReminderState,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
     onTimeChange: (LocalTime) -> Unit,
@@ -64,8 +64,8 @@ fun NotificationSettingsDialog(
 ) {
     var showTimePicker by remember { mutableStateOf(false) }
     val timePickerState = rememberTimePickerState(
-        initialHour = notificationSettings.time.hour,
-        initialMinute = notificationSettings.time.minute
+        initialHour = settingsReminderState.time.hour,
+        initialMinute = settingsReminderState.time.minute
     )
 
     Dialog(
@@ -124,7 +124,7 @@ fun NotificationSettingsDialog(
                                 fontSize = 14.sp
                             )
                             Text(
-                                text = notificationSettings.time.format(
+                                text = settingsReminderState.time.format(
                                     DateTimeFormatter.ofPattern("h:mm a")
                                 ),
                                 color = Color.White,
@@ -155,7 +155,7 @@ fun NotificationSettingsDialog(
                     DayOfWeek.entries.forEach { day ->
                         DayChip(
                             day = day,
-                            isSelected = notificationSettings.selectedDays.contains(day),
+                            isSelected = settingsReminderState.selectedDays.contains(day),
                             onClick = { onDayToggle(day) }
                         )
                     }
