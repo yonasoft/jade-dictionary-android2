@@ -2,6 +2,7 @@ package com.yonasoft.jadedictionary.di
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
+import com.yonasoft.jadedictionary.core.notifications.firebase.FirebaseManager
 import com.yonasoft.jadedictionary.core.notifications.reminder.ReminderScheduler
 import com.yonasoft.jadedictionary.core.stores.settings.ReminderPreferences
 import com.yonasoft.jadedictionary.core.stores.settings.ThemePreferences
@@ -65,10 +66,13 @@ val appModule = module {
         }
     }
 
-    //Settings
+    // Settings
     single { ThemePreferences(androidContext()) }
     single { ReminderPreferences(androidContext()) }
     single { ReminderScheduler(androidContext()) }
+
+    // Firebase
+    single { FirebaseManager(androidContext()) }
 
     // ViewModels
     viewModel { WordSearchViewModel(application = get(), get(), get()) }
@@ -111,7 +115,8 @@ val appModule = module {
         SettingsViewModel(
             themePreferences = get(),
             reminderPreferences = get(),
-            reminderScheduler = get()
+            reminderScheduler = get(),
+            firebaseManager = get() // Add Firebase manager
         )
     }
 }

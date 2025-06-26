@@ -2,15 +2,14 @@ package com.yonasoft.jadedictionary
 
 import ListeningPractice
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.view.WindowCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,6 +22,7 @@ import com.yonasoft.jadedictionary.core.navigation.SettingsRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
 import com.yonasoft.jadedictionary.core.stores.settings.ThemePreferences
+import com.yonasoft.jadedictionary.core.utils.PlayStoreUtils
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
 import com.yonasoft.jadedictionary.features.practice.presentation.screens.main.PracticeSelection
 import com.yonasoft.jadedictionary.features.practice.presentation.screens.practice_modes.FlashCardPractice
@@ -51,21 +51,25 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        private const val TAG = "MainActivity"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Configure window to handle edge-to-edge display
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        Log.d("TEST", "=== BASIC LOG TEST ===")
+        Log.e("TEST", "=== ERROR LOG TEST ===")
 
-        // Explicitly set the status bar appearance to ensure text is visible
-        WindowCompat.getInsetsController(window, window.decorView).apply {
-            isAppearanceLightStatusBars = false // Force white status bar icons
+
+        // Log all extras for debugging
+        intent.extras?.let { extras ->
+            for (key in extras.keySet()) {
+                Log.d(TAG, "Extra: $key = ${extras.get(key)}")
+            }
         }
 
-        enableEdgeToEdge()
-
         setContent {
-
             val context = LocalContext.current
             val themePreferences = remember { ThemePreferences(context) }
             val isDarkTheme by themePreferences.isDarkTheme.collectAsState(initial = false)
@@ -74,16 +78,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 LaunchedEffect(Unit) {
-                    val shouldNavigateToPractice = intent?.getBooleanExtra("navigate_to_practice", false) ?: false
-                    if (shouldNavigateToPractice) {
-                        // Navigate to practice screen
-                        navController.navigate(MainRoutes.Practice.name) {
-                            // Clear the back stack so user starts fresh
-                            popUpTo(navController.graph.startDestinationId) {
-                                inclusive = false
-                            }
-                        }
-                    }
+                    handleNotificationIntent(intent, navController)
                 }
 
                 NavHost(
@@ -261,22 +256,80 @@ class MainActivity : ComponentActivity() {
                                 viewModel = listeningViewModel
                             )
                         }
+                    }
 
-                        navigation(
-                            startDestination = SettingsRoutes.Settings.route,
-                            route = MainRoutes.Settings.name
-                        ) {
-                            composable(route = SettingsRoutes.Settings.route) {
-                                val settingsViewModel = koinViewModel<SettingsViewModel>()
-                                SettingsScreen(
-                                    navController = navController,
-                                    settingsViewModel = settingsViewModel,
-                                )
-                            }
+                    navigation(
+                        startDestination = SettingsRoutes.Settings.route,
+                        route = MainRoutes.Settings.name
+                    ) {
+                        composable(route = SettingsRoutes.Settings.route) {
+                            val settingsViewModel = koinViewModel<SettingsViewModel>()
+                            SettingsScreen(
+                                navController = navController,
+                                settingsViewModel = settingsViewModel,
+                            )
                         }
                     }
                 }
             }
         }
+    }
+
+    // ONLY ONE handleNotificationIntent method - remove the other one completely
+    private fun handleNotificationIntent(intent: android.content.Intent, navController: androidx.navigation.NavController?) {
+        Log.d(TAG, "handleNotificationIntent called")
+        Log.d(TAG, "Intent: $intent")
+        Log.d(TAG, "Intent extras: ${intent.extras}")
+
+        // Check for Play Store action FIRST
+        val openPlayStore = intent.getBooleanExtra("open_play_store", false)
+        val fromNotification = intent.getBooleanExtra("from_notification", false)
+
+        Log.d(TAG, "open_play_store: $openPlayStore")
+        Log.d(TAG, "from_notification: $fromNotification")
+
+        if (openPlayStore) {
+            Log.d(TAG, "Opening Play Store...")
+            try {
+                PlayStoreUtils.openRateApp(this)
+                Log.d(TAG, "Play Store opened successfully")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to open Play Store", e)
+            }
+            return // Don't continue with other navigation
+        }
+
+        // Handle share app
+        if (intent.getBooleanExtra("share_app", false)) {
+            Log.d(TAG, "Sharing app...")
+            PlayStoreUtils.shareApp(this)
+            return
+        }
+
+        // Handle navigation to practice
+        val shouldNavigateToPractice = intent.getBooleanExtra("navigate_to_practice", false)
+        if (shouldNavigateToPractice) {
+            Log.d(TAG, "Navigating to practice...")
+            navController?.navigate(MainRoutes.Practice.name) {
+                popUpTo(navController.graph.startDestinationId) {
+                    inclusive = false
+                }
+            }
+        }
+
+        // Handle word detail navigation
+        val navigateToWord = intent.getStringExtra("navigate_to_word")
+        if (navigateToWord != null) {
+            Log.d(TAG, "Navigating to word: $navigateToWord")
+            val wordSource = intent.getStringExtra("word_source") ?: "CC"
+            val route = if (wordSource == "HSK") {
+                "word_detail_hsk/$navigateToWord"
+            } else {
+                "word_detail_cc/$navigateToWord"
+            }
+            navController?.navigate(route)
+        }
+
+        Log.d(TAG, "handleNotificationIntent completed")
     }
 }

@@ -9,14 +9,14 @@ plugins {
 
 android {
     namespace = "com.yonasoft.jadedictionary"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.yonasoft.jadedictionary"
         minSdk = 26
         targetSdk = 35
-        versionCode = 10
-        versionName = "2.0"
+        versionCode = 11
+        versionName = "2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -87,6 +87,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.firebase.messaging)
 
     implementation(libs.tiny.pinyin)
     implementation(libs.tiny.pinyin.lexicons)

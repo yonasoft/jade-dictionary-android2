@@ -3,6 +3,7 @@ package com.yonasoft.jadedictionary.features.settings.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yonasoft.jadedictionary.core.constants.DayOfWeek
+import com.yonasoft.jadedictionary.core.notifications.firebase.FirebaseManager
 import com.yonasoft.jadedictionary.core.notifications.reminder.ReminderScheduler
 import com.yonasoft.jadedictionary.core.stores.settings.ReminderPreferences
 import com.yonasoft.jadedictionary.core.stores.settings.ThemePreferences
@@ -18,7 +19,8 @@ import java.time.LocalTime
 class SettingsViewModel(
     private val themePreferences: ThemePreferences,
     private val reminderPreferences: ReminderPreferences,
-    private val reminderScheduler: ReminderScheduler // Inject instead of creating
+    private val reminderScheduler: ReminderScheduler,
+    private val firebaseManager: FirebaseManager
 ) : ViewModel() {
 
     private val _graphicalState = MutableStateFlow(SettingsGraphicalState())
@@ -30,6 +32,13 @@ class SettingsViewModel(
 
     private val _showNotificationDialog = MutableStateFlow(false)
     val showNotificationDialog: StateFlow<Boolean> = _showNotificationDialog.asStateFlow()
+
+    private val _fcmToken = MutableStateFlow<String?>(null)
+    val fcmToken: StateFlow<String?> = _fcmToken.asStateFlow()
+
+    private val _notificationSubscriptions = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+    val notificationSubscriptions: StateFlow<Map<String, Boolean>> = _notificationSubscriptions.asStateFlow()
+
 
     init {
         viewModelScope.launch {
@@ -53,6 +62,9 @@ class SettingsViewModel(
                 _settingsReminderState.value = settings
             }
         }
+
+        loadFCMToken()
+        loadNotificationSubscriptions()
     }
 
     fun toggleTheme() {
@@ -118,5 +130,43 @@ class SettingsViewModel(
 
             closeNotificationDialog()
         }
+    }
+
+    private fun loadFCMToken() {
+        viewModelScope.launch {
+            val token = firebaseManager.getToken()
+            _fcmToken.value = token
+        }
+    }
+
+    fun subscribeToTopic(topic: String) {
+        firebaseManager.subscribeToTopic(topic)
+        updateSubscriptionState(topic, true)
+    }
+
+    fun unsubscribeFromTopic(topic: String) {
+        firebaseManager.unsubscribeFromTopic(topic)
+        updateSubscriptionState(topic, false)
+    }
+
+    private fun updateSubscriptionState(topic: String, subscribed: Boolean) {
+        val currentSubs = _notificationSubscriptions.value.toMutableMap()
+        currentSubs[topic] = subscribed
+        _notificationSubscriptions.value = currentSubs
+    }
+
+    private fun loadNotificationSubscriptions() {
+        // Load saved subscription states (you might want to save these in SharedPreferences)
+        val defaultSubscriptions = mapOf(
+            "general" to true,
+            "practice_reminders" to true,
+            "new_features" to false,
+            "weekly_summary" to false
+        )
+        _notificationSubscriptions.value = defaultSubscriptions
+    }
+
+    fun refreshFCMToken() {
+        loadFCMToken()
     }
 }

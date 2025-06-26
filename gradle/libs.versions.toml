@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.2"
+agp = "8.8.0"
 kotlin = "2.0.21"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -22,6 +22,7 @@ koin-ksp-annotations = "1.4.0-RC4"
 annotation = "1.9.1"
 gms-google-services = "4.4.2"
 firebase-bom = "32.7.4"
+firebase-messaging = "24.0.0"
 tinpinyin = "2.0.3"
 pinyin4j = "2.5.1"
 digitalInkRecognition = "18.1.0"
@@ -69,6 +70,7 @@ koin-ksp = { group = "io.insert-koin", name = "koin-ksp-compiler", version.ref =
 androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
 tiny-pinyin = { group = "com.github.promeg", name = "tinypinyin", version.ref = "tinpinyin" }
 tiny-pinyin-lexicons = { group = "com.github.promeg", name = "tinypinyin-lexicons-android-cncity", version.ref = "tinpinyin" }
 pinyin4j = { group = "com.belerweb", name = "pinyin4j", version.ref = "pinyin4j" }
