@@ -64,13 +64,8 @@ class JadeFirebaseMessagingService : FirebaseMessagingService() {
     private fun showNotification(title: String, body: String, data: Map<String, String>) {
         Log.d(TAG, "Creating notification with data: $data")
 
-        val intent = createNotificationIntent(data)
-        Log.d(TAG, "Created intent with extras: ${intent.extras}")
-
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent = createNotificationPendingIntent(data)
+        Log.d(TAG, "Created pending intent")
 
         val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.jade_icon)
@@ -78,7 +73,8 @@ class JadeFirebaseMessagingService : FirebaseMessagingService() {
             .setContentText(body)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH) // Changed to HIGH
+            .setCategory(NotificationCompat.CATEGORY_PROMO) // Added category
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
@@ -86,83 +82,112 @@ class JadeFirebaseMessagingService : FirebaseMessagingService() {
         Log.d(TAG, "Notification shown")
     }
 
-    private fun createNotificationIntent(data: Map<String, String>): Intent {
+    private fun createNotificationPendingIntent(data: Map<String, String>): PendingIntent {
         val action = data["action"]
         val url = data["url"]
 
-        Log.d(TAG, "Processing action: $action")
-        Log.d(TAG, "Processing url: $url")
+        Log.d(TAG, "Processing action: $action, url: $url")
 
-        // If there's a URL, create direct intent to open it
-        if (!url.isNullOrEmpty()) {
-            Log.d(TAG, "Creating direct URL intent for: $url")
+        // Handle direct Play Store URLs
+        if (!url.isNullOrEmpty() && url.contains("play.google.com")) {
+            Log.d(TAG, "Creating Play Store intent for URL: $url")
+
+            // Create Play Store intent that will definitely work
+            val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
+                setData(Uri.parse("market://details?id=com.yonasoft.jadedictionary"))
+                setPackage("com.android.vending")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+
+            // Try Play Store app first, fallback to browser
             return try {
-                if (url.contains("play.google.com")) {
-                    // Try Play Store app first
-                    Intent(Intent.ACTION_VIEW).apply {
-                        setData(Uri.parse("market://details?id=com.yonasoft.jadedictionary"))
-                        setPackage("com.android.vending")
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    }
-                } else {
-                    // Generic URL
-                    Intent(Intent.ACTION_VIEW).apply {
-                        setData(Uri.parse(url))
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                }
+                PendingIntent.getActivity(
+                    this,
+                    System.currentTimeMillis().toInt(), // Unique request code
+                    playStoreIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to create URL intent, falling back to web", e)
-                // Fallback to web browser
-                Intent(Intent.ACTION_VIEW).apply {
+                Log.w(TAG, "Play Store app not available, using browser", e)
+                val browserIntent = Intent(Intent.ACTION_VIEW).apply {
                     setData(Uri.parse(url))
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
+                PendingIntent.getActivity(
+                    this,
+                    System.currentTimeMillis().toInt(),
+                    browserIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             }
         }
 
-        // If no URL, use app intent with data
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        // Handle other URLs
+        if (!url.isNullOrEmpty()) {
+            Log.d(TAG, "Creating generic URL intent for: $url")
+            val urlIntent = Intent(Intent.ACTION_VIEW).apply {
+                setData(Uri.parse(url))
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            return PendingIntent.getActivity(
+                this,
+                System.currentTimeMillis().toInt(),
+                urlIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
 
-        when (action) {
-            "open_play_store", "rate_app" -> {
-                Log.d(TAG, "Setting open_play_store extra")
-                intent.putExtra("open_play_store", true)
-                intent.putExtra("action", action)
-                intent.putExtra("from_notification", true)
-            }
-            "share_app" -> {
-                intent.putExtra("share_app", true)
-                intent.putExtra("from_notification", true)
-            }
-            "practice" -> {
-                intent.putExtra("navigate_to_practice", true)
-            }
-            "word_detail" -> {
-                data["word_id"]?.let { wordId ->
-                    intent.putExtra("navigate_to_word", wordId)
-                    intent.putExtra("word_source", data["word_source"] ?: "CC")
+        // Handle app-specific actions
+        Log.d(TAG, "Creating app intent for action: $action")
+        val appIntent = Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+
+            when (action) {
+                "open_play_store", "rate_app" -> {
+                    putExtra("open_play_store", true)
+                    putExtra("action", action)
+                    putExtra("from_notification", true)
+                }
+                "share_app" -> {
+                    putExtra("share_app", true)
+                    putExtra("from_notification", true)
+                }
+                "practice" -> {
+                    putExtra("navigate_to_practice", true)
+                    putExtra("from_notification", true)
+                }
+                "word_detail" -> {
+                    data["word_id"]?.let { wordId ->
+                        putExtra("navigate_to_word", wordId)
+                        putExtra("word_source", data["word_source"] ?: "CC")
+                    }
+                    putExtra("from_notification", true)
                 }
             }
+
+            // Add all data as extras for debugging
+            data.forEach { (key, value) ->
+                putExtra("fcm_$key", value)
+            }
         }
 
-        // Add all data as extras for debugging
-        data.forEach { (key, value) ->
-            intent.putExtra("data_$key", value)
-        }
-
-        Log.d(TAG, "Intent created with extras: ${intent.extras?.keySet()}")
-        return intent
+        return PendingIntent.getActivity(
+            this,
+            System.currentTimeMillis().toInt(), // Unique request code
+            appIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
     }
 
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             CHANNEL_ID,
             "Jade Dictionary Notifications",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_HIGH // Changed to HIGH
         ).apply {
             description = "Notifications for practice reminders and updates"
+            enableLights(true)
+            enableVibration(true)
         }
 
         val notificationManager: NotificationManager =
