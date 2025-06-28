@@ -15,11 +15,28 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 </details>
 
 <details>
+  
 <summary>From APK File</summary>
 
 1. Download the latest APK from the [Releases page](https://github.com/yonasoft/jade-dictionary-android2/raw/master/app/release/app-release.apk)
 2. Enable installation from unknown sources in your device settings
 3. Open the downloaded APK file to install
+</details>
+
+## Updates
+
+<details>
+<summary>2.1</summary>
+  
+  ### Practice Reminders
+  <img src="/screenshots/notifications-1.jpg" width="200" alt="Dictionary Screenshot">
+  <img src="/screenshots/notifications-2.jpg" width="200" alt="Dictionary Screenshot">
+
+  ### Settings Page (more settings will be added!!!)
+  <img src="/screenshots/settings.jpg" width="200" alt="Dictionary Screenshot">
+  
+  ### New Dropdown Menu
+  <img src="/screenshots/home-dropdown.jpg" width="200" alt="Dictionary Screenshot">
 </details>
 
 ## Features
@@ -94,8 +111,9 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 - Sync data to Google Play account
 - Preset lists
 - Shop for premium content
-- Practice reminders
-- Light/Dark Mode
+- Achievements and progress
+- SRS
+- More Practice modes
 
 ## Contact
 
