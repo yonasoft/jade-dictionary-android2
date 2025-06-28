@@ -98,11 +98,15 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
   <img src="/screenshots/lists.jpg" width="200" alt="Custom Lists Screenshot">
   <img src="/screenshots/list-detail.jpg" width="200" alt="Custom Lists Detail Screenshot">
+  <img src="/screenshots/notifications-1.jpg" width="200" alt="Dictionary Screenshot">
+  <img src="/screenshots/notifications-2.jpg" width="200" alt="Dictionary Screenshot">
 </div>
 
 - Create and manage custom word lists
 - Focus on vocabulary relevant to your needs
 - Track your progress (coming soon)
+- Customizable practice notifications
+  
 
 ### Upcoming Features
 - Word stats from practice
