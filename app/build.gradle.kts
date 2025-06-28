@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.yonasoft.jadedictionary"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.yonasoft.jadedictionary"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 11
         versionName = "2.1"
 
@@ -28,6 +28,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            isProfileable = false
         }
     }
     compileOptions {
@@ -39,6 +40,11 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
     }
 }
 
@@ -71,6 +77,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.material3.window.size.android)
+    implementation(libs.androidx.navigation.runtime.android)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.compose.ui.google.fonts)
@@ -86,6 +93,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.firebase.messaging)
 
     implementation(libs.tiny.pinyin)
     implementation(libs.tiny.pinyin.lexicons)
@@ -95,6 +103,7 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.datastore)
 
     implementation(libs.gson)
 

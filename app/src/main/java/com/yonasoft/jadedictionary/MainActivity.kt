@@ -1,11 +1,18 @@
 package com.yonasoft.jadedictionary
 
 import ListeningPractice
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.core.view.WindowCompat
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,8 +21,11 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.yonasoft.jadedictionary.core.navigation.MainRoutes
 import com.yonasoft.jadedictionary.core.navigation.PracticeRoutes
+import com.yonasoft.jadedictionary.core.navigation.SettingsRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordListRoutes
 import com.yonasoft.jadedictionary.core.navigation.WordRoutes
+import com.yonasoft.jadedictionary.core.stores.settings.ThemePreferences
+import com.yonasoft.jadedictionary.core.utils.PlayStoreUtils
 import com.yonasoft.jadedictionary.features.home.presentation.screens.Home
 import com.yonasoft.jadedictionary.features.practice.presentation.screens.main.PracticeSelection
 import com.yonasoft.jadedictionary.features.practice.presentation.screens.practice_modes.FlashCardPractice
@@ -27,6 +37,8 @@ import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.Fla
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.HSKPracticeSetupViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.ListeningPracticeViewModel
 import com.yonasoft.jadedictionary.features.practice.presentation.viewmodels.MultipleChoicePracticeViewModel
+import com.yonasoft.jadedictionary.features.settings.presentation.screens.main.SettingsScreen
+import com.yonasoft.jadedictionary.features.settings.presentation.viewmodels.SettingsViewModel
 import com.yonasoft.jadedictionary.features.word.presentation.screens.CCWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.screens.HSKWordDetail
 import com.yonasoft.jadedictionary.features.word.presentation.viewmodels.CCWordDetailViewModel
@@ -42,22 +54,48 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        private const val TAG = "MainActivity"
+    }
+
+    private var pendingIntent: Intent? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Configure window to handle edge-to-edge display
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        Log.d(TAG, "MainActivity onCreate")
+        Log.d(TAG, "Intent: $intent")
+        Log.d(TAG, "Intent action: ${intent.action}")
+        Log.d(TAG, "Intent data: ${intent.data}")
 
-        // Explicitly set the status bar appearance to ensure text is visible
-        WindowCompat.getInsetsController(window, window.decorView).apply {
-            isAppearanceLightStatusBars = false // Force white status bar icons
-        }
+        // Store the intent for processing after UI is ready
+        pendingIntent = intent
 
-        enableEdgeToEdge()
+        // Log all extras for debugging
+        intent.extras?.let { extras ->
+            Log.d(TAG, "Intent has ${extras.size()} extras:")
+            for (key in extras.keySet()) {
+                Log.d(TAG, "Extra: $key = ${extras.get(key)}")
+            }
+        } ?: Log.d(TAG, "Intent has no extras")
 
         setContent {
-            JadeDictionaryTheme {
-                val navController = rememberNavController()
+            val context = LocalContext.current
+            val themePreferences = remember { ThemePreferences(context) }
+            val isDarkTheme by themePreferences.isDarkTheme.collectAsState(initial = false)
+            val navController = rememberNavController()
+            var hasProcessedIntent by remember { mutableStateOf(false) }
+
+            JadeDictionaryTheme(darkTheme = isDarkTheme) {
+                // Process intent after UI is fully rendered
+                LaunchedEffect(navController) {
+                    if (!hasProcessedIntent && pendingIntent != null) {
+                        Log.d(TAG, "Processing pending intent...")
+                        handleNotificationIntent(pendingIntent!!, navController)
+                        hasProcessedIntent = true
+                        pendingIntent = null
+                    }
+                }
 
                 NavHost(
                     navController = navController,
@@ -235,8 +273,126 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
+
+                    navigation(
+                        startDestination = SettingsRoutes.Settings.route,
+                        route = MainRoutes.Settings.name
+                    ) {
+                        composable(route = SettingsRoutes.Settings.route) {
+                            val settingsViewModel = koinViewModel<SettingsViewModel>()
+                            SettingsScreen(
+                                navController = navController,
+                                settingsViewModel = settingsViewModel,
+                            )
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        Log.d(TAG, "=== onNewIntent called ===")
+
+        intent.let {
+            Log.d(TAG, "New intent: $it")
+            Log.d(TAG, "New intent action: ${it.action}")
+            Log.d(TAG, "New intent data: ${it.data}")
+
+            it.extras?.let { extras ->
+                Log.d(TAG, "New intent has ${extras.size()} extras:")
+                for (key in extras.keySet()) {
+                    Log.d(TAG, "New intent extra: $key = ${extras.get(key)}")
+                }
+            } ?: Log.d(TAG, "New intent has no extras")
+
+            setIntent(it)
+            // Process the new intent immediately
+            handleNotificationIntent(it, null)
+        }
+    }
+
+    private fun handleNotificationIntent(
+        intent: Intent,
+        navController: androidx.navigation.NavController?
+    ) {
+        Log.d(TAG, "=== handleNotificationIntent called ===")
+        Log.d(TAG, "Intent: $intent")
+        Log.d(TAG, "Intent extras count: ${intent.extras?.size() ?: 0}")
+
+        try {
+            // Check for FCM data first (prefixed with fcm_)
+            val fcmUrl = intent.getStringExtra("fcm_url")
+            val fcmAction = intent.getStringExtra("fcm_action")
+
+            Log.d(TAG, "FCM URL: $fcmUrl")
+            Log.d(TAG, "FCM Action: $fcmAction")
+
+            // Check for direct URL from campaign notification
+            val urlExtra = intent.getStringExtra("url") ?: fcmUrl
+            if (!urlExtra.isNullOrEmpty()) {
+                Log.d(TAG, "Found URL in intent extras: $urlExtra")
+                if (urlExtra.contains("play.google.com")) {
+                    Log.d(TAG, "Opening Play Store from campaign...")
+                    PlayStoreUtils.openRateApp(this)
+                    Log.d(TAG, "Play Store opened successfully from campaign")
+                    return
+                }
+            }
+
+            // Check for Play Store action FIRST
+            val openPlayStore = intent.getBooleanExtra("open_play_store", false) ||
+                    fcmAction == "open_play_store" || fcmAction == "rate_app"
+            val fromNotification = intent.getBooleanExtra("from_notification", false)
+
+            Log.d(TAG, "open_play_store: $openPlayStore")
+            Log.d(TAG, "from_notification: $fromNotification")
+
+            if (openPlayStore) {
+                Log.d(TAG, "Opening Play Store...")
+                PlayStoreUtils.openRateApp(this)
+                Log.d(TAG, "Play Store opened successfully")
+                return // Don't continue with other navigation
+            }
+
+            // Handle share app
+            if (intent.getBooleanExtra("share_app", false) || fcmAction == "share_app") {
+                Log.d(TAG, "Sharing app...")
+                PlayStoreUtils.shareApp(this)
+                return
+            }
+
+            // Handle navigation to practice
+            val shouldNavigateToPractice = intent.getBooleanExtra("navigate_to_practice", false) ||
+                    fcmAction == "practice"
+            if (shouldNavigateToPractice && navController != null) {
+                Log.d(TAG, "Navigating to practice...")
+                navController.navigate(MainRoutes.Practice.name) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = false
+                    }
+                }
+            }
+
+            // Handle word detail navigation
+            val navigateToWord = intent.getStringExtra("navigate_to_word") ?:
+            intent.getStringExtra("fcm_word_id")
+            if (navigateToWord != null && navController != null) {
+                Log.d(TAG, "Navigating to word: $navigateToWord")
+                val wordSource = intent.getStringExtra("word_source") ?:
+                intent.getStringExtra("fcm_word_source") ?: "CC"
+                val route = if (wordSource == "HSK") {
+                    "word_detail_hsk/$navigateToWord"
+                } else {
+                    "word_detail_cc/$navigateToWord"
+                }
+                navController.navigate(route)
+            }
+
+            Log.d(TAG, "handleNotificationIntent completed")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error handling notification intent", e)
         }
     }
 }

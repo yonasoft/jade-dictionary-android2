@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,8 +31,7 @@ import com.yonasoft.jadedictionary.features.home.presentation.components.LinkDir
 
 @Composable
 fun Home(navController: NavHostController) {
-    // Use a slightly darker background for better contrast with cards
-    val backgroundColor = Color(0xFF0A0A0A)
+
 
     Scaffold(
         topBar = {
@@ -39,7 +39,6 @@ fun Home(navController: NavHostController) {
                 navController.navigate(MainRoutes.Words.name)
             }
         },
-        containerColor = backgroundColor,
     ) { padding ->
         val scrollState = rememberScrollState()
 
@@ -102,6 +101,17 @@ fun Home(navController: NavHostController) {
 //                onClick = {},
 //                isComingSoon = true, // Mark the store as coming soon
 //            )
+
+            LinkDirector(
+                modifier = Modifier.fillMaxWidth(),
+                icon = Icons.Filled.Settings,
+                contentDescription = "Settings",
+                label = "Settings",
+                description = "Change and customize your app settings",
+                onClick = {
+                    navController.navigate(MainRoutes.Settings.name)
+                },
+            )
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
