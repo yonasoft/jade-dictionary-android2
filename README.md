@@ -94,8 +94,9 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 - Sync data to Google Play account
 - Preset lists
 - Shop for premium content
-- Practice reminders
-- Light/Dark Mode
+- Achievements and progress
+- SRS
+- More Practice modes
 
 ## Contact
 

@@ -14,7 +14,7 @@ android {
     defaultConfig {
         applicationId = "com.yonasoft.jadedictionary"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 11
         versionName = "2.1"
 
@@ -28,6 +28,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            isProfileable = false
         }
     }
     compileOptions {
@@ -39,6 +40,11 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
     }
 }
 

@@ -609,11 +609,11 @@ fun AppInfoTab() {
     ) {
         InfoCard(
             title = "Version",
-            content = "2.0"
+            content = "2.1"
         )
         InfoCard(
             title = "Updated",
-            content = "Apr 2, 2025"
+            content = "Jun 28, 2025"
         )
         InfoCard(
             title = "Requirements",
@@ -625,7 +625,7 @@ fun AppInfoTab() {
         )
         InfoCard(
             title = "Downloads",
-            content = "10+ downloads"
+            content = "40+ downloads"
         )
         InfoCard(
             title = "Developer",
@@ -701,7 +701,7 @@ fun UpdatesTab() {
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Text(
-            text = "• Enhanced search functionality\n• Practice Reminders\n• Customizable app settings",
+            text = "• Practice Reminders\n• Customizable app settings\n• Update Notifications",
             color = Color.White.copy(alpha = 0.8f),
             fontSize = 13.sp
         )
