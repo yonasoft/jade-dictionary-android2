@@ -4,5 +4,6 @@ import com.yonasoft.jadedictionary.features.word.domain.cc.CCWord
 
 data class SearchState(
     val query: String = "",
-    val results: List<CCWord> = emptyList()
+    val results: List<CCWord> = emptyList(),
+    val loading: Boolean = false,
 )
