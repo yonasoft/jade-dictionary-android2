@@ -26,6 +26,9 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
 ## Updates
 
 <details>
+<summary>Versions</summary>
+
+<details>
 <summary>2.1</summary>
   
   ### Practice Reminders
@@ -37,6 +40,8 @@ Chinese dictionary with HSK vocabulary, flashcards, OCR & handwriting recognitio
   
   ### New Dropdown Menu
   <img src="/screenshots/home-dropdown.jpg" width="200" alt="Dictionary Screenshot">
+</details>
+
 </details>
 
 ## Features
