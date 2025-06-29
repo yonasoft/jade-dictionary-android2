@@ -7,6 +7,12 @@ plugins {
     alias(libs.plugins.google.services)
 }
 
+tasks.configureEach {
+    if (name.contains("compileReleaseArtProfile") || name.contains("ArtProfile")) {
+        enabled = false
+    }
+}
+
 android {
     namespace = "com.yonasoft.jadedictionary"
     compileSdk = 36
