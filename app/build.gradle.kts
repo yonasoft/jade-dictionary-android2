@@ -46,12 +46,14 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     lint {
         checkReleaseBuilds = false
         abortOnError = false
     }
+
 }
 
 
